@@ -89,7 +89,7 @@ helloWorld = function() {
 ////
 
 ~~~js
-❯ Deps.autorun( function() { console.log('Value is: ' + Session.get('pageTitle')); } );
+❯ Tracker.autorun( function() { console.log('Value is: ' + Session.get('pageTitle')); } );
 Value is: A brand new title
 ~~~
 <%= caption "Browser console" %>
@@ -107,7 +107,7 @@ Value is: Yet another value
 ////
 
 ~~~js
-Deps.autorun(function() {
+Tracker.autorun(function() {
   alert(Session.get('message'));
 });
 ~~~
