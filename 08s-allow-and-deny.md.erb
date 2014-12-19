@@ -3,7 +3,10 @@ title: Allow and Deny
 slug: allow-and-deny
 date: 0008/01/02
 number: 8.5
+points: 10
 sidebar: true
+photoUrl: http://www.flickr.com/photos/ikewinski/9475104376/
+photoAuthor: Mike Lewinski
 contents: Learn about Allow and Deny callbacks.|Understand in which order callbacks are called.
 paragraphs: 16
 ---
@@ -36,25 +39,7 @@ paragraphs: 16
 
 ////
 
-### Server-side permissions
-
-////
-
-////
-
-### Using deny as a callback
-
-////
-
-~~~js
-Posts.deny({
-  update: function(userId, doc, fields, modifier) {
-    doc.lastModified = +(new Date());
-    return false;
-  },
-  transform: null
-});
-~~~
+### Server-side Permissions
 
 ////
 

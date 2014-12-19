@@ -1,0 +1,388 @@
+---
+title: Implementing Intercom
+slug: intercom
+number: 17
+extra: true
+date: 0017/01/01
+points: 100
+published: true
+photoUrl: http://www.flickr.com/photos/ikewinski/8267236829/
+photoAuthor: Mike Lewinski
+contents: Implement Intercom in a Meteor app.
+note: NOT INCLUDED IN FREE/TRANSLATED VERSIONS
+---
+
+////
+
+////
+
+<%= screenshot "15-1", "The Intercom dashboard." %>
+
+////
+
+<% note do %>
+
+### The Intercom Package
+
+////
+
+////
+
+<% end %>
+
+### Signing Up
+
+////
+
+////
+
+////
+
+////
+
+### Creating a Package
+
+////
+
+~~~js
+Package.describe({
+  name: 'intercom',
+  summary: "Intercom package",
+  version: '1.0.0'
+});
+Package.on_use(function (api) {
+  api.versionsFrom('0.9.4');
+  api.add_files('intercom_loader.js', 'client');
+});
+~~~
+<%= caption "packages/intercom/package.js" %>
+
+////
+
+////
+
+~~~js
+(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://static.intercomcdn.com/intercom.v1.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}};})()
+~~~
+<%= caption "packages/intercom/intercom_loader.js" %>
+
+////
+
+~~~bash
+meteor add intercom
+~~~
+
+////
+
+~~~js
+window.intercomSettings = {
+  // TODO: The current logged in user's full name
+  name: "John Doe",
+  // TODO: The current logged in user's email address.
+  email: "john.doe@example.com",
+  // TODO: The current logged in user's sign-up date as a Unix timestamp.
+  created_at: 1234567890,
+  app_id: "4na10aq1"
+};
+~~~
+<%= caption "client/main.js" %>
+
+<%= screenshot "15-2", "Intercom confirmation message." %>
+
+////
+
+<%= commit "17-1", "Added Intercom code snippet." %>
+
+### Sending Custom Data
+
+////
+
+////
+
+~~~js
+Accounts.ui.config({
+  passwordSignupFields: 'USERNAME_AND_EMAIL'
+});
+~~~
+<%= caption "client/helpers/config.js" %>
+
+////
+
+////
+
+////
+
+////
+
+~~~js
+Meteor.publish('currentUser', function() {
+  return Meteor.users.find(this.userId, {fields: {createdAt: 1}});
+});
+~~~
+<%= caption "server/publications.js" %>
+
+////
+
+~~~js
+Router.configure({
+  layoutTemplate: 'layout',
+  loadingTemplate: 'loading',
+  notFoundTemplate: 'notFound',
+  waitOn: function() {
+    return [
+      Meteor.subscribe('currentUser'),
+      Meteor.subscribe('notifications')
+    ]
+  }
+});
+
+//...
+~~~
+<%= highlight "6" %>
+<%= caption "lib/router.js" %>
+
+////
+
+////
+
+### A Better Snippet
+
+////
+
+////
+
+
+////
+
+////
+
+////
+
+~~~js
+Tracker.autorun(function(){
+  if (Meteor.user() && !Meteor.loggingIn()) {
+    var intercomSettings = {
+      name: Meteor.user().username,
+      email: Meteor.user().emails[0].address,
+      created_at: Math.round(Meteor.user().createdAt/1000),
+      favorite_color: _.sample(['blue','red','green','yellow']),
+      app_id: "4na10aq1"
+    };
+    Intercom('boot', intercomSettings);
+  }
+});
+~~~
+<%= caption "client/main.js" %>
+
+<%= commit "17-2", "Sending custom user data." %>
+
+### Enabling Secure Mode
+
+////
+
+////
+
+////
+
+////
+
+////
+
+~~~js
+var crypto = Npm.require('crypto');
+
+IntercomHash = function(user, secret) {
+  var secret = new Buffer(secret, 'utf8')
+  return crypto.createHmac('sha256', secret)
+    .update(user._id).digest('hex');
+}
+~~~
+<%= caption "packages/intercom/intercom_server.js" %>
+
+////
+
+////
+
+~~~js
+Package.describe({
+  summary: "Intercom package",
+  version: "0.1.0",
+  name: 'intercom'
+});
+
+Package.onUse(function (api) {
+  api.addFiles('intercom_loader.js', 'client');
+  
+  api.add_files('intercom_server.js', 'server');
+  
+  api.export('IntercomHash', 'server');
+});
+});
+~~~
+<%= highlight "9,11" %>
+<%= caption "packages/intercom/package.js" %>
+
+////
+
+////
+
+~~~js
+Accounts.onCreateUser(function(options, user) {
+  user.intercomHash = IntercomHash(user, '12345678');
+
+  if (options.profile)
+    user.profile = options.profile;
+
+  return user;
+});
+~~~
+<%= caption "server/accounts.js" %>
+
+////
+
+~~~js
+db.users.find()
+~~~
+<%= caption "The MongoDB shell" %>
+
+////
+
+////
+
+~~~js
+//...
+
+Meteor.publish('currentUser', function() {
+  return Meteor.users.find(this.userId, {fields: {createdAt: 1, intercomHash: 1}});
+});
+~~~
+<%= caption "server/publications.js" %>
+<%= highlight "3~5" %>
+
+////
+
+~~~js
+Tracker.autorun(function(){
+  if (Meteor.user() && !Meteor.loggingIn()) {
+    var intercomSettings = {
+      name: Meteor.user().username,
+      email: Meteor.user().emails[0].address,
+      created_at: Math.round(Meteor.user().createdAt/1000),
+      favorite_color: _.sample(['blue','red','green','yellow']),
+      user_id: Meteor.user()._id,
+      user_hash: Meteor.user().intercomHash,
+      app_id: "4na10aq1"
+    };
+    Intercom('boot', intercomSettings);
+  }
+});
+~~~
+<%= caption "client/main.js" %>
+<%= highlight "7~8" %>
+
+<%= commit "17-3", "Enabling secure mode." %>
+
+<% note do %>
+
+### Where did my users go?!?
+
+////
+
+////
+
+<% end %>
+
+### Installing the Inbox
+
+////
+
+////
+
+////
+
+~~~html
+<template name="header">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navigation">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{{pathFor 'home'}}">Microscope</a>
+      </div>
+      <div class="collapse navbar-collapse" id="navigation">
+        <ul class="nav navbar-nav">
+          <li class="{{activeRouteClass 'home' 'newPosts'}}">
+            <a href="{{pathFor 'newPosts'}}">New</a>
+          </li>
+          <li class="{{activeRouteClass  'bestPosts'}}">
+            <a href="{{pathFor 'bestPosts'}}">Best</a>
+          </li>
+          <li class="{{activeRouteClass  'clickedPosts'}}">
+            <a href="{{pathFor 'clickedPosts'}}">Most Clicked</a>
+          </li>
+          {{#if currentUser}}
+            <li class="{{activeRouteClass 'postSubmit'}}">
+              <a href="{{pathFor 'postSubmit'}}">Submit Post</a>
+            </li>
+            <li class="dropdown">
+              {{> notifications}}
+            </li>
+            <li>
+              <a id="Intercom" href="mailto:k20iexvc@incoming.intercom.io">Support</a>
+            </li>
+          {{/if}}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {{> loginButtons}}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</template>
+~~~
+<%= caption "client/templates/includes/header.html" %>
+<%= highlight "31~33" %>
+
+////
+
+~~~js
+Tracker.autorun(function(){
+  if (Meteor.user() && !Meteor.loggingIn()) {
+    var intercomSettings = {
+      name: Meteor.user().username,
+      email: Meteor.user().emails[0].address,
+      created_at: Math.round(Meteor.user().createdAt/1000),
+      favorite_color: _.sample(['blue','red','green','yellow']),
+      user_id: Meteor.user()._id,
+      user_hash: Meteor.user().intercomHash,
+      widget: {
+        activator: '#Intercom',
+        use_counter: true
+      },
+      app_id: "4na10aq1"
+    };
+    Intercom('boot', intercomSettings);
+  }
+});
+~~~
+<%= caption "client/main.js" %>
+<%= highlight "10~13" %>
+
+<%= screenshot "15-1", "The Intercom inbox." %>
+
+////
+
+<%= commit "17-4", "Displaying the inbox link." %>
+
+### Wrapping Up
+
+////
+
+////
+
+////
+

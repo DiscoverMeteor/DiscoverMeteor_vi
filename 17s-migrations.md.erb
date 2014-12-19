@@ -1,0 +1,126 @@
+---
+title: Migrations
+slug: migrations
+number: 17.5
+extra: true
+sidebar: true
+date: 0017/01/02
+points: 100
+published: true
+photoUrl: http://www.flickr.com/photos/ikewinski/7810592472/in/photostream/
+photoAuthor: Mike Lewinski
+contents: Use a migration to update the data in our database.|Learn about important concerns when migrating production data.
+note: NOT INCLUDED IN FREE/TRANSLATED VERSIONS
+---
+
+////
+
+////
+
+////
+
+////
+
+### The Migrations Package
+
+////
+
+////
+////
+////
+
+### Installing the Package
+
+////
+
+~~~bash
+meteor add percolatestudio:percolatestudio-migrations
+~~~
+
+### Writing the Migration
+
+////
+
+~~~js
+var users = Meteor.users.find({intercomHash: {$exists: false}});
+users.forEach(function(user) {
+  Meteor.users.update(user._id, {$set: {
+    intercomHash: IntercomHash(user, '12345')
+  }});
+});
+~~~
+
+////
+
+////
+
+~~~js
+Meteor.users.update({}, {$unset: {intercomHash: true}}, {multi: true});
+~~~
+
+////
+
+~~~js
+Migrations.add({
+  name: 'Add intercom hash to users.',
+  version: 1,
+
+  up: function() {
+    var users = Meteor.users.find({intercomHash: {$exists: false}});
+    users.forEach(function(user) {
+      Meteor.users.update(user._id, {$set: {
+        intercomHash: IntercomHash(user, '12345')
+      }});
+    });
+  },
+
+  down: function() {
+    Meteor.users.update({}, {$unset: {intercomHash: true}}, {multi: true});
+  }
+});
+~~~
+<%= caption "server/migrations.js" %>
+
+### Running the Migration Locally
+
+////
+
+~~~bash
+packages/percolatestudio-migrations/migrate.sh latest
+~~~
+
+### Migrating On Production Systems
+
+////
+
+////
+
+////
+
+~~~js
+Migrations.migrateTo('latest');
+~~~
+
+////
+
+////
+
+### "In-Between" States
+
+////
+
+////
+
+////
+////
+////
+
+////
+
+////
+
+### Technical Debt Trade-Offs
+
+////
+
+////
