@@ -387,21 +387,21 @@ Router.configure({
 <%= caption "lib/router.js"%>
 <%= highlight "4" %>
 
-To test out your new error page, you can try accessing a random URL like `http://localhost:3000/nothing-here`. 
+////
 
-But wait, what if someone enters a URL of the form `http://localhost:3000/posts/xyz`, where `xyz` is *not* a valid post `_id`? This is still a valid route, just not one that points to any data.
+////
 
-Thankfully, Iron Router is smart enough to figure this out if we just add a special `dataNotFound` hook at the end of `router.js`:
+////
 
 ~~~js
-////
+//...
 
-////
+Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 ~~~
 <%= caption "lib/router.js"%>
 <%= highlight "4" %>
 
-This tells Iron Router to show the “not found” page not just for invalid routes but also for the `postPage` route,  whenever the `data` function returns a “falsy” (i.e. `null`, `false`, `undefined`, or empty) object.
+////
 
 <%= commit "5-4", "Added not found template." %>
 
@@ -409,6 +409,6 @@ This tells Iron Router to show the “not found” page not just for invalid rou
 
 ### Why “Iron”?
 
-You might be wondering about the story behind the name “Iron Router”. According to Iron Router author Chris Mather, it comes from the fact that meteors are composed primarily of iron.
+////
 
 <% end %>
