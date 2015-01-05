@@ -8,107 +8,107 @@ contents: Learn how to deploy on Meteor.com.|Learn how to deploy on Modulus.|Lea
 paragraphs: 48
 ---
 
-////
+Một số người thích làm việc lặng lẽ trên một dự án cho đến khi nó hoàn hảo, trong khi những người khác không thể chờ đợi để cho thế giới càng sớm càng tốt.
 
-////
+Nếu bạn là loại đầu tiên của con người và thay sẽ phát triển tại địa phương cho bây giờ, cảm thấy tự do để bỏ qua chương này. Mặt khác, nếu bạn thích dành thời gian để tìm hiểu làm thế nào để triển khai các ứng dụng trực tuyến của bạn Meteor, chúng tôi đã có bạn bảo hiểm.
 
-////
+Chúng tôi sẽ được học làm thế nào để triển khai một ứng dụng Meteor trong vài cách khác nhau. Hãy sử dụng mỗi người ở giai đoạn nào của quá trình phát triển của bạn, cho dù bạn đang làm việc trên kính hiển vi hoặc bất kỳ ứng dụng Meteor khác. Hãy bắt đầu!
 
 <% note do %>
 
-### Introducing Sidebars
+### Giới thiệu Sidebars
 
-////
+Đây là một sidebar ** ** chương. Sidebar có một cái nhìn sâu sắc hơn về nhiều chủ đề Meteor chung độc lập với phần còn lại của cuốn sách.
 
-////
+Vì vậy, nếu bạn không muốn đi về với xây dựng Kính hiển vi, bạn có thể bỏ qua nó cho bây giờ và trở lại với nó sau này.
 
 <% end %>
 
 ### Deploying On Meteor
 
-////
+Triển khai trên một tên miền phụ Meteor (tức là 'http: // myapp.meteor.com`) là lựa chọn dễ dàng nhất, và là người đầu tiên chúng tôi sẽ cố gắng. Điều này có thể hữu ích để giới thiệu ứng dụng của bạn với những người khác trong những ngày đầu của nó, hoặc để nhanh chóng thiết lập một dàn máy chủ.
 
-////
+Triển khai trên Meteor là khá đơn giản. Chỉ cần mở thiết bị đầu cuối của bạn, hãy để vào thư mục ứng dụng Meteor của bạn, và loại:
 
 ~~~bash
 meteor deploy myapp.meteor.com
 ~~~
 
-////
+Tất nhiên, bạn sẽ phải chăm sóc để thay thế "myapp" với một tên của sự lựa chọn của bạn, tốt nhất là không phải là đã được sử dụng.
 
-////
+Nếu đây là lần đầu tiên của bạn triển khai một ứng dụng, bạn sẽ được nhắc nhở để tạo một tài khoản Meteor. Và nếu mọi việc suôn sẻ, sau một vài giây, bạn sẽ có thể truy cập vào ứng dụng của bạn tại 'http: // myapp.meteor.com`.
 
-////
+Bạn có thể tham khảo [tài liệu chính thức] (http://docs.meteor.com/#deploying) để biết thêm thông tin về những thứ như truy cập vào cơ sở dữ liệu lưu trữ trên máy dụ của bạn trực tiếp, hoặc cấu hình một miền tùy chỉnh cho ứng dụng của bạn.
 
 ### Deploying On Modulus
 
-////
+[Modulus] (https://modulus.io/) là một lựa chọn tuyệt vời cho việc triển khai các ứng dụng Node.js. Đó là một trong số ít các PaaS (nền tảng như một dịch vụ) cung cấp đó chính thức hỗ trợ Meteor, và đã có khá một vài người chạy các ứng dụng Meteor sản xuất trên đó.
 
 <% note do %>
 
 ### Demeteorizer
 
-////
+Modulus mã nguồn mở là một công cụ gọi là [demeteorizer] (https://github.com/onmodulus/demeteorizer) trong đó chuyển đổi ứng dụng Meteor của bạn vào một ứng dụng Node.js chuẩn.
 
 <% end %>
 
-////
+Bắt đầu bởi [tạo một tài khoản] (https://modulus.io/register). Để triển khai các ứng dụng của chúng tôi trên Modulus, sau đó chúng tôi sẽ cần phải cài đặt các công cụ dòng lệnh Modulus:
 
 ~~~bash
 npm install -g modulus
 ~~~
 
-////
+Và sau đó xác nhận với:
 
 ~~~bash
 modulus login
 ~~~
 
-////
+Bây giờ chúng ta sẽ tạo ra một dự án Modulus (lưu ý rằng bạn cũng có thể làm được điều này thông qua bảng điều khiển web Modulus '):
 
 ~~~bash
 modulus project create
 ~~~
 
-////
+Bước tiếp theo sẽ được tạo ra một cơ sở dữ liệu MongoDB cho ứng dụng của chúng tôi. Chúng ta có thể tạo ra một cơ sở dữ liệu MongoDB với [Modulus chính nó] (http://help.modulus.io/customer/portal/articles/1647770-using-meteor-with-modulus), [Soạn] (https: //www.compose .io /) hoặc với bất kỳ nhà cung cấp đám mây MongoDB khác.
 
-////
+Một khi chúng ta đã tạo ra cơ sở dữ liệu MongoDB của chúng tôi, chúng tôi có thể nhận được các `MONGO_URL` cho cơ sở dữ liệu của chúng tôi từ giao diện người dùng web Modulus '(đi vào Bảng điều khiển> Cơ sở dữ liệu> Chọn cơ sở dữ liệu của bạn> Quản trị), sau đó sử dụng nó để cấu hình ứng dụng của chúng tôi như vậy:
 
 ~~~bash
 modulus env set MONGO_URL "mongodb://<user>:<pass>@mongo.onmodulus.net:27017/<database_name>"
 ~~~
 
-////
+Đó là bây giờ thời gian để triển khai các ứng dụng của chúng tôi. Nó là dễ như gõ:
 
 ~~~bash
 modulus deploy
 ~~~
 
-////
+Bây giờ chúng ta đã triển khai thành công ứng dụng của chúng tôi để Modulus. Tham khảo [tài liệu Modulus] (https://modulus.io/codex/projects) để biết thêm thông tin về truy cập nhật ký, thiết lập tên miền tùy chỉnh, và SSL.
 
 ### Meteor Up
 
-////
+Mặc dù các giải pháp điện toán đám mây mới được xuất hiện mỗi ngày, họ thường đi kèm với phần riêng của họ về các vấn đề và hạn chế. Vì vậy, ngày hôm nay, việc triển khai trên máy chủ của mình vẫn là cách tốt nhất để đặt một ứng dụng Meteor trong sản xuất. Điều duy nhất là, việc triển khai chính mình mà không phải là đơn giản, đặc biệt là nếu bạn đang tìm kiếm cho việc triển khai sản xuất chất lượng.
 
-////
+[Meteor Up] (https://github.com/arunoda/meteor-up) (hoặc `mup` cho ngắn) là một nỗ lực khắc phục vấn đề đó, với một tiện ích dòng lệnh mà sẽ chăm sóc của các thiết lập và triển khai cho bạn . Vì vậy, chúng ta hãy xem làm thế nào để triển khai Microscope sử dụng Meteor Up.
 
-////
+Trước khi bất cứ điều gì khác, chúng tôi sẽ cần một máy chủ để đẩy đến. Chúng tôi khuyên bạn nên hoặc [Digital Dương] (http://digitalocean.com), mà bắt đầu từ $ 5 mỗi tháng, hoặc [AWS] (http://aws.amazon.com/), trong đó cung cấp cho các trường hợp vi miễn phí (bạn 'sẽ nhanh chóng chạy vào vấn đề nhân rộng, nhưng nếu bạn đang tìm kiếm chỉ để chơi xung quanh với Meteor Up nó nên là đủ).
 
-////
+Cho dù bạn chọn dịch vụ, bạn nên kết thúc với ba điều: địa chỉ IP của máy chủ, đăng nhập (thường là `root` hoặc` ubuntu`), và một mật khẩu. Giữ những nơi an toàn, chúng tôi sẽ cần đến chúng ngay!
 
 ### Initializing Meteor Up
 
-////
+Để bắt đầu ra, chúng tôi sẽ cần phải cài đặt Meteor Up qua 'npm` như sau:
 
 ~~~bash
 npm install -g mup
 ~~~
 
-////
+Sau đó chúng ta sẽ tạo một thư mục riêng biệt mà sẽ giữ các thiết lập Meteor Up của chúng tôi đối với việc triển khai cụ thể. Chúng tôi đang sử dụng một thư mục riêng biệt cho hai lý do: thứ nhất, nó thường là tốt nhất để tránh bao gồm bất kỳ thông tin cá nhân trong repo Git của bạn, đặc biệt là nếu bạn đang làm việc trên một codebase công.
 
-////
+Thứ hai, bằng cách sử dụng nhiều thư mục riêng biệt, chúng tôi sẽ có thể quản lý nhiều cấu hình Meteor Up song song. Điều này sẽ có ích cho việc triển khai cho các trường hợp sản xuất và dàn dựng, cho ví dụ.
 
-////
+Vì vậy, hãy tạo mới thư mục này và sử dụng nó để khởi tạo một dự án Meteor Up mới:
 
 ~~~bash
 mkdir ~/microscope-deploy
@@ -118,19 +118,20 @@ mup init
 
 <% note do %>
 
-### Sharing with Dropbox
+### Chia sẻ với Dropbox
 
-////
+Một cách tuyệt vời để đảm bảo rằng bạn và nhóm của bạn sử dụng tất cả các thiết lập triển khai cùng chỉ đơn giản là tạo ra Meteor của bạn Up thư mục cấu hình bên trong Dropbox của bạn, hoặc bất kỳ dịch vụ tương tự.
+
 
 <% end %>
 
 ### Meteor Up Configuration
 
-////
+Khi khởi tạo một dự án mới, Meteor Up sẽ tạo ra hai tập tin cho bạn: `và` mup.json` settings.json`.
 
-////
+`mup.json` sẽ giữ tất cả các thiết lập liên quan đến việc triển khai của chúng tôi, trong khi 'settings.json` sẽ chứa tất cả các ứng dụng cài đặt liên quan đến (tokens OAuth, thẻ phân tích, vv).
 
-////
+Bước tiếp theo là cấu hình file `mup.json` của bạn. Đây là mặc định `mup.json` tập tin được tạo bởi` mup init`, và tất cả các bạn phải làm là điền vào chỗ trống:
 
 ~~~js
 {
@@ -157,52 +158,50 @@ mup init
 ~~~
 <%= caption "mup.json" %>
 
-////
+Hãy đi bộ qua từng thiết lập.
+** Authentication Server **
 
-////
+Bạn sẽ nhận thấy rằng Meteor Up hỗ trợ mật khẩu dựa và khóa riêng (PEM) dựa trên xác thực, vì vậy nó có thể được sử dụng với hầu hết các nhà cung cấp điện toán đám mây.
 
-////
+** Lưu ý quan trọng **: nếu bạn chọn để sử dụng xác thực dựa trên mật khẩu, hãy chắc chắn rằng bạn đã cài đặt 'sshpass` đầu tiên ([tham khảo hướng dẫn này] (https://gist.github.com/arunoda/7790979)) .
 
-////
+** Cấu hình MongoDB **
 
-////
+Bước tiếp theo là cấu hình cơ sở dữ liệu MongoDB cho ứng dụng của bạn. Chúng tôi khuyên bạn nên sử dụng [Soạn] (https://www.compose.io) hoặc bất kỳ nhà cung cấp đám mây MongoDB khác, kể từ khi họ cung cấp hỗ trợ chuyên nghiệp và các công cụ quản lý tốt hơn.
 
-////
+Nếu bạn đã quyết định sử dụng Compose, thiết lập `setupMongo` như` false` và thêm biến `môi trường MONGO_URL` trong` `khối env` mup.json` của. Nếu bạn quyết định tổ chức MongoDB với Meteor Up, chỉ cần thiết lập `setupMongo` như` true` và Meteor Up sẽ chăm sóc phần còn lại.
 
-////
+** Meteor App Đường dẫn **
 
-////
+Kể từ Meteor Up cấu hình của chúng ta sống trong một thư mục khác nhau, chúng ta sẽ cần đến điểm Meteor Up lại để ứng dụng của chúng tôi sử dụng `hữu app`. Chỉ cần nhập vào đường dẫn nội bộ đầy đủ của bạn, mà bạn có thể nhận được bằng cách sử dụng lệnh `pwd` từ các thiết bị đầu cuối khi nằm bên trong thư mục của ứng dụng của bạn.
 
-////
+** Biến môi trường **
 
-////
-
-////
-
+Bạn có thể xác định tất cả các biến môi trường của ứng dụng của bạn (chẳng hạn như `ROOT_URL`,` MAIL_URL`, `MONGO_URL`, vv) bên trong 'khối env`.
 ### Setting Up and Deploying
 
-////
+Trước khi chúng ta có thể triển khai, chúng tôi sẽ cần phải thiết lập các máy chủ do đó, nó đã sẵn sàng để lưu trữ các ứng dụng Meteor. Sự kỳ diệu của Meteor Up gói gọn quá trình phức tạp này trong một lệnh duy nhất!
 
 ~~~bash
 mup setup
 ~~~
 
-////
+Điều này sẽ mất một vài phút tùy thuộc vào hiệu suất của máy chủ và kết nối mạng. Sau khi cài đặt thành công, cuối cùng chúng ta có thể triển khai các ứng dụng của chúng tôi với:
 
 ~~~bash
 mup deploy
 ~~~
 
-////
+Điều này sẽ bó các ứng dụng sao băng, và triển khai đến các máy chủ, chúng tôi chỉ cần thiết lập.
 
 ### Displaying Logs
 
-////
+Nhật ký là khá quan trọng và Meteor Up cung cấp một cách rất dễ dàng để xử lý chúng bằng cách cạnh tranh với 'đuôi lệnh -f`. Chỉ cần gõ:
 
 ~~~bash
 mup logs -f
 ~~~
 
-////
+Điều này kết thúc tốt đẹp tổng quan của chúng ta về những gì Meteor Up có thể làm. Để biết thêm thông tin, chúng tôi khuyên bạn nên truy [GitHub kho Meteor Up của] (https://github.com/arunoda/meteor-up).
 
-////
+Ba cách để triển khai các ứng dụng Meteor nên là đủ cho hầu hết các trường hợp sử dụng. Tất nhiên, chúng ta biết một số bạn sẽ thích được kiểm soát hoàn toàn và thiết lập máy chủ Meteor của họ từ đầu. Nhưng đó là một chủ đề cho một ngày khác ... hoặc có thể là một cuốn sách!
