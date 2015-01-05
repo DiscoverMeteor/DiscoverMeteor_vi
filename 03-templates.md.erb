@@ -3,15 +3,15 @@ title: Templates
 slug: templates
 date: 0003/01/01
 number: 3
-contents: Learn about Meteor's templating language, Spacebars.|Create your first three templates.|Learn how Meteor managers work.|Get a basic prototype working with static data.
+contents: Tìm hiểu về ngôn ngữ templating Meteor, Spacebars | Tạo ba mẫu đầu tiên của bạn | Tìm hiểu cách quản lý công việc Meteor | Nhận một nguyên mẫu cơ bản làm việc với các dữ liệu tĩnh....
 paragraphs: 44
 ---
 
-////
+Để dễ dàng vào phát triển Meteor, chúng tôi sẽ áp dụng một phương pháp tiếp cận từ ngoài vào trong. Nói cách khác, chúng tôi sẽ xây dựng một "câm" HTML / JavaScript vỏ bên ngoài đầu tiên, và sau đó treo nó lên để hoạt động bên trong ứng dụng của chúng tôi sau này.
 
-////
+Điều này có nghĩa rằng trong chương này chúng tôi sẽ chỉ để quan tâm đến những gì đang xảy ra bên trong `/ thư mục client`.
 
-////
+Nếu bạn đã không làm như vậy, tạo ra một tập tin mới có tên `main.html` bên trong` / thư mục client` của chúng tôi, và điền nó với đoạn mã sau:
 
 ~~~html
 <head>
@@ -32,25 +32,25 @@ paragraphs: 44
 ~~~
 <%= caption "client/main.html" %>
 
-////
+Đây sẽ là mẫu ứng dụng chính của chúng tôi. Như bạn có thể nhìn thấy nó là tất cả HTML ngoại trừ một `{{> postsList}}` tag đưa mẫu đơn, đó là một điểm chèn cho các sắp tới 'postsList` mẫu. Còn bây giờ, chúng ta hãy tạo ra một vài chi tiết mẫu.
 
 ### Meteor Templates
 
-////
+Tại cốt lõi của nó, một trang web tin tức xã hội bao gồm các bài viết có tổ chức trong danh sách, và đó chính xác là như thế nào, chúng tôi sẽ tổ chức các mẫu của chúng tôi.
 
-////
+Hãy tạo một thư mục '/ templates` bên trong `/ client`. Đây sẽ là nơi chúng tôi đặt tất cả các mẫu của chúng tôi, và để giữ cho mọi thứ gọn gàng, chúng tôi cũng sẽ tạo ra `/ posts` bên trong` / templates` chỉ cho bài liên quan đến mẫu của chúng tôi.
 
 <% note do %>
 
 ### Finding Files
 
-////
+Meteor là rất tốt trong việc tìm kiếm các tập tin. Không có vấn đề mà bạn đặt mã của bạn trong `/ thư mục client`, Meteor sẽ tìm thấy nó và biên dịch nó đúng cách. Điều này có nghĩa là bạn không bao giờ phải viết bao gồm đường dẫn cho JavaScript hay CSS.
 
-////
+Nó cũng có nghĩa là bạn rất có thể đặt tất cả các tập tin của bạn trong cùng một thư mục, hoặc thậm chí tất cả các mã của bạn trong cùng một tập tin. Nhưng kể từ khi Meteor sẽ biên dịch tất cả mọi thứ vào một tập tin minified đơn anyway, ta muốn giữ cho mọi thứ được tổ chức tốt và sử dụng một cấu trúc tập tin sạch hơn.
 
 <% end %>
 
-////
+Chúng tôi cuối cùng đã sẵn sàng để tạo ra mẫu thứ hai của chúng tôi. Bên trong 'client / templates / posts`, tạo `posts_list.html`:
 
 ~~~html
 <template name="postsList">
@@ -63,7 +63,7 @@ paragraphs: 44
 ~~~
 <%= caption "client/templates/posts/posts_list.html" %>
 
-////
+Và `post_item.html`:
 
 ~~~html
 <template name="postItem">
@@ -76,51 +76,51 @@ paragraphs: 44
 ~~~
 <%= caption "client/templates/posts/post_item.html" %>
 
-////
+Lưu ý các `name =" postsList "` thuộc tính của phần tử mẫu. Đây là tên mà sẽ được sử dụng bởi Meteor để theo dõi những gì mẫu đi nơi (lưu ý rằng tên của các tập tin thực tế * * là không có liên quan).
 
-////
+Đó là thời gian để giới thiệu hệ thống khuôn mẫu Meteor, ** Spacebars **. Spacebars chỉ đơn giản là HTML, với việc bổ sung ba điều: * vùi * (cũng đôi khi được gọi là "partials"), biểu thức * * * khối và những người giúp đỡ *.
 
-////
+* * Inclusions sử dụng `{{> templateName}}` cú pháp, và chỉ đơn giản nói với Meteor để thay thế sự bao gồm với các mẫu cùng tên (trong trường hợp của chúng tôi 'postItem`).
 
-////
+* Biểu thức * như `{{title}}` hoặc gọi một thuộc tính của đối tượng hiện tại, hoặc giá trị trở lại của một mẫu helper như được định nghĩa trong quản lý các mẫu hiện tại của (nhiều hơn về điều này sau).
 
-////
+Cuối cùng, những người giúp đỡ * khối * là thẻ đặc biệt để kiểm soát dòng chảy của các mẫu, chẳng hạn như `{{#each}} ... {{/ mỗi}}` hoặc `{{}} # nếu ... {{/ if}}` .
 
 <% note do %>
 
 ### Going Further
 
-////
+Bạn có thể tham khảo [Spacebars tài liệu] (https://github.com/meteor/meteor/blob/devel/packages/spacebars/README.md) nếu bạn muốn tìm hiểu thêm về Spacebars.
 
 <% end %>
 
-////
+Với thông tin này, chúng ta có thể bắt đầu hiểu những gì đang xảy ra ở đây.
 
-////
+Đầu tiên, trong postsList` `template, chúng ta lặp qua một 'đối tượng posts` với các` {{#each}} ... {{/ mỗi}} `khối helper. Sau đó, mỗi lần lặp chúng tôi bao gồm các postItem` `mẫu.
 
-////
+Trường hợp được đối tượng này `posts` đến từ đâu? Câu hỏi hay. Nó thực sự là một helper mẫu ** **, và bạn có thể nghĩ về nó như một giữ chỗ cho một giá trị động.
 
-////
+Các postItem` `mẫu chính nó là khá đơn giản. Nó chỉ sử dụng ba biểu thức: `{{url}}` và `{{title}}` cả hai trở lại các thuộc tính của tài liệu, và `{{domain}}` gọi một mẫu helper.
 
 ### Template Helpers
 
-////
+Đến nay chúng tôi đã được giao dịch với Spacebars, đó là ít hơn so với HTML với một vài thẻ rắc trong. Không giống như các ngôn ngữ khác như PHP (hoặc ngay cả các trang HTML thông thường, trong đó có thể bao gồm JavaScript), Meteor giữ mẫu và logic của họ tách ra, và những mẫu này không làm được gì nhiều bởi bản thân.
 
-////
+Để đến với cuộc sống, một mẫu cần người giúp việc ** **. Bạn có thể nghĩ về những người giúp việc trong bếp mà đưa nguyên liệu thô (dữ liệu của bạn) và chuẩn bị cho họ, trước khi giao ra các món ăn đã hoàn thành (mẫu) để người phục vụ, người sau đó trình bày nó cho bạn.
 
-////
+Nói cách khác, trong khi vai trò của mẫu được giới hạn để hiển thị hoặc lặp qua các biến, những người giúp việc là một trong những người thực sự làm việc nặng nhọc bằng cách gán một giá trị cho mỗi biến.
 
 <% note do %>
 
 ### Controllers?
 
-////
+Nó có thể được hấp để nghĩ về các tập tin có chứa tất cả những người giúp đỡ của một người mẫu như một bộ điều khiển của các loại. Nhưng điều đó có thể mơ hồ, như bộ điều khiển (ít nhất là theo nghĩa MVC) thường có một vai trò khác nhau một chút.
 
-////
+Vì vậy, chúng tôi quyết định ở lại đi từ ngữ đó, và chỉ cần tham khảo "người giúp việc của mẫu" hay "logic của mẫu" khi nói về đồng mã JavaScript một mẫu.
 
 <% end %>
 
-////
+Để giữ cho mọi thứ đơn giản, chúng tôi sẽ áp dụng quy ước đặt tên tập tin chứa những người giúp việc sau khi mẫu, nhưng với một **. ** Js mở rộng. Vì vậy, hãy tạo ra 'posts_list.js` bên trong `/ khách hàng / templates / posts` ngay lập tức và bắt đầu xây dựng helper đầu tiên của chúng tôi:
 
 ~~~js
 var postsData = [
@@ -143,15 +143,15 @@ Template.postsList.helpers({
 ~~~
 <%= caption "client/templates/posts/posts_list.js" %>
 
-////
+Nếu bạn đã thực hiện nó ngay, bây giờ bạn cần phải nhìn thấy một cái gì đó tương tự như sau trong trình duyệt của bạn:
 
 <%= screenshot "3-1", "Our first templates with static data" %>
 
-////
+Chúng tôi đang làm hai việc ở đây. Đầu tiên, chúng tôi đang thiết lập một số dữ liệu mẫu dummy trong mảng `postsData`. Dữ liệu mà thông thường sẽ đến từ các cơ sở dữ liệu, nhưng kể từ khi chúng tôi đã không nhìn thấy như thế nào để làm điều đó chưa (chờ cho chương tiếp theo!), Chúng tôi đang "gian lận" bằng cách sử dụng dữ liệu tĩnh.
 
-////
+Thứ hai, chúng tôi đang sử dụng `Template.postsList.helpers Meteor ()` chức năng để tạo ra một helper mẫu gọi là `posts` trả về` postsData` mảng chúng ta vừa định nghĩa ở trên.
 
-////
+Nếu bạn còn nhớ, chúng tôi đang sử dụng là `helper posts` trong` postsList` mẫu của chúng tôi:
 
 ~~~html
 <template name="postsList">
@@ -164,13 +164,13 @@ Template.postsList.helpers({
 ~~~
 <%= caption "client/templates/posts/posts_list.html" %>
 
-////
+Xác định các `helper posts` có nghĩa nó là bây giờ có sẵn cho mẫu của chúng tôi để sử dụng, do mẫu của chúng ta sẽ có thể lặp qua mảng` postsData` của chúng tôi và vượt qua từng đối tượng được chứa bên trong để các postItem` `mẫu.
 
 <%= commit "3-1", "Added basic posts list template and static data." %>
 
 ### The `domain` Helper
 
-////
+Tương tự như vậy, bây giờ chúng ta sẽ tạo ra 'post_item.js` để giữ logic postItem`' của mẫu:
 
 ~~~js
 Template.postItem.helpers({
@@ -183,17 +183,17 @@ Template.postItem.helpers({
 ~~~
 <%= caption "client/templates/posts/post_item.js" %>
 
-////
+Lần này giá trị `domain` helper của chúng tôi không phải là một mảng, nhưng một chức năng vô danh. Mô hình này là phổ biến hơn nhiều (và hữu dụng hơn) so với trước đây được đơn giản hóa ví dụ dữ liệu giả của chúng tôi.
 
 <%= screenshot "3-2", "Displaying domains for each links." %>
 
-////
+Các `helper domain` mất một URL và trả về phạm vi của nó thông qua một chút ma thuật JavaScript. Nhưng nơi nào nó đi url mà từ ở nơi đầu tiên?
 
-////
+Để trả lời câu hỏi mà chúng ta cần phải quay trở lại để `mẫu posts_list.html` của chúng tôi. Các `{{}}` #each khối helper không chỉ lặp trên mảng của chúng tôi, nó cũng ** đặt giá trị của `this` bên trong các khối để các đối tượng lặp **.
 
-////
+Điều này có nghĩa là giữa hai '{{}} `#each tags, mỗi bài được gán cho` this` tục và kéo dài tất cả các cách bên trong quản lý bao gồm các mẫu của (`post_item.js`).
 
-////
+Bây giờ chúng ta hiểu tại sao 'this.url` trả về URL của bài viết hiện tại của. Và hơn thế nữa, nếu chúng ta sử dụng `{{title}}` và `{{url}}` `bên trong của chúng tôi post_item.html` mẫu, Meteor biết rằng chúng ta có nghĩa là` và `this.title` this.url` và trả về đúng giá trị.
 
 <%= commit "3-2", "Setup a `domain` helper on the `postItem`." %>
 
@@ -201,24 +201,25 @@ Template.postItem.helpers({
 
 ### JavaScript Magic
 
-////
+Mặc dù điều này là không cụ thể cho Meteor, đây là một lời giải thích nhanh của các bit trên của "ma thuật JavaScript". Đầu tiên, chúng tôi đang tạo một anchor rỗng (`a`) yếu tố HTML và lưu trữ nó trong bộ nhớ.
 
-////
+Chúng tôi sau đó đặt thuộc tính 'href` của nó phải bằng URL của bài viết hiện tại của (như chúng ta đã thấy, trong một helper `this` là đối tượng hiện đang được thực thi).
 
-////
+Cuối cùng, chúng tôi tận dụng mà `` đặc biệt hữu hostname` a` của yếu tố để lấy lại tên miền của liên kết mà không cần phần còn lại của URL.
 
 <% end %>
 
-////
+Nếu bạn đã theo cùng một cách chính xác, bạn nên nhìn thấy một danh sách các bài viết trong trình duyệt của bạn. Danh sách đó chỉ là dữ liệu tĩnh, vì vậy nó không tận dụng lợi thế của các tính năng thời gian thực của Meteor chỉ được nêu ra. Chúng tôi sẽ cho bạn thấy làm thế nào để thay đổi điều đó trong các chương tiếp theo!
+
 
 <% note do %>
 
 ### Hot Code Reload
 
-////
+Bạn có thể thấy rằng bạn thậm chí không cần phải tự tải lại cửa sổ trình duyệt của bạn bất cứ khi nào bạn thay đổi một tập tin.
 
-////
+Điều này là bởi vì Meteor theo dõi tất cả các file trong thư mục dự án của bạn, và tự động làm mới trình duyệt của bạn cho bạn bất cứ khi nào nó phát hiện một sửa đổi để một trong số họ.
 
-////
+Đang tải lại nóng Meteor là khá thông minh, thậm chí bảo tồn trạng thái của ứng dụng của bạn ở giữa hai làm mới!
 
 <% end %>

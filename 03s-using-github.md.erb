@@ -8,99 +8,99 @@ contents: Learn how to use GitHub to follow along with the book.
 paragraphs: 33
 ---
 
-////
+[GitHub] (https://github.com/) là một kho lưu trữ xã hội cho các dự án mã nguồn mở dựa trên các [Git] (http://git-scm.com/) hệ thống kiểm soát phiên bản, và chức năng chính của nó là làm cho nó dễ dàng để chia sẻ mã và cộng tác trên các dự án. Nhưng nó cũng là một công cụ học tập tuyệt vời. Trong sidebar này, chúng tôi sẽ nhanh chóng đi qua một vài cách bạn có thể sử dụng GitHub theo cùng với * Khám phá Meteor *.
 
-////
+Sidebar này giả định bạn không quen với Git và GitHub. Nếu bạn đã cảm thấy thoải mái với cả hai, cảm thấy tự do để bỏ vào các chương tiếp theo!
 
-### Being Committed
+### Committed
 
-////
+Các khối làm việc cơ bản của một kho git là một * cam *. Bạn có thể nghĩ ra một commit như là một bản chụp của nhà nước của codebase của bạn tại một thời điểm nhất định trong thời gian.
 
-////
+Thay vì chỉ đơn giản là cung cấp cho bạn mã thành phẩm cho các kính hiển vi, chúng tôi đã thực hiện những bức ảnh chụp mỗi bước của con đường, và bạn có thể xem tất cả trong số họ trực tuyến trên GitHub.
 
-////
+Ví dụ, đây là những gì [commit cuối cùng của chương trước] (https://github.com/DiscoverMeteor/Microscope/commit/chapter3-2) trông giống như:
 
 <%= screenshot "s3-1", "A Git commit as shown on GitHub." %>
 
-////
+Các "diff" (cho "sự khác biệt") của file `post_item.js`, nói cách khác là thay đổi giới thiệu của thành viên này commit những gì bạn nhìn thấy ở đây là. Trong trường hợp này, chúng tôi tạo ra các file `post_item.js` từ đầu, vì vậy tất cả các nội dung của nó được đánh dấu màu xanh.
 
-////
+Hãy so sánh với một ví dụ từ [sau này trong cuốn sách] (https://github.com/DiscoverMeteor/Microscope/commit/chapter13-1):
 
 <%= screenshot "s3-2", "Modifying code." %>
 
-////
+Lần này, chỉ có các dòng sửa đổi được đánh dấu màu xanh.
 
-////
+Và tất nhiên, đôi khi bạn không thêm hoặc thay đổi dòng mã, nhưng [xóa chúng] (https://github.com/DiscoverMeteor/Microscope/commit/chapter12-2):
 
 <%= screenshot "s3-3", "Deleting code." %>
 
-////
+Vì vậy, chúng tôi đã nhìn thấy đầu tiên sử dụng GitHub: nhìn thấy những gì đang thay đổi trong nháy mắt.
 
 ### Browsing A Commit's Code
 
-////
+Git của commit xem cho chúng ta thấy sự thay đổi bao gồm trong commit này, nhưng đôi khi bạn có thể muốn xem các tập tin mà * không * thay đổi, chỉ để chắc chắn rằng những gì mã của họ là vụ phải giống như ở giai đoạn này của quá trình.
 
-////
+Một lần nữa GitHub đi qua cho chúng tôi. Khi bạn đang ở trên một trang commit, click vào Browse ** ** đang nút:
 
 <%= screenshot "s3-5", "The Browse code button." %>
 
-////
+Bây giờ bạn sẽ có quyền truy cập vào các repo * là nó đứng ở phạm cụ thể *:
 
 <%= screenshot "s3-6", "The repository at commit 3-2." %>
 
-////
+GitHub không cung cấp cho chúng tôi rất nhiều gợi mở hình ảnh mà chúng tôi đang tìm kiếm một commit, nhưng bạn có thể so sánh với quan điểm "bình thường" bậc thầy và thấy ngay rằng các cấu trúc tập tin là khác nhau:
 
 <%= screenshot "s3-7", "The repository at commit 14-2." %>
 
 ### Accessing A Commit Locally
 
-////
+Chúng tôi đã thấy được cách để duyệt một mã toàn bộ commit của tuyến trên GitHub. Nhưng nếu bạn muốn làm điều tương tự tại địa phương? Ví dụ, bạn có thể muốn chạy các ứng dụng cục bộ tại một commit cụ thể để xem nó như thế nào là nghĩa vụ phải cư xử vào thời điểm này trong quá trình này.
 
-////
+Để làm được điều này, chúng tôi sẽ thực hiện các bước đầu tiên của chúng tôi (tốt, trong cuốn sách này ít nhất) với các `git` tiện ích dòng lệnh. Để bắt đầu, [chắc chắn rằng bạn đã cài đặt Git] (http://git-scm.com/downloads). Sau đó, bản sao ** ** (nói cách khác, tải về một bản sao cục bộ) các kho Microscope với:
 
 ~~~bash
 git clone git@github.com:DiscoverMeteor/Microscope.git github_microscope
 ~~~
 
-////
+Mà `github_microscope` ở cuối đơn giản là tên của thư mục địa phương, bạn sẽ được nhân bản các ứng dụng vào. Giả sử bạn đã có một 'thư mục microscope` tồn tại trước đó, chỉ cần chọn bất kỳ tên khác nhau (nó không cần phải có cùng tên như repo GitHub).
 
-////
+Hãy `cd` vào kho lưu trữ để chúng ta có thể bắt đầu sử dụng` git` dòng lệnh tiện ích:
 
 ~~~bash
 cd github_microscope
 ~~~
 
-////
+Bây giờ khi chúng ta nhân bản kho từ GitHub, chúng ta đã download * tất cả * mã của ứng dụng này, có nghĩa là chúng ta đang nhìn vào mã cho người cuối cùng bao giờ commit.
 
-////
+Rất may, có một con đường để đi ngược thời gian và "kiểm tra" một commit cụ thể mà không ảnh hưởng đến những người khác. Hãy thử nó ra:
 
 ~~~bash
 git checkout chapter3-1
-Note: checking out 'chapter3-1'.
+Lưu ý: kiểm tra ra 'chapter3-1'.
 
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by performing another checkout.
+Bạn đang ở trạng thái 'TRỤ tách'. Bạn có thể nhìn xung quanh, làm thí nghiệm
+thay đổi và commit cho họ, và bạn có thể loại bỏ bất cứ commit nào thực hiện trong này
+nhà nước mà không ảnh hưởng đến bất kỳ chi nhánh bằng cách thực hiện thanh toán khác.
 
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -b with the checkout command again. Example:
+Nếu bạn muốn tạo ra một ngành mới để duy trì commit tạo, bạn có thể
+làm như vậy (bây giờ hoặc sau này) bằng cách sử dụng -b với lệnh thanh toán một lần nữa. Ví dụ:
 
   git checkout -b new_branch_name
 
 HEAD is now at a004b56... Added basic posts list template and static data.
 ~~~
 
-////
+Git thông báo với chúng tôi rằng chúng tôi đang ở trong "ĐẦU tách rời" nhà nước, có nghĩa là như xa như Git là có liên quan, chúng ta có thể quan sát qua commit nhưng chúng ta không thể thay đổi chúng. Bạn có thể nghĩ về nó như một trình kiểm tra quá khứ thông qua một quả cầu pha lê.
 
-////
+(Lưu ý rằng Git cũng có các lệnh cho phép bạn thay đổi * * qua commit. Điều này sẽ được nhiều hơn như một du hành thời gian sẽ trở lại trong thời gian và có thể bước trên một con bướm, nhưng nó nằm ngoài phạm vi giới thiệu ngắn gọn này.)
 
-////
+Lý do tại sao bạn có thể chỉ đơn giản là gõ `chapter3-1` là chúng ta đã sẵn gắn thẻ tất cả các commit của kính hiển vi với chương đánh dấu chính xác. Nếu đây không phải là trường hợp, bạn cần phải tìm hiểu đầu tiên của ** băm commit của **, hoặc định danh duy nhất.
 
-////
+Một lần nữa, làm cho cuộc sống của chúng tôi GitHub dễ dàng hơn. Bạn có thể tìm thấy một hành băm ở góc dưới cùng bên phải của hộp màu xanh commit tiêu đề, như được hiển thị ở đây:
 
 <%= screenshot "s3-4", "Finding a commit hash." %>
 
-////
+Vì vậy, hãy thử nó với các hash thay vì một thẻ:
 
 ~~~bash
 git checkout c7af59e425cd4e17c20cf99e51c8cd78f82c9932
@@ -108,34 +108,34 @@ Previous HEAD position was a004b56... Added basic posts list template and static
 HEAD is now at c7af59e... Augmented the postsList route to take a limit
 ~~~
 
-////
+Và cuối cùng, nếu chúng ta muốn dừng lại nhìn vào quả cầu pha lê ma thuật của chúng tôi và trở lại với hiện tại? Chúng tôi nói với Git mà chúng tôi muốn kiểm tra tổng thể ** ** chi nhánh:
 
 ~~~bash
 git checkout master
 ~~~
 
-////
+Lưu ý rằng bạn cũng có thể chạy các ứng dụng với các `lệnh meteor` tại bất kỳ điểm nào trong quá trình này, ngay cả khi trong" ĐẦU tách rời "nhà nước. Bạn có thể cần phải chạy một cách nhanh chóng 'sao băng update` đầu tiên nếu Meteor than phiền về các gói mất tích, vì mã gói không được bao gồm trong Git repo Microscope của.
 
 ### Historical Perspective
 
-////
+Đây là một kịch bản phổ biến: bạn đang tìm kiếm một tập tin và thông báo một số thay đổi mà bạn đã không thấy trước. Có điều là, bạn không thể nhớ * * khi các tập tin đã thay đổi. Bạn chỉ có thể nhìn vào từng commit từng cái một cho đến khi bạn tìm thấy một trong những quyền, nhưng có một cách dễ dàng hơn nhờ ** ** Tính năng History của GitHub.
 
-////
+Đầu tiên, truy cập vào một file nào trong kho của bạn trên GitHub, sau đó xác định vị trí các nút "History":
 
 <%= screenshot "s3-8", "GitHub's History button." %>
 
-////
+Bây giờ bạn có một danh sách gọn gàng của tất cả các commit mà bị ảnh hưởng tập tin này:
 
 <%= screenshot "s3-9", "Displaying a file's history." %>
 
 ### The Blame Game
 
-////
+Để quấn thứ lên, chúng ta hãy nhìn vào ** ** Đổ lỗi:
 
 <%= screenshot "s3-10", "GitHub's Blame button." %>
 
-////
+Nhìn gọn gàng này cho chúng ta thấy từng dòng người sửa đổi một tập tin, và trong đó commit (nói cách khác, người để đổ lỗi khi mọi việc không làm việc nữa):
 
 <%= screenshot "s3-11", "GitHub's Blame view." %>
 
-////
+Bây giờ Git là một công cụ khá phức tạp - và như vậy là GitHub -, vì vậy chúng tôi không thể hy vọng để trang trải tất cả mọi thứ trong một chương duy nhất. Trong thực tế, chúng tôi đã hầu như không trầy xước bề mặt của những gì có thể với những công cụ này. Nhưng hy vọng, thậm chí đôi chút sẽ có ích khi bạn làm theo cùng với phần còn lại của cuốn sách.
