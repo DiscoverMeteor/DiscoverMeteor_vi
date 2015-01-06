@@ -7,103 +7,105 @@ contents: Learn what makes Meteor special.|Read about the story of this book.|Le
 paragraphs: 37
 ---
 
-////
+Hãy thử tưởng tượng trong đầu một thí nghiệm như sau. Từ màn hình máy tính, mở 2 cửa sổ dẫn tới cùng một thư mục. Sau đó, bấm chọn một cửa sổ và tiến hành xóa một tập tin trong thư mục ở cửa sổ đó. Câu hỏi đặt ra là: Liệu tập tin bị xóa có biến mất ngay lập tức ở cửa sổ còn lại không?
 
-////
+Tất nhiên, ta không cần phải mở máy tính và thực hiện hết các tao tác trên mới biết được câu trả lời. Các thay đổi thực hiện với hệ thống tập tin trên máy tính (local filesystems) luôn được phản ánh đồng bộ ở mọi nơi mà không cần phải làm mới (refresh) hay tham chiếu ngược (callback).
 
-////
+Tuy nhiên, hãy xem kịch bản trên sẽ ra sao nếu diễn ra trên nền web. Giả sử, bạn mở cùng một địa chỉ admin của một trang web WordPress trong hai cửa sổ trình duyệt. Sau đó, tiến hành tạo một bài viết mới từ một trong hai cửa sổ đó. Khác vơi hệ thống tập tin trên máy tính, các cửa sổ của trình duyệt web không phản ánh sự thay đổi tức thì, trừ khi bạn làm mới chúng.
 
-////
+Trong những năm qua, chúng ta đã quá quen với ý tưởng rằng, hoạt động tương tác trên nền web là ngắn hạn và rời rạc.
 
-////
+Tuy nhiên, nền tảng công nghệ Meteor mới ra đời sẽ thách thức thực trạng trên khi cho phép xây dựng các ứng dụng web tương tác theo thời gian thực. 
 
-////
+### Meteor là gì?
 
-### What is Meteor?
+Meteor là một nền tảng được xây dựng trên môi trường Node.js, cho phép tạo ra các ứng dụng web theo thời gian thực. Nó đảm bảo việc đồng bộ thông tin giữa cơ sở dữ liệu của ứng dụng và giao diện người dùng.
 
-////
+Chính vì được xây dựng trên nền Node.js nên Meteor sử dụng JavaScript trên cả máy khách và máy chủ. Hơn thế nữa, Meteor còn cho phép chia sẻ code giữa hai môi trường này.
 
-////
+Có thể nói, Meteor là một nền tảng vừa đơn giản lại mạnh mẽ khi xóa bỏ hầu hết mọi phiền phức và cạm bẫy thông thường hay gặp phải khi phát triển ứng dụng web.
 
-////
+### Tại sao nên sử dụng Meteor?
 
-### Why Meteor?
+Vậy tại sao bạn nên dành thời gian nghiên cứu Meteor thay vì các nền tảng web khác? Tạm gác lại rất nhiều các tính năng hữu dụng khác của Meteor, chúng tôi tin rằng, điểm mạnh nhất của nền tảng web này là: rất dễ nắm bắt.
 
-////
+Học Meteor dễ hơn nhiều so với bất kỳ nền tảng web nào khác. Bạn có thể xây dựng và cho chạy một ứng dụng web theo thời gian thực chỉ sau vài giờ. Và nếu bạn đã từng phát triển front-end và quen thuộc với JavaScript, bạn sẽ không cần mất thời gian học một ngôn ngữ mới khi tiếp cận với Meteor.
 
-////
+Meteor có thể là nền tảng lý tưởng cho nhu cầu phát triển web của bạn, cũng có thể không. Nhưng nếu bạn chỉ mất một khóa học vài buổi để tìm ra chân lý thì tại sao lại không thử?
 
-////
+### Mục đich của cuốn sách?
 
-### Why This Book?
+Vài năm trở lại đây, chúng tôi có cơ hội làm việc với nhiều dự án Meteor, từ phát triển ứng dụng di động đến ứng dụng web, từ các dự án thương mại đến các dự án mã nguồn mở.
 
-////
+Tuy thật không dễ để tìm ra câu trả lời cho nhiều vấn đề, nhưng chúng tôi đã học hỏi được khá nhiều. Đôi khi phải chọn lọc giải pháp từ nhiều nguồn khác nhau, đôi khi phải tự tìm ra lối đi cho riêng mình. Với cuốn sách này, chúng tôi hy vọng có thể chia sẻ những kiến thức quý báu mình học được và tập hợp chúng thành một cuốn cẩm nang hướng dẫn các bước xây dựng một ứng dụng Meteor từ a đến z.
 
-////
+Ứng dụng Meteor chúng tôi sẽ xây dựng là một phiên bản đơn giản của các kiểu website tin tức xã hội như [Hacker News] (http://news.ycombinator.com) hay [Reddit] (http://reddit.com). Chúng tôi gọi nó là Microscope (được đặt theo tên người anh em Telescope - một ứng dụng Meteor mã nguồn mở - http://telesc.pe). Trong khi xây dựng Microscope, chúng tôi sẽ đề cập đến tất cả các yếu tố cần thiết để tạo ra một ứng dụng Meteor, ví như tài khoản người dùng (user account), bộ sưu tập Meteor (Meteor collection), định tuyến (routing), và nhiều yếu tố khác nữa.
 
-////
+### Đối tượng của cuốn sách?
 
-### Who Is This Book For?
+Một trong những mục tiêu của chúng tôi khi viết cuốn sách là giữ cho mọi thứ gần gũi và dễ hiểu. Vì vậy, bạn có thể dễ dàng học theo cuốn sách dù chưa từng có kinh nghiệm với Meteor, Node.js, MVC frameworks, hay thậm chí là lập trình cho máy chủ nói chung.
 
-////
+Mặt khác, chúng tôi giả định người đọc phải có hiểu biết cơ bản với các cú pháp và khái niệm của JavaScript. Tuy nhiên, để hiểu cuốn sách này không hề khó, nếu bạn có kinh nghiệm xử lý các mã mã jQuery hay quen thuộc với giao diện điều khiển cho lập trình viên trên các trình duyệt.
 
-////
+Nếu bạn vẫn chưa thực sự tự tin với kiến thức JavaScript của mình, chúng tôi khuyên bạn nên đọc qua bài viết về [JavaScript cho nền tảng Meteor] (https://www.discovermeteor.com/blog/javascript-for-meteor/) trước khi bắt đầu cuốn sách.
 
-////
+### Về tác giả
 
-### About the Authors
-
-////
+Nếu bạn đang tự hỏi tại sao nên tin tưởng chúng tôi, dưới đây là tập hợp thông tin về các tác giả của cuốn sách.
 
 <%= image "tom-photo.jpg", "portrait" %>
 
-////
+** Tom Coleman ** một thành viên của [Percolate Studio] (http://percolatestudio.com/), đơn vị phát triển web chú trọng vào chất lượng và trải nghiệm người dùng. Ông còn là một trong những nhà điều hành [Atmosphere] (http://atmosphere.meteor.com), và cũng là một trong những bộ não đằng sau nhiều dự án Meteor mã nguồn mở khác như [Iron Router] (https: / /github.com/EventedMind/iron-router).
 
 <%= image "sacha-photo.jpg", "portrait" %>
 
-////
 
-### Chapters & Sidebars
+** Sacha Greif ** có kinh nghiệm làm việc với nhiều công ty startup như [Hipmunk] (http://hipmunk.com) và [RubyMotion] (http://rubymotion.com) với vai trò nhân viên phát triển sản phẩm và thiết kế web. Ông là tác giả của [Telescope] (http://telesc.pe), [Sidebar] (http://sidebar.io) (dựa trên Telescope), và cũng là người sáng lập [Folyo] (http://folyo.me).
 
-////
+### Chương và mục nâng cao
 
-////
+Cuốn sách này được thiết kế cho cả người dùng mới làm quen Meteor và các lập trình viên có kinh nghiệm. Nội dung được chia làm hai loại: chương cơ bản (đánh số từ 1 đến 14) và các nội dung nâng cao (các số lẻ 0,5).
 
-////
+Chương cơ bản hướng dẫn người đọc các bước xây dựng một ứng dụng Meteor. Nội dung tập trung vào các điểm mục trọng yếu, tránh đi sâu vào chi tiết rườm rà, tốn thời gian cho người đọc. 
 
-////
+Mặt khác, các mục nâng cao đi sâu hơn vào những chi tiết phức tạp của Meteor, giúp người đọc có cái nhìn sâu hơn về bản chất hoạt động của Meteor. 
 
-### Commits & Live Instances
+Vì vậy, những người mới làm quen với Meteor có thể bỏ qua các mục nâng cao và quay lại đọc khi đã có một hiểu biết nhất định về Meteor.
 
-////
+### Đẩy code và cập nhật ứng dụng 
 
-////
+Không gì tệ hơn việc theo dõi một cuốn sách lập trình từ đầu đến cuối và rồi đột nhiên nhận ra các dòng code của bạn không hoạt động được như các ví dụ trong sách.
+
+Để tránh gặp phải trường hợp này, chúng tôi đã tạo một [kho dữ liệu cho Microscope trên GitHub] (https://github.com/DiscoverMeteor/Microscope), và sẽ cung cấp các link trực tiếp đến mỗi thay đổi trên git. Ngoài ra, mỗi lần code mới được đưa lên git, một liên kết sẽ được tạo ra link đến bản cập nhật của ứng dụng, giúp tiện cho việc so sánh bản ứng dụng trên web và trên máy tính. Hãy xem ví dụ dưới đây.
 
 <%= commit "11-2", "Display notifications in the header." %>
 
-////
+Cũng cần lưu ý rằng, việc chúng tôi cung cấp sẵn các bản cập nhật code không có nghĩa là bạn chỉ xài không mà không cần hiểu bản chất. Việc tự gõ ra các dòng code của ứng dụng sẽ giúp bạn sẽ học tốt hơn.
 
-### A Few Other Resources
+### Các nguồn tài liệu liên quan
 
-////
+Nếu bạn muốn tìm hiểu thêm về một khía cạnh cụ thể của Meteor, bạn nên bắt đầu đọc từ [tài liệu chính thống về Meteor] (http://docs.meteor.com/).
 
-////
+Khi cần xử lý sự cố, giải đáp các thắc mắc hay hỗ trợ trực tuyến, bạn nên tham khảo tại [Stack Overflow] (http://stackoverflow.com/questions/tagged/meteor) và #meteor [IRC channel] (https://webchat.freenode.net/).
 
-<% note do %>
+<% Lưu ý%>
 
-### Do I Need Git?
+### Git có thật cần thiết?
 
-////
+Để đọc hiểu cuốn sách này, bạn không nhất thiết phải quen thuộc với việc quản lý code trên Git. Tuy nhiên, chúng tôi khuyên bạn nên có hiểu biết nhất định về Git.
 
-////
+Nếu bạn cần một cuốn cẩm nang cấp tốc về Git, có thể đọc cuốn [Git đơn giản hơn bạn nghĩ] (http://nfarina.com/post/9868516270/git-is-simpler) của Nick Farina.
 
-////
+Nếu bạn là người mới làm quen với Git, chúng tôi khuyên bạn nên cài ứng dụng [GitHub cho Mac] (http://mac.github.com/). Nó cho phép bạn sao chép và quản lý các kho code trên git mà không cần sử dụng dòng lệnh.
 
-<% end %>
+<% End%>
 
-### Getting in Touch
+### Liên hệ
 
-- ////
-- ////
-- ////
-- ////
+- Để liên lạc với chúng tôi, bạn vui lòng gửi email tới địa chỉ [hello@discovermeteor.com] (mailto: hello@discovermeteor.com).
+
+- Ngoài ra, nếu bạn phát hiện lỗi sai sót trong đánh máy hay nội dung của cuốn sách, vui lòng thông báo cho chúng tôi bằng cách [gửi thông báo lỗi vào kho GitHub này] (https://github.com/DiscoverMeteor/book/issues).
+
+- Nếu bạn gặp vấn đề với code Microscope, vui lòng [gửi thông báo lỗi vào kho lưu trữ của Microscope] (https://github.com/DiscoverMeteor/Microscope/issues).
+
+- Với các câu hỏi khác, vui lòng để lại lời nhắn ở bảng bên của ứng dụng này.
