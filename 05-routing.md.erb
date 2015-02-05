@@ -7,19 +7,21 @@ contents: Learn about routing in Meteor.|Create post discussion pages, with uniq
 paragraphs: 84
 ---
 
-////
+Bây giờ chúng ta đã có một danh sách các bài viết (mà cuối cùng sẽ được người dùng gửi), chúng ta cần một trang bài viết đơn lẻ mà người dùng sẽ có thể thảo luận về từng bài.
+ 
+Chúng tôi muốn các trang này có thể được truy cập thông qua một *permalink*, một URL dạng `http://myapp.com/posts/xyz` ('xyz` là một nhận dạng kiểu MongoDB' _id`) duy nhất cho mỗi bài.
+ 
+Điều này có nghĩa chúng tôi sẽ cần một loại định tuyến *routing* để nhìn vào những gì bên trong thanh URL của trình duyệt và hiển thị đúng nội dung phù hợp.
 
-////
+### Thêm Iron Router Package
 
-////
-
-### Adding the Iron Router Package
-
-////
-
-////
-
-////
+[Iron Router](https://github.com/EventedMind/iron-router) là một gói phần mềm routing được hình thành cụ thể cho các ứng dụng Meteor.
+ 
+Nó không chỉ giúp định tuyến (thiết lập đường dẫn), mà còn quản lý các bộ lọc (gán hành động cho một số đường dẫn) và thậm chí quản lý subscription (kiểm soát các đường có quyền truy cập vào dữ liệu). (Lưu ý: Iron Router được phát triển một phần bởi đồng tác giả cuốn *Khám phá Meteor* là Tom Coleman.)
+ 
+Trước tiên, hãy cài đặt các gói package từ Atmosphere:
+ 
+Đây là lệnh tải và cài đặt các gói Iron Router package vào ứng dụng của chúng tôi, sẵn sàng để sử dụng. Lưu ý: đôi khi bạn có thể phải khởi động lại ứng dụng Meteor (dùng  `ctrl + C` để kết thúc quá trình, sau đó dùng 'meteor` để khởi động lại) trước khi một gói có thể được sử dụng.
 
 ~~~bash
 meteor add iron:router
@@ -30,36 +32,43 @@ meteor add iron:router
 
 <% note do %>
 
-### Router Vocabulary
+### Từ vựng Router
 
-////
+Chúng ta sẽ đề cập đến rất nhiều tính năng khác nhau của bộ định tuyến trong chương này. Nếu bạn đã có kinh nghiệm với một framework như Rails, bạn sẽ thấy hầu hết các khái niệm khá quen thuộc. Nhưng nếu không, đây là một danh sách các thuật ngữ giúp bạn học nhanh nhất:
 
-- ////
-- ////
-- ////
-- ////
-- ////
-- ////
-- ////
-- ////
-
-////
+- **Routes**:  Route là các khối cơ bản xây dựng nên định tuyến(routing). Về cơ bản, nó là một bộ các hướng dẫn cho ứng dụng biết nên đi đâu và làm gì khi nó gặp một URL.
+ 
+- **Paths**: Path là một URL trong ứng dụng. Nó có thể ở dạng tĩnh (`/terms_of_service`) hoặc động (`/posts/xyz`), và thậm chí bao gồm các tham số truy vấn (`/search?Keyword = meteor`).
+ 
+- **Segments**: Là các phần khác nhau của một path, được giới hạn bởi các chéo ngược (`/`).
+ 
+- **Hooks**: Hook là hành động mà bạn muốn thực hiện trước, sau, hoặc thậm chí trong quá trình định tuyến. Một ví dụ điển hình là kiểm tra quyền truy cập của người dùng trước khi hiển thị một trang nào đó cho họ.
+ 
+- **Filters**: Filter (Bộ lọc) đơn giản là các hook mà bạn định nghĩa trên tổng thể với một hoặc nhiều route.
+ 
+- **Route Templates**: Mỗi route cần trỏ đến một template. Nếu bạn không chỉ định rõ trỏ tới template nào, một route sẽ tự động trỏ tới template cùng tên với nó.
+ 
+- **Layouts**: Layout giống như một khung cho nội dung của bạn. Chúng chứa tất cả các mã HTML tạo nên template hiện tại, và sẽ vẫn như cũ ngay cả khi các template tự thay đổi.
+ 
+- **Controllers **: Đôi khi, bạn sẽ nhận ra rằng rất nhiều mẫu của bạn đang sử dụng cùng thông số tương tự. Thay vì sao chép lại các mã, bạn có thể tạo một *routing controller*, nơi chứa tất cả các logic định tuyến thông thường cho tất cả các route.
+ 
+Để tìm hiểu thêm về Iron Router, hãy đọc tài liệu GitHub sau (https://github.com/EventedMind/iron-router).
 
 <% end %>
 
-### Routing: Mapping URLs To Templates
+### Routing: Ánh xạ URL tới Template
 
-////
-
-////
-
-////
+Cho đến nay, chúng ta đã xây dựng các layout sử dụng các template tĩnh bao gồm (như `{{> postsList}}`). Vì vậy, mặc dù nội dung của ứng dụng có thể thay đổi, cấu trúc cơ bản của trang vẫn giữ nguyên với một tiêu đề và một danh sách các bài viết bên dưới nó.
+ 
+Iron Router cho phép chúng ta thoát ra khỏi khuôn mẫu này bằng chiếm quyền quản lý những gì bên trong HTML `<body> 'tag. Vì vậy, chúng ta sẽ không định nghĩa nội dung của thẻ này giống như với một trang HTML thông thường. Thay vào đó, chúng tôi sẽ trỏ các router tới một mẫu layout đặc biệt có chứa một trợ giúp mẫu `{{> yield}}` helper.
+ 
+Trợ giúp mẫu `{{> yield}}` này sẽ xác định một khu vực năng động đặc biệt mà sẽ tự động trả về bất cứ mẫu tương ứng với các tuyến đường hiện tại (như một quy ước, chúng tôi sẽ chỉ định mẫu đặc biệt này là “route template” ( tuyến đường mẫu) từ bây giờ):
 
 <%= diagram "router-diagram", "Layouts and templates.", "pull-center" %>
 
-////
-
-////
+Chúng tôi sẽ bắt đầu bằng cách tạo layout và bổ sung các `{{> yield}}` helper. Đầu tiên, chúng tôi sẽ loại bỏ thẻ HTML '<body> ` từ` main.html`, và di chuyển nội dung của nó đến mẫu riêng của mình, `layout.html` (được đặt tại thưc mục `client/templates/application`).
+ 
+Iron Router sẽ giúp nhúng layout vào các mẫu 'main.html` trông như thế này:
 
 ~~~html
 <head>
@@ -68,7 +77,7 @@ meteor add iron:router
 ~~~
 <%= caption "client/main.html" %>
 
-////
+Trong khi đó `layout.html` mới được tạo ra, giờ sẽ chứa các layout bên ngoài của ứng dụng:
 
 ~~~html
 <template name="layout">
@@ -86,11 +95,11 @@ meteor add iron:router
 ~~~
 <%= caption "client/templates/application/layout.html" %>
 
-////
+Bạn sẽ nhận thấy chúng ta vừa thay thế sự bao gồm của mẫu `postsList` với một cuộc gọi tới `yield` helper.
 
-////
-
-////
+Sau sự thay đổi này, tab trình duyệt của chúng ta sẽ chuyển sang màu trắng và một lỗi sẽ hiển thị trong giao diện điều khiển trình duyệt. Nguyên nhân là bởi chúng ta chưa bảo các router phải làm gì với các `/` URL, vì vậy nó chỉ hiển thị một mẫu trống.
+ 
+Để bắt đầu, chúng ta có thể lấy lại hành vi cũ bằng cách lập bản đồ gốc `/` URL đến mẫu `postsList`. Chúng ta sẽ tạo ra một tập tin `router.js` mới bên trong thư mục ` / lib` tại gốc của dự án:
 
 ~~~js
 Router.configure({
@@ -101,29 +110,29 @@ Router.route('/', {name: 'postsList'});
 ~~~
 <%= caption "lib/router.js"%>
 
-////
-
-////
+Chúng ta vừa thực hiện hai điều quan trọng. Đầu tiên, chúng bảo các router sử dụng mẫu `layout` vừa tạo làm layout  mặc định cho tất cả các route.
+ 
+Thứ hai, chúng ta đã định nghĩa một route mới có tên `postsList` và chỉ nó vào thư mục gốc` / `.
 
 <% note do %>
 
-### The `/lib` folder
+### Thư mục `/lib`
 
-////
-
-////
+Bất cứ thứ gì bạn đặt bên trong thư mục '/ lib` được đảm bảo load trước bất cứ thứ gì khác trong ứng dụng của bạn (có thể ngoại trừ các gói thông minh). Điều này làm tạo ra một nơi tuyệt vời để đặt mã helper mà cần phải có sẵn ở mọi lúc.
+ 
+Lưu ý nhỏ: vì thư mục `/lib` không nằm trong` / client` hay `/ server`, nên nội dung của nó sẽ có sẵn cho cả hai môi trường.
 
 <% end %>
 
-### Named Routes
+### Đặt tên Routes
 
-////
-
-////
-
-////
-
-////
+Hãy làm sáng tỏ một chút mơ hồ ở đây. Chúng ta đặt tên route của mình là 'postsList`, nhưng chúng ta cũng có một *template* gọi là `postsList`. Vậy điều gì đang xảy ra ở đây?
+ 
+Theo mặc định, Iron Router sẽ tìm một mẫu cùng tên với tên route. Trong thực tế, nó thậm chí sẽ suy ra các tên từ *path* mà bạn cung cấp. Mặc dù trong trường hợp cụ thể này khó thành công (bởi path của chúng ta là `/`), Iron Router sẽ tìm thấy mẫu chính xác nếu chúng ta sử dụng `http://localhost:3000/postsList` làm path.
+ 
+Bạn có thể tự hỏi tại sao chúng ta cần phải đặt tên cho các route đầu tiên. Đặt tên các route cho phép chúng ta sử dụng một số tính năng của Iron Router giúp cho việc dễ dàng xây dựng các link bên trong ứng dụng. Tính năng hữu ích nhất là `{{pathFor}}` Spacebars helper, giúp trả về các phần URL path của bất kỳ route nào.
+ 
+Chúng ta muốn liên kết tại trang chủ trỏ về danh sách các bài viết, vì vậy thay vì chỉ định một `/` URL tĩnh, chúng ta có thể sử dụng các helper Spacebars. Kết quả cuối cùng là như nhau, nhưng cách này linh hoạt hơn bởi các helper sẽ luôn luôn xuất URL đúng ngay cả khi chúng ta đổi path của route sau này.
 
 ~~~html
 <header class="navbar navbar-default" role="navigation"> 
@@ -141,13 +150,13 @@ Router.route('/', {name: 'postsList'});
 
 ### Waiting On Data
 
-////
-
-////
-
-////
-
-////
+Nếu bạn triển khai các phiên bản hiện tại của ứng dụng (hoặc khởi động các ví dụ web bằng cách sử dụng liên kết ở trên), bạn sẽ nhận thấy danh sách xuất hiện trống trong một vài phút trước khi bài viết xuất hiện. Nguyên nhân là bởi vì khi tải trang đầu tiên, không có bài viết để hiển thị cho tới khi các thuê bao 'posts` hoàn thành việc lấy dữ liệu từ máy chủ.
+ 
+Để có một trải nghiệm người dùng tốt, nên cung cấp thông tin phản hồi trực quan cho thấy dữ liệu đang được xử lý, và rằng người dùng nên đợi một chút.
+ 
+May mắn thay, Iron Router cung cấp cho chúng ta một cách dễ dàng để làm điều đó: chúng ta có thể yêu cầu nó *wait on* các thuê bao.
+ 
+Chúng ta bắt đầu bằng cách di chuyển các thuê bao `posts` từ `main.js` tới router:
 
 ~~~js
 Router.configure({
@@ -160,13 +169,13 @@ Router.route('/', {name: 'postsList'});
 <%= caption "lib/router.js" %>
 <%= highlight "3" %>
 
-////
-
-////
+Những gì chúng ta đang nói đến ở đây là đối với *mỗi* route trên trang web (giờ chúng ta chỉ có một route, nhưng sẽ có nhiều hơn nữa sau đó!), chúng ta muốn đăng ký vào các thuê bao `posts`.
+ 
+Sự khác biệt chính giữa điều này và những gì chúng ta đã có trước đó (khi các thuê bao nằm trong `main.js`, mà bây giờ đã trống rỗng và có thể được gỡ bỏ), là bây giờ Iron Router biết khi nào route sẵn sàng - đó là khi các route có dữ liệu nó cần xử lý.
 
 ### Get A Load Of This
 
-////
+Biết khi nào `postsList` route sẵn sàng không giúp được gì nếu chúng ta chỉ cần hiển thị một mẫu trống. Rất may, Iron Router có một giải pháp đi kèm giúp trì hoãn việc hiển thị một mẫu cho đến khi các route gọi nó đã sẵn sàng, và hiển thị một mẫu `loading` thay vì:
 
 ~~~js
 Router.configure({
@@ -180,9 +189,9 @@ Router.route('/', {name: 'postsList'});
 <%= caption "lib/router.js" %>
 <%= highlight "3,4" %>
 
-////
-
-////
+Lưu ý rằng kể từ khi chúng ta đang xác định các chức năng `waitOn` ở mức router, trình tự này sẽ chỉ xảy ra một lần khi một người sử dụng lần đầu tiên truy cập ứng dụng của bạn. Sau đó, các dữ liệu sẽ tự động được nạp vào bộ nhớ của trình duyệt và các router sẽ không cần phải chờ đợi dữ liệu một lần nữa.
+ 
+Bài toán cuối cùng phải giải là tạo một template tải thực tế. Chúng ta sẽ dùng package `spin` để tạo ra một spinner tải với animation đẹp. Thêm nó với `meteor add sacha:spin`, và sau đó tạo ra các mẫu `loading` như sau trong thư mục `client/templates/includes`
 
 ~~~html
 <template name="loading">
@@ -191,31 +200,32 @@ Router.route('/', {name: 'postsList'});
 ~~~
 <%= caption "client/templates/includes/loading.html" %>
 
-////
-
-////
+Lưu ý rằng `{{> spinner}}` là một phần chứa trong gói `spin`. Mặc dù phần này xuất phát từ "bên ngoài" ứng dụng, chúng ta có thể thêm nó vào như bất kỳ mẫu nào khác.
+ 
+Thường thì nên đợi các thuê bao đăng ký, vì không chỉ giúp tạo trải nghiệm người dùng tốt hơn, mà nó còn giúp bạn yên tâm rằng dữ liệu sẽ luôn luôn có sẵn từ bên trong một mẫu. Điều này giúp loại bỏ việc xử lý các mẫu được trả lại trước khi dữ liệu cơ bản của chúng có sẵn. Việc xử lý này thường đòi hỏi các cách giải quyết khá khó khăn.
 
 <%= commit "5-2", "Wait on the post subscription." %>
 
 <% note do %>
 
-### A First Glance At Reactivity
+### Khái niệm Reactivity
+ 
+Phản ứng (reactivity) là một phần cốt lõi của Meteor, và mặc dù chúng ta chưa thực sự đi sâu vào nó, template tải cũng giúp cung cấp cho chúng ta một cái nhìn đầu tiên về khái niệm này.
+ 
+Chuyển hướng đến một template tải khi dữ liệu chưa sẵn sàng là một giải pháp tốt, nhưng làm thế nào để các router biết khi nào cần chuyển hướng người dùng quay lại trang đúng, một khi dữ liệu đã được thông qua?
+ 
+Với chương này, chúng ta hãy cứ tạm hiểu đây là nơi phản ứng đi đến. Nhưng đừng lo lắng, bạn sẽ được học kỹ về nó sớm thôi!
 
-////
-
-////
-
-////
 
 <% end %>
 
-### Routing To A Specific Post
-
-////
-
-////
-
-////
+### Định tuyến tới Một bài viết cụ thể
+ 
+Bây giờ chúng ta đã biết làm thế nào để định tuyến đến `postsList` template. Hãy thiết lập một lộ trình để hiển thị các chi tiết của một bài viết cụ thể.
+ 
+Một nhược điểm là: chúng ta không thể đi trước và xác định một lộ trình cho mỗi bài viết, vì có thể có hàng trăm trong số chúng. Vì vậy, chúng ta cần phải thiết lập một route năng động duy nhất, và làm cho route đó hiển thị bất kỳ bài viết nào chúng ta muốn.
+ 
+Để bắt đầu, chúng ta sẽ tạo ra một mẫu mới để xử lý cùng một mẫu bài viết trước đó trong danh sách các bài viết.
 
 ~~~html
 <template name="postPage">
@@ -224,9 +234,9 @@ Router.route('/', {name: 'postsList'});
 ~~~
 <%= caption "client/templates/posts/post_page.html" %>
 
-////
-
-////
+Chúng ta sẽ bổ sung thêm nhiều yếu tố cho mẫu này về sau (như thêm bình luận), nhưng bây giờ nhiệm vụ của nó chỉ đơn giản là một vỏ chứa `{{> postItem}}`.
+ 
+Chúng ta sẽ tạo ra một route mới, ánh xạ đường dẫn URL của dạng `/posts/<ID>` tới mẫu `postPage`.
 
 ~~~js
 Router.configure({
@@ -243,17 +253,17 @@ Router.route('/posts/:_id', {
 <%= caption "lib/router.js" %>
 <%= highlight "8~10" %>
 
-////
-
-////
-
-////
-
-////
+Cú pháp `:_id` đặc biệt cho router biết hai điều: thứ nhất, khớp bất cứ route nào có dạng `/posts/xyz/` ("xyz" có thể là bất cứ thứ gì). Thứ hai, để đặt những gì nó tìm thấy trong "xyz" vào bên trong một vùng `_id` trong mảng `params` của router.
+ 
+Lưu ý rằng chúng ta chỉ sử dụng `_id` cho mục đích thuận tiện ở đây. Các router không có cách nào để biết nếu bạn cho đi qua nó một `_id` thực tế, hay chỉ một số chuỗi ngẫu nhiên các ký tự.
+ 
+Chúng ta hiện đã định tuyến đến các mẫu chính xác, nhưng vẫn còn thiếu một cái gì đó: các router biết `_id` của bài viết chúng ta muốn hiển thị, nhưng các mẫu thì không. Vì vậy, làm thế nào để chúng ta thu hẹp khoảng cách đó?
+ 
+Rất may, các router có một giải pháp tích hợp thông minh: nó cho phép bạn chỉ định ** bối cảnh dữ liệu** của một mẫu. Bạn có thể coi bối cảnh dữ liệu giống như phần bên trong một chiếc bánh ngon làm từ mẫu và layout. Đơn giản, nó là những gì bạn điền vào mẫu như sau:
 
 <%= diagram "router-diagram-2", "The data context.", "pull-center" %>
 
-////
+Trong trường hợp này, chúng ta có thể có được các ngữ cảnh dữ liệu thích hợp bằng cách tìm kiếm bài viết dựa trên các `_id` nhận được từ URL:
 
 ~~~js
 Router.configure({
@@ -271,17 +281,17 @@ Router.route('/posts/:_id', {
 <%= caption "lib/router.js" %>
 <%= highlight "10" %>
 
-////
-
-////
+Vì vậy, mỗi khi người dùng truy cập route này, chúng ta sẽ tìm thấy các bài viết phù hợp và đưa nó vào template. Hãy nhớ rằng 'findOne` trả về một bài duy nhất phù hợp với một truy vấn, và rằng việc cung cấp một `id` như một đối số là một cách viết tắt cho` {_id: id} `.
+ 
+Trong chức năng `data` của một route, `this` tương ứng với các route hiện đang xuất hiện, và chúng ta có thể sử dụng` this.params` để truy cập vào phần tên của các route (mà chúng tôi chỉ ra bằng cách đặt tiền tố `:` trước chúng, bên trong `path`).
 
 <% note do %>
 
-### More About Data Contexts
-
-////
-
-////
+### Tìm hiểu thêm về bối cảnh dữ liệu
+ 
+Bằng cách đặt một mẫu *dữ liệu ngữ cảnh*, bạn có thể kiểm soát giá trị của `this` bên trong mẫu trợ giúp.
+ 
+Điều này thường được thực hiện ngầm với các biến lặp `{{#each}}`, mà tự động cài đặt các dữ liệu ngữ cảnh của mỗi lần lặp đến mục hiện đang được lặp trên:
 
 ~~~html
 {{#each widgets}}
@@ -289,7 +299,7 @@ Router.route('/posts/:_id', {
 {{/each}}
 ~~~
 
-////
+Nhưng rõ ràng chúng ta cũng có thể làm điều đó bằng cách sử dụng '{{}} `{{#with}}`, mà chỉ đơn giản nói "lấy đối tượng này, và áp dụng các mẫu sau cho nó ". Ví dụ, chúng ta có thể viết:
 
 ~~~html
 {{#with myWidget}}
@@ -297,21 +307,21 @@ Router.route('/posts/:_id', {
 {{/with}}
 ~~~
 
-////
+Hóa ra bạn có thể đạt được kết quả tương tự bằng cách đi qua các bối cảnh như một *tham số* để gọi mẫu. Vì vậy, các khối trước của mã có thể được viết lại như sau:
 
 ~~~js
 {{> widgetPage myWidget}}
 ~~~
 
-////
+Để hiểu thêm về bối cảnh dữ liệu, chúng tôi đề nghị bạn [đọc bài viết trên blog của chúng tôi] (https://www.discovermeteor.com/blog/a-guide-to-meteor-templates-data-contexts/) về chủ đề này.
 
 <% end %>
 
-### Using a Dynamic Named Route Helper
-
-////
-
-////
+### Sử dụng một Route Helper có tên động
+ 
+Cuối cùng, chúng ta sẽ tạo ra một nút mới "Thảo luận" để liên kết đến mỗi trang bài viết. Một lần nữa, chúng ta có thể tạo một cái gì đó như `<a href="/posts/{{_id}}">`. Tuy nhiên, sử dụng một router helper là đáng tin cậy hơn cả.
+ 
+Chúng ta đã đặt tên cho route bài viết là 'postPage`, vì vậy chúng ta có thể sử dụng một {{pathFor' postPage '}} `helper`:
 
 ~~~html
 <template name="postItem">
@@ -327,15 +337,15 @@ Router.route('/posts/:_id', {
 <%= highlight "6" %>
 <%= commit "5-3", "Routing to a single post page." %>
 
-////
-
-////
-
-////
-
-////
-
-////
+Nhưng khoan, chính xác thì làm thế nào các router biết nơi để lấy những phần `xyz` trong `/posts/xyz`? Chúng ta chưa hề cho bất kỳ '_id` nào đi qua nó.
+ 
+Hóa ra Iron Router đủ thông minh để tự tìm ra. Chúng ta lệnh cho các router phải sử dụng `postPage` route, và router tự biết rằng route này đòi hỏi một loại `_id` nào đó (vì đó là cách chúng ta định nghĩa `path`).
+ 
+Vì vậy, các bộ định tuyến sẽ tìm kiếm `_id` này ở nơi hợp lý nhất có thể:  trong bối cảnh dữ liệu của `{{pathFor 'postPage'}}` helper hay nói cách khác là `this`. Và ngạc nhiên thay, `this` này tương ứng với một bài viết, trong đó có một đặc tính `_id`.
+ 
+Ngoài ra, bạn cũng có thể cho các bộ định tuyến biết nơi bạn muốn nó tìm kiếm các đặc tính '_id`, bằng cách thông qua một đối số thứ hai tới các helper (tức là . `{{pathFor 'postPage' someOtherPost}}`).  Một thực tế sử dụng của mô hình này sẽ nhận được các liên kết đến các bài viết trước đó hoặc kế tiếp trong danh sách, ví dụ.
+ 
+Để xem nó hoạt động chính xác hay không, duyệt đến danh sách bài viết và click vào một trong những liên kết 'Thảo luận'. Bạn sẽ thấy một cái gì đó như thế này:
 
 <%= screenshot "5-2", "A single post page." %>
 
@@ -343,21 +353,21 @@ Router.route('/posts/:_id', {
 
 ### HTML5 pushState
 
-////
-
-////
-
-////
+Một điều cần lưu lý rằng những thay đổi với URL diễn ra bằng cách sử dụng [HTML5pushState](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history?redirectlocale=en-US&redirectslug=Web%2FGuide%2FDOM%2FManipulating_the_browser_history).
+ 
+Các Router thu thập các cú nhấp chuột vào URL nội bộ trong trang web, và ngăn ngừa trình duyệt đi ra ngoài ứng dụng. Thay vào đó, chúng chỉ thực hiện những thay đổi cần thiết tới trạng thái của ứng dụng.
+ 
+Nếu tất cả mọi thứ hoạt động đúng, thay đổi trong trang sẽ được thể hiện ngay lập tức. Trong thực tế, đôi khi mọi thứ thay đổi quá nhanh mà một số loại trang chuyển tiếp có thể cần thiết. Điều này nằm ngoài phạm vi của chương này, nhưng dù sao cũng là một chủ đề thú vị.
 
 <% end %>
 
 ### Post Not Found
 
-////
-
-////
-
-////
+Chúng ta đừng quên rằng routing hoạt động cả hai cách: nó có thể thay đổi URL khi chúng ta ghé thăm một trang, nhưng nó cũng có thể hiển thị một trang mới khi chúng ta thay đổi URL. Vì vậy, chúng ta cần phải tìm ra những gì sẽ xảy ra nếu ai đó nhập *sai* URL.
+ 
+Rất may, Iron Router giúp giải quyết vấn đề này nhờ lựa chọn `notFoundTemplate`.
+ 
+Đầu tiên, chúng tôi sẽ thiết lập một template mới để hiển thị một thông báo lỗi 404 đơn giản:
 
 ~~~html
 <template name="notFound">
@@ -369,7 +379,7 @@ Router.route('/posts/:_id', {
 ~~~
 <%= caption "client/templates/application/not_found.html"%>
 
-////
+Sau đó, chúng ta sẽ chỉ cần trỏ Iron Router đến mẫu này:
 
 ~~~js
 Router.configure({
@@ -384,11 +394,11 @@ Router.configure({
 <%= caption "lib/router.js"%>
 <%= highlight "4" %>
 
-////
-
-////
-
-////
+Để kiểm tra trang error mới của bạn, bạn có thể thử truy cập một URL ngẫu nhiên như `http://localhost:3000/nothing-here`.
+ 
+Nhưng khoan, điều gì sẽ xảy ra nếu ai đó nhập URL dạng ` `http://localhost:3000/posts/xyz`, trong đó `xyz` không phải là một ` _id` hợp lệ? Đây vẫn là một route hợp lệ, chỉ có điều nó  không trỏ đến bất kỳ dữ liệu nào.
+ 
+Rất may, Iron Router là đủ thông minh để giải quyết bài toán này. Chúng ta chỉ cần thêm một hook đặc biệt `dataNotFound` vào cuối của `router.js`:
 
 ~~~js
 //...
@@ -398,14 +408,14 @@ Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 <%= caption "lib/router.js"%>
 <%= highlight "4" %>
 
-////
+Như vậy Iron Router sẽ biết hiển thị các trang "không tìm thấy" không chỉ cho các route không hợp lệ mà còn cho các route `postPage`, bất cứ khi nào các hàm `data` trả về một đối tượng "falsy" (ví dụ ` null`, `false`,` undefined` , hoặc rỗng).
 
 <%= commit "5-4", "Added not found template." %>
 
 <% note do %>
 
-### Why “Iron”?
-
-////
+### Tại sao lại gọi là "Iron Router" (sắt)?
+ 
+Bạn có thể đang thắc mắc về câu chuyện đằng sau cái tên "Iron Router". Theo tác giả Chris Mather, nó xuất phát từ thực tế rằng thiên thạch(meteor) được cấu tạo chủ yếu từ sắt.
 
 <% end %>
