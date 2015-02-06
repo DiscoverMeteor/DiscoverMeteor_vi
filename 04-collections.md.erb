@@ -3,19 +3,19 @@ title: Collections
 slug: collections
 date: 0004/01/01
 number: 4
-contents: Học về  thu thập thời gian thực (realtime collection), một trong những tính năng lõi của Meteor.|Hiểu được công việc đồng bộ của Meteor diễn ra như thế nào.|Tích hợp Collections vào Templates.|Kết hợp những bản chạy thử cơ bản thành một ứng dụng thời gian thực hoàn thiện chức năng
+contents: Học về thu thập thời gian thực (realtime collection), một trong những tính năng chủ chốt của Meteor.|Hiểu được công việc đồng bộ của Meteor diễn ra như thế nào.|Tích hợp Collections vào Templates.|Kết hợp những bản chạy thử cơ bản thành một ứng dụng thời gian thực hoàn thiện chức năng.
 paragraphs: 78
 ---
 
-Trong chương một, chúng ta đã nói về tính năng lõi của Meteor, đó là sự đồng bộ tự động giữa máy khách và máy chủ, .
+Trong chương một, chúng ta đã nói về tính năng lõi của Meteor, đó là sự đồng bộ tự động giữa client và server.
 
 Trong chương này, chúng ta sẽ tìm hiểu sâu hơn về cơ chế hoạt động của nó, cũng như sẽ theo dõi sự vận hành của kỹ thuật chủ đạo giúp làm được điều đó, chính là **Collection** của Meteor. 
 
-Collection là một dạng cấu trúc dữ liệu đặc biệt. Nó giúp chúng  quản lý việc lưu giữ dữ liệu thường trực, chính là cơ sở dữ liệu MongoDB ở phía máy chủ, sau đó đồng bộ nó với từng kết nối từ trình duyệt web của người dùng trong thời gian thực.
+Collection là một dạng cấu trúc dữ liệu đặc biệt. Nó giúp chúng ta quản lý việc lưu trữ dữ liệu thường trực, chính là cơ sở dữ liệu MongoDB ở phía server, sau đó đồng bộ nó với từng kết nối từ trình duyệt web của người dùng trong thời gian thực.
 
 Chúng ta muốn dữ liệu bài viết được thường trực và chia sẻ giữa mọi người dùng, vì vậy chúng ta sẽ bắt đầu bằng việc tạo một collection gọi là `Posts` để lưu trữ.
 
-Collections đóng vai trò khá là chính trong mọi ứng dụng, do đó để chắc chắn rằng chúng được định nghĩa trước tiên, chúng ta sẽ đặt bên trong thư mục `lib`. Nếu bạn chưa hoàn thành việc này, hãy tạo thư mục `collections/` bên trong `lib`, và sau đó tạo một tập tin(file) tên là `posts.js` bên trong thư mục đó. Khi hoàn thành, hãy thêm: 
+Collections đóng vai trò khá là chủ đạo trong mọi ứng dụng, do đó để chắc chắn rằng chúng được định nghĩa trước tiên, chúng ta sẽ đặt bên trong thư mục `lib`. Nếu bạn chưa hoàn thành việc này, hãy tạo thư mục `collections/` bên trong `lib`, và sau đó tạo một file tên là `posts.js` bên trong thư mục đó. Khi hoàn thành, hãy thêm vào: 
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -28,40 +28,40 @@ Posts = new Mongo.Collection('posts');
 
 ### Dùng Var hay là không?
 
-Với Meteor, từ khoá `var` hạn chế phạm vi của một đối tượng trong tập tin hiện tại. Hiện tại, chúng ta muốn Collection `Posts` khả dụng với toàn bộ ứng dụng, bởi vậy mà chúng ta sẽ *không* dùng từ khoá `var`.
+Với Meteor, từ khoá `var` hạn chế phạm vi của một đối tượng trong file hiện hành. Hiện tại, chúng ta muốn Collection `Posts` khả dụng với toàn bộ ứng dụng, bởi vậy mà chúng ta sẽ *không* dùng từ khoá `var`.
 
 <% end %>
 
 ### Lưu dữ liệu
 
-Ứng dụng web có 3 cách cơ bản để lưu dữ liệu đối lập nhau, mỗi cách hoàn thiện được một nhiệm vụ khác nhau:
+Ứng dụng web có 3 cách cơ bản để lưu dữ liệu đối lập nhau, mỗi cách hoàn thiện được một nhiệm vụ riêng biệt:
 
 - **Bởi bộ nhớ của trình duyệt:** những thứ như là biến số JavaScript được lưu tại bộ nhớ của trình duyệt, điều đó có nghĩa là chúng không *lâu dài*: chúng chỉ bố cục với tab hiện tại của trình duyệt, và sẽ biến mất ngay khi bạn tắt tab trình duyệt.
 - **Bởi bộ lưu trữ của trình duyệt:** trình duyệt cũng có thể lưu trữ lâu dài hơn nhờ vào cookie hoặc là [bộ lưu trữ cục bộ](http://diveintohtml5.info/storage.html). Mặc dù dữ liệu này vẫn tồn tại giữa các phiên làm việc (session), nó vẫn *cục bộ* đối với người dùng hiện tại (tuy nhiên khả dụng giữa các tab của trình duyệt) và không thể dễ dàng chia sẻ với người dùng khác.
-- **Cơ sở dữ liệu phía máy chủ**: nơi tốt nhất lưu trữ dữ liệu lâu dài mà bạn muốn khả dụng cho nhiều hơn một người dùng là một cơ sở dữ liệu cũ mà tốt (MongoDB là giải pháp mặc định cho ứng dụng Meteor).
+- **Cơ sở dữ liệu phía server**: nơi tốt nhất lưu trữ dữ liệu lâu dài, mà bạn muốn khả dụng cho nhiều hơn một người dùng đó là cơ sở dữ liệu. (MongoDB là giải pháp mặc định cho ứng dụng Meteor).
 
 Meteor sử dụng cả ba cách trên, và đôi khi sẽ đồng bộ dữ liệu từ chỗ này sang chỗ khác (như chúng ta sẽ thấy sau đây). Như đang được nói đến, cơ sở dữ liệu giữ nguyên là “kiểu mẫu“ lưu trữ dữ liệu nguồn, bao gồm bản sao chép gốc (master copy) dữ liệu của bạn.
 
-### Máy khách & Máy chủ
+### Client & Server
 
-Code bên trong thư mục mà không phải là `client/` hoặc `server/` sẽ chạy giữa *cả hai* ngữ cảnh. Vì vậy Collection `Posts` khả dụng đối với cả phía máy khác và máy chủ. Tuy nhiên, cách mà collection làm việc với mỗi môi trường có thể khác nhau đôi chút.
+Code bên trong thư mục mà không phải là `client/` hoặc `server/` sẽ chạy giữa *cả hai* ngữ cảnh. Vì vậy Collection `Posts` khả dụng đối với cả phía client và server. Tuy nhiên, cách mà collection làm việc với mỗi môi trường có thể khác nhau đôi chút.
 
-Trên phía máy chủ, collection có nhiệm vụ nói chuyện với cơ sở dữ liệu MongoDB, đọc và viết những thay đổi. Theo cách này, nó có thể được so sánh với một thư viện cơ sở dữ liệu chuẩn.
+Trên phía server, collection có nhiệm vụ nói chuyện với cơ sở dữ liệu MongoDB, đọc và viết những thay đổi. Theo cách này, nó có thể được so sánh với một thư viện cơ sở dữ liệu chuẩn.
 
-Còn ở phía máy khách, collection là bản sao chép *tập hợp con* của collection kiểu mẫu thực. Collection ở phía máy khách giữ liên lạc trong thời gian thực một cách thường xuyên và (hầu như) rõ rệt với bộ phận dữ liệu đó.
+Còn ở phía client, collection là bản sao chép *tập hợp con* của collection kiểu mẫu thực. Collection ở phía client giữ liên lạc trong thời gian thực một cách thường xuyên và (hầu như) rõ rệt với bộ phận dữ liệu đó.
 
 <% note do %>
 
 ### Console vs Console vs Console
 
-Trong chương này, chúng ta sẽ bắt đầu sử dụng chức năng **console trình duyệt**, thứ không nên bị nhầm lẫn với **terminal** hoặc là **Mongo shell**. Sau đây là tóm tắt nhanh về mỗi thứ
+Trong chương này, chúng ta sẽ bắt đầu sử dụng chức năng **console trình duyệt**, thứ không nên bị nhầm lẫn với **terminal** hoặc là **Mongo shell**. Sau đây là tóm tắt nhanh về mỗi thứ.
 
 #### Terminal
 
 <%= screenshot "terminal", "The Terminal" %>
 
 - Được gọi ra từ hệ điều hành máy tính của bạn.
-- `console.log()` từ **Phía máy chủ** xuất dữ liệu ra đây.
+- `console.log()` từ **Phía server** xuất dữ liệu ra đây.
 - Bắt đầu bởi ký tự: `$`
 - Được biết đến như là: Shell, Bash
 
@@ -70,7 +70,7 @@ Trong chương này, chúng ta sẽ bắt đầu sử dụng chức năng **cons
 <%= screenshot "browser-console", "The Browser Console" %>
 
 - Gọi từ phía trình duyệt, chạy mã code JavaScript.
-- `console.log()` **phía máy khách** xuất dữ liệu tại đây.
+- `console.log()` **phía client** xuất dữ liệu tại đây.
 - Bắt đầu bởi ký tự: `❯`.
 - Còn được biết đến như là: JavaScript Console, DevTools Console
 
@@ -83,13 +83,13 @@ Trong chương này, chúng ta sẽ bắt đầu sử dụng chức năng **cons
 - Bắt đầu bởi ký tự: `>`.
 - Còn được biết đến như là: Mongo Console
 
-Lưu ý rằng trong mỗi trường hợp, bạn không cần thiết phải gõ ký tự bắt đầu (`$`, `❯`, or `>`) như một phần của câu lệnh. Và bạn cũng có thể giả định là những dòng *không* bắt đầu với ký tự bắt đầu đó (prompt) là dòng xuất dữ liệu của câu lệnh trước đó.
+Lưu ý rằng trong mỗi trường hợp, bạn không cần thiết phải gõ ký tự bắt đầu (`$`, `❯`, or `>`) như một phần của câu lệnh. Và bạn cũng có thể giả định là những dòng *không* bắt đầu với ký tự bắt đầu đó (prompt) là dòng xuất dữ liệu của câu lệnh được nhập trước đó.
 
 <% end %>
 
-### Collections phía máy chủ
+### Collections phía server
 
-Quay trở lại với máy chủ, collection hoạt động như là API với cơ sở dữ liệu Mongo của bạn. Trong mã code phía máy chủ của bạn, nó cho phép bạn viết lệnh Mongo giống như `Posts.insert()` hoặc, `Posts.update()`, chúng sẽ tác động thay đổi tới collection `posts` được lưu trong Mongo.
+Quay trở lại với server, collection hoạt động như là API với cơ sở dữ liệu Mongo. Trong mã code phía server, nó cho phép bạn viết lệnh Mongo giống như `Posts.insert()` hoặc, `Posts.update()`, chúng sẽ tác động thay đổi tới collection `posts` được lưu trong Mongo.
 
 Để xem bên trong cơ sở dữ liệu Mongo, mở một cửa sổ terminal thứ hai (trong khi `meteor` vẫn đang được chạy ở cửa sổ thứ nhất), sau đó đi tới đường dẫn của ứng dụng. Chạy lệnh `meteor mongo` để khởi tạo Mongo shell, với nó bạn có thể gõ lệnh Mongo chuẩn (và như mọi khi, bạn có thể thoát khỏi shell với phím tắt `ctrl+c`). Ví dụ, hãy thêm một bài viết:
 
@@ -113,33 +113,33 @@ Và khi đã truy cập vào trong đó, bạn có thể lấy logs của ứng 
 
 <% end %>
 
-Cú pháp của Mongo thân thuộc, vì nó cũng dùng giao tiếp JavaScript. Chúng ta sẽ không thao tác thêm dữ liệu gì bằng Mongo shell, nhưng thi thoảng chúng ta cũng có thể nhìn vào nó để xem điều gì đang diễn ra.
+Cú pháp của Mongo thân thuộc, vì nó cũng dùng giao tiếp JavaScript. Chúng ta sẽ không thao tác thêm gì bằng Mongo shell, nhưng thi thoảng bạn cũng có thể nhìn vào nó để xem điều gì đang diễn ra.
 
-### Collections phía máy khách
+### Collections phía client
 
-Collections trở lên thú vị hơn ở máy khách. Khi bạn định nghĩa `Posts = new Mongo.Collection('posts');` ở phía máy khách, điều bạn đang làm là tạo một collection Mongo *cục bộ, trong cache của trình duyệt*. Khi chúng ta bảo rằng collection đã được "cache" phía máy khách, nghĩa là nó đã chứa *tập hợp con* của dữ liệu, và cho phép chúng tra truy cập *nhanh* dữ liệu đó.
+Collections trở lên thú vị hơn ở client. Khi bạn định nghĩa `Posts = new Mongo.Collection('posts');` ở phía client, điều bạn đang làm là tạo ra một collection Mongo *cục bộ, trong cache của trình duyệt*. Khi chúng ta bảo rằng collection đã được "cache" phía client, nghĩa là nó đã chứa *tập hợp con* của dữ liệu, và cho phép chúng tra truy cập *nhanh* dữ liệu đó.
 
-Biết được những điều này rất quan trọng vì nó là những điểm cơ bản để nắm được cách thức Meteor hoạt động. Nói một cách chung nhất, collection phía máy khách chứa tập hợp con của tất cả dữ liệu được lưu trong Mongo collection (quả thực, chúng ta thường không muốn gửi *toàn bô* cơ sở dữ liệu về máy khách)
+Biết được những điều này rất quan trọng vì nó là những điểm cơ bản để nắm được cách thức Meteor hoạt động. Nói một cách chung nhất, collection phía client chứa tập hợp con của tất cả dữ liệu được lưu trong Mongo collection (quả thực, chúng ta thường không muốn gửi *toàn bộ* cơ sở dữ liệu về client).
 
-Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duyệt*, có nghĩa là truy cập chúng nói chung ngay lập tức. Như vậy, sẽ không mất đường dài để tới máy chủ, lấy về  dữ liệu mỗi khi gọi `Posts.find()` phía máy khách, do dữ liệu đã được nạp sẵn. 
+Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duyệt*, có nghĩa là truy cập chúng nói chung ngay lập tức. Như vậy, sẽ không mất đường dài để tới server, lấy về dữ liệu mỗi khi gọi `Posts.find()` phía client, do dữ liệu đã được nạp sẵn. 
 
 <% note do %>
 
-### Giới thiệu MiniMongo
+### Giới thiệu về MiniMongo
 
-////
+Mongo mà được cài đặt phía client của Meteor thì được gọi là MinoMongo. Nó chưa phải là được tạo một cách hoàn hảo, nên có những trường hợp mà tính năng của Mongo không hoạt động với MiniMongo. Cho dù như thế thì tất cả những tính năng trong cuốn sách này hoạt động giống nhau cả trên Mongo lẫn MiniMongo.
 
 <% end %>
 
-### Client-Server Communication
+### Giao tiếp Client-Server
 
-////
+Phần chủ chốt của giao tiếp này là làm sao collection phía client đồng bộ với dữ liệu collection có cùng tên ở phía server (trong trường hợp của chúng ta là `'posts'`)
 
-////
+Thay vì việc giải thích chi tiết, hãy xem nó xảy ra như thế nào.
 
-////
+Bắt đầu bằng việc mở hai cửa sổ trình duyệt, và truy nhập vào console của mỗi trình duyệt. Sau đó, mở Mongo shell bên command line.
 
-////
+Tại thời điểm này, chúng ta có thể thấy tài liệu đã được tạo trước đó trong cả ba ngữ cảnh (chú ý rằng *giao diện người dùng* của ứng dụng của chúng ta vẫn hiển thị ba bài viết dummy lúc trước. Tạm thời xin hãy bỏ qua chúng). 
 
 ~~~bash
 > db.posts.find();
@@ -153,7 +153,7 @@ Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duy
 ~~~
 <%= caption "First browser console" %>
 
-////
+Hãy tạo một bài viết mới. Trong một cửa sổ trình duyệt, chạy đoạn mã chèn vào như sau:
 
 ~~~js
 ❯ Posts.find().count();
@@ -165,7 +165,7 @@ Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duy
 ~~~
 <%= caption "First browser console" %>
 
-////
+Không có gì ngạc nhiên, bài viết được tạo ra trong collection cục bộ. Bây giờ, hãy kiểm tra Mongo:
 
 ~~~bash
 ❯ db.posts.find();
@@ -174,9 +174,9 @@ Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duy
 ~~~
 <%= caption "The Mongo Shell" %>
 
-////
+Như các bạn có thể thấy, bài viết cũng được cho vào cơ sở dữ liệu Mongo, mà không cần chúng ta viết một dòng code nào bắt client gửi tới server (nói một cách chặt chẽ thì chúng ta đã viết một dòng code: `new Mongo.Collection('posts')`). Tuy nhiên đó không phải là tất cả.
 
-////
+Đưa ra cửa sổ trình duyệt thứ hai, và enter vào console trình duyệt như bên dưới: 
 
 ~~~js
 ❯ Posts.find().count();
@@ -184,35 +184,35 @@ Thêm nữa, những dữ liệu này được lưu *trong bộ nhớ trình duy
 ~~~
 <%= caption "Second browser console" %>
 
-////
+Bài viết cũng ở đó! Cho dù chúng ta đã không làm mới (refresh) hoặc là tương tác với trình duyệt thứ hai, và chúng ta cũng đã không viết dòng code nào để yêu cầu việc cập nhật mới. Nó diễn ra như là có phép thuật - và cũng diễn ra ngay lập tức, mặc dù điều này sẽ trở thành hiển nhiên về sau. 
 
-////
+Điều thực sự đã diễn ra là, collection phía server của chúng ta đã được thông báo bởi collection từ client về một bài viết mới, để tiến hành công việc truyển phát bài viết đó sang cơ sở dữ liệu Mongo và thao tác ngược cho tất cả collection đã kết nối với `post`.
 
-////
+Truy xuất bài viết từ console trình duyệt không thực sự hữu ích. Chúng ta sẽ sớm được học làm thế nào để gắn kết dữ liệu này vào template, cũng như dùng dữ liệu này để tiến hành chuyển những bản HTML nguyên bản thành một ứng dụng web đầy đủ chức năng vận hành theo thời gian thực. 
 
-### Populating the Database
+### Làm tăng (populate) cơ sở dữ liệu
 
-////
+Việc nhìn thấy dữ liệu Collection trên console trình duyệt là một việc, nhưng điều chúng ta thực sự muốn làm là hiển thị dữ liệu đó, cũng như sự thay đổi của dữ liệu, trên màn hình. Bằng việc đó, chúng ta sẽ chuyển được ứng dụng từ một *trang* đơn hiển thị dữ liệu tĩnh, sang một *ứng dụng* web thời gian thực với sự linh động, và dữ liệu thay đổi.
 
-////
+Việc đầu tiên chúng ta sẽ làm là đặt một vài dữ liệu vào cơ sở dữ liệu. Chúng ta sẽ làm việc đó với một file cố định, file đó sẽ nạp dữ liệu có cấu trúc vào Collection `Posts` khi server chạy lần đầu.
 
-////
+Đầu tiên, hãy chắc chắn rằng không có gì trong cơ sở dữ liệu. Chúng ta sẽ sử dụng `meteor reset`, để xoá cơ sở dữ liệu và khởi tạo lại dự án. Dĩ nhiên, bạn sẽ phải thật sự cẩn thận với câu lệnh này khi làm việc với một dự án thực tế.
 
-////
+Dừng server Meteor (bằng việc bấm `ctrl-c`) và sau đó, trên công cụ dòng lệnh, chạy:
 
 ~~~bash
 meteor reset
 ~~~
 
-////
+Câu lệnh khởi tạo lại sẽ xoá toàn bộ cơ sở dữ liệu Mongo. Nó là một câu lệnh hữu ích trong quá trình phát triển dự án, những lúc mà cơ sở dữ liệu có khả năng lớn bị rơi vào trạng thái không ổn định.
 
-////
+Hãy khởi động lại ứng dụng Meteor của chúng ta lần nữa:
 
 ~~~bash
 meteor
 ~~~
 
-////
+Bây giờ cơ sở dữ liệu đã trống không, chúng ta có thể thêm đoạn code sau. Nó sẽ tạo ra ba bài viết mỗi khi server khởi động, miễn sao khi đó Collection `Posts` đang trong trạng thái trống không.
 
 ~~~js
 if (Posts.find().count() === 0) {
@@ -236,24 +236,24 @@ if (Posts.find().count() === 0) {
 
 <%= commit "4-2", "Added data to the posts collection." %>
 
-////
+Chúng ta vừa đặt file này trong thư mục `server/`, như vậy thì nó sẽ không bao giờ bị nạp phía trình duyệt người dùng. Đoạn code sẽ được chạy ngay khi server khởi động, và thực hiện gọi `insert` vào cơ sở dữ liệu để thêm ba bài việt vào Collection `Posts`.
 
-////
+Bây giờ hãy khởi động server thêm một lần nữa với câu lệnh `meteor`, và ba bài viết đó sẽ được nạp vào cơ sở dữ liệu.
 
-### Dynamic Data
+### Dữ liệu động
 
-////
+Nếu chúng ta mở một cửa sổ console trình duyệt, chúng ta sẽ thấy được rằng ba bài viết đã được nạp vào MiniMongo:
 
 ~~~js
 ❯ Posts.find().fetch();
 ~~~
 <%= caption "Browser console" %>
 
-////
+Để có được những bài viết này trong file HTML được tạo, chúng ta sẽ sử dụng trợ giúp template thân thiện (template helper)
 
-////
+Trong chương 3 chúng ta đã thấy Meteor cho phép liên kết *ngữ cảnh dữ liệu* tới template Spacebar để xây dựng phần HTML view cho cấu trúc dữ liệu đơn giản.
 
-////
+Hãy tự do xoá `postsData` tại thời điểm đó. `posts_list.js` nên giống như sau:
 
 ~~~js
 Template.postsList.helpers({
@@ -269,21 +269,21 @@ Template.postsList.helpers({
 
 <% note do %>
 
-### Find & Fetch
+### Tìm & Nạp
 
-////
+Trong Meteor, `find()` trả về một *con trỏ*, thứ là [nguồn dữ liệu tác động trở lại](http://docs.meteor.com/#find). Khi chúng ta muốn log nội dung của nó, chúng ta có thể sử dụng `fetch()` trên con trỏ đó để chuyển nó thành một mảng dữ liệu.
 
-////
+Trong một ứng dụng, Meteor đủ thông minh để biết làm thế nào để tạo vòng lặp với con trỏ mà không bắt buộc phải chuyển đổi thành mảng trước. Chính vì vậy mà bạn sẽ không thấy `fetch()` được dùng nhiều trong code Meteor (và tại sao chúng ta đã không dùng ở ví dụ phía trên).
 
 <% end %>
 
-////
+Thay vì việc lấy ra một danh sách bài viết như một mảng tĩnh từ biến, chúng ta trả về một con trỏ cho helper `posts` (mặc dù mọi thứ không có vẻ khác nhau mấy vì chúng ta vẫn dùng cùng dữ liệu):
 
 <%= screenshot "4-3", "Using live data" %>
 
-////
+Helper `{{#each}}` của chúng ta đã lặp qua tất cả `Posts` và hiển thị chúng trên màn hình. Collection phía server đẩy bài viết từ Mongo ra, gửi chúng tới collection phía client, và Spacebars trợ giúp gửi chúng tới template.
 
-////
+Bây giờ chúng ta sẽ tiến thêm một bước nữa; thêm bài viết bằng console:
 
 ~~~js
 ❯ Posts.insert({
@@ -294,37 +294,37 @@ Template.postsList.helpers({
 ~~~
 <%= caption "Browser console" %>
 
-////
+Nhìn lại trình duyệt -- bạn sẽ thấy:
 
 <%= screenshot "4-4", "Adding posts via the console" %>
 
-////
+Bạn vừa mới thấy tương tác ngược diễn ra lần đầu. Khi chúng ta bảo Spacebars lặp lại con trỏ `Posts.find()`, nó biết làm thế nào để theo dõi sự thay đổi của con trỏ, và ráp lại HTML theo cách đơn giản nhất để sửa lại dữ liệu trên màn hình.
 
 <% note do %>
 
-### Inspecting DOM Changes
+### Giám sát sự thay đổi của DOM
 
-////
+Trong trường hợp này, sự thay đổi đơn giản nhất nhận thấy là một đoạn `<div class="post">...</div>` khác được thêm vào. Nếu bạn muốn biết thứ gì đã thực sự đã diễn ra, mở thanh giám sát DOM (DOM inspector) và chọn ra thẻ `<div>` tương ứng với một bài viết đang tồn tại.
 
-////
+Bây giờ, trong màn hình console JavaScript, thêm vào một bài viết mới. Khi bạn trở lại thanh giám sát, bạn sẽ thấy thêm một thẻ `<div>`, tương ứng với bài viết mới, tuy nhiên bạn vẫn thấy được là thẻ `<div>` *cũ* trong trạng thái chọn. Điều này rất hữu ích vì nó cho biết thành phần (elements) đã được tạo lại hay là chúng đã được để không.
 
 <% end %>
 
-### Connecting Collections: Publications and Subscriptions
+### Kết nối Collections: Xuất bản và đặt theo dõi (Publications and Subscriptions)
 
-////
+Cho tới bây giờ, chúng ta đã cho phép gói (package) `autopublish` được kích hoạt, điều đó không phải là ý định tốt cho một ứng dụng sản phẩm. Như tên của nó nói lên, package nói rằng mỗi collection nên chia sẻ mọi phần tử của nó cho mỗi client được kết nối. Đó không phải là điều chúng ta thực sự muốn, vì vậy hãy tắt nó đi.
 
-////
+Mở cửa sổ terminal mới, và gõ:
 
 ~~~bash
 meteor remove autopublish
 ~~~
 
-////
+Nó có hiệu ứng tức thời. Nếu bạn nhìn vào trình duyệt bây giờ, bạn sẽ thấy tất cả bài viết đã biến mất! Đó là vì chúng ta trước đó đã dựa vào `autopublish` để chắc chắn rằng collection bài viết phía client được phản chiếu tất cả bài viết trong cơ sở dữ liệu.
 
-////
+Rốt cuộc thì chúng ta chỉ cần chắc chắn rằng chúng ta chỉ gửi những bài viết mà người dùng thực sự cần (giống như trong trường hợp đánh số trang). Nhưng hiện tại, chúng ta sẽ thiết lập `Posts` để xuất bản phần tử của nó.
 
-////
+Để làm điều đó, chúng ta tạo một hàm `publish()` trả về con trỏ tham chiếu tất cả bài viết:
 
 ~~~js
 Meteor.publish('posts', function() {
@@ -333,7 +333,7 @@ Meteor.publish('posts', function() {
 ~~~
 <%= caption "server/publications.js" %>
 
-////
+Ở phía client, chúng ta phải *đặt theo dõi* (subscribe) tới tất cả những thứ xuất bản (publiction). Chúng ta chỉ phải thêm vào dòng sau vào `main.js`:
 
 ~~~js
 Meteor.subscribe('posts');
@@ -342,8 +342,8 @@ Meteor.subscribe('posts');
 
 <%= commit "4-4", "Removed `autopublish` and set up a basic publication." %>
 
-////
+Nếu chúng ta kiểm tra lại trình duyệt, lần này những bài viết đã quay trở lại. Phew!
 
-### Conclusion
+### Kết luận
 
-////
+Chúng ta đã đạt được điều gì? Mặc dù vẫn chưa có được giao diện người dùng, bây giờ chúng ta đã có được một ứng dụng web với chức năng hoạt động. Chúng ta có thể deploy ứng dụng này lên Internet, và (sử dụng console trình duyệt) để bắt đầu viết bài và nhìn thấy chúng xuất hiện trên trình duyệt của người dùng trên khắp thế giới.
