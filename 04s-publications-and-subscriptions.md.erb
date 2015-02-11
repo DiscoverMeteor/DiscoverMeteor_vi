@@ -36,7 +36,7 @@ Hãy cùng nhau nhìn lại điều gì đã khiến Meteor trở nên đặc bi
 
 Cấu trúc này giúp cho Meteor có thể làm được nhiều thứ hay ho, một trong những thứ đó là cái mà Meteor gọi là [cơ sở dữ liệu ở mọi nơi](http://docs.meteor.com/#sevenprinciples). Nói một cách đơn giản, Meteor lấy một tập con dữ liệu của bạn và *sao chép nó tới client*.
 
-Điều này có hai hàm ý lớn: đầu tiên, thay vì gửi HTML code tới client, ứng dụng Meteor sẽ gửi **dữ liệu thực, nguyên dạng** và để cho client tự quyết định làm gì với nó ([dữ liệu mắc trên dây])(http://docs.meteor.com/#sevenprinciples)). Thứ hai, bạn sẽ có thể **truy xuất và thay đổi dữ liệu đó tức thời** mà không cần phải chờ một chuyến đi lại với server ([sự điều chỉnh ngầm])(http://docs.meteor.com/#sevenprinciples)).
+Điều này có hai hàm ý lớn: đầu tiên, thay vì gửi HTML code tới client, ứng dụng Meteor sẽ gửi **dữ liệu thực, nguyên dạng** và để cho client tự quyết định làm gì với nó [dữ liệu mắc trên dây](http://docs.meteor.com/#sevenprinciples)). Thứ hai, bạn sẽ có thể **truy xuất và thay đổi dữ liệu đó tức thời** mà không cần phải chờ một chuyến đi lại với server [sự điều chỉnh ngầm](http://docs.meteor.com/#sevenprinciples)).
 
 ### Publishing (xuất bản)
 
@@ -166,7 +166,7 @@ Meteor.publish('somePosts', function(){
 
 ### Phía sau màn hình
 
-Nếu bạn đã đọc về [tài liệu publication Meteor](http://docs.meteor.com/#publishandsubscribe), có lẽ bạn đã bị làm quá sức bằng việc nói về sử dụng `added()` và `ready()` để thiết lập tính năng cho bản ghi phía client, và đã chiến đấu để tạo hình nó với ứng dụng Meteor mà bạn chưa từng nhìn thấy những method đó bao giờ.
+Nếu bạn đã đọc về ([tài liệu publication Meteor](http://docs.meteor.com/#publishandsubscribe)), có lẽ bạn đã bị làm quá sức bằng việc nói về sử dụng `added()` và `ready()` để thiết lập tính năng cho bản ghi phía client, và đã chiến đấu để tạo hình nó với ứng dụng Meteor mà bạn chưa từng nhìn thấy những method đó bao giờ.
 
 Lý do là Meteor cung cấp một tiện ích rất quan trọng: method `_publishCursor()`. Bạn cũng chưa từng thấy nó bao giờ? Có lẽ không trực tiếp, nhưng nếu bạn trả về một [con trỏ](/chapter/meteor-vocabulary/) (ví dụ như `Posts.find({'author':'Tom'})`) trong hàm publish, nó chính là cái mà Meteor đang sử dụng.
 
