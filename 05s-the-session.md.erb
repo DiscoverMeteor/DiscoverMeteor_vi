@@ -4,36 +4,36 @@ slug: the-session
 date: 0005/01/02
 number: 5.5
 sidebar: true
-contents: Learn about the Meteor Session|Learn about the autorun function|Learn about Hot Code Reload
+contents: Học về Meteor Session|Học về những hàm tự chạy|Học về Hot Code Reload (nạp lại code tự động)
 paragraphs: 36
 ---
 
-////
+Meteor là một bộ framework tác động ngược. Điều đó có nghĩa là khi dữ liệu thay đổi, các thứ trong ứng dụng của bạn sẽ thay đổi theo mà bạn không cần phải làm bất cứ thứ gì rõ ràng.
 
-////
+Chúng ta đã từng được thấy điều này thực tế khi mà template thay đổi khi dữ liệu và route thay đổi.
 
-////
+Chúng ta sẽ đào sâu hơn hoạt động của nó trong chương này, nhưng bây giờ, chúng tôi muốn giới thiệu một vài tính năng cơ bản của tương tác ngược mà rất hữu ích với những ứng dụng chung.
 
-### The Meteor Session
+### Meteor Session
 
-////
+Ngay bây giờ trong Microscope, trạng thái hiện tại của ứng dụng người dùng được hoàn toàn chứa trong URL mà họ đang nhìn vào (và cả cơ sở dữ liệu)
 
-////
+Nhưng trong nhiều trường hợp, bạn cần phải lưu giữ những trạng thái ngắn đời mà chỉ thích hợp với người dùng hiện tại của ứng dụng (ví dụ, khi một thành phần được hiển thị hoặc ẩn). Session chính là một cách tiện lợi để làm điều này.
 
-////
+Session là một dạng lưu trữ dữ liệu tương tác ngược toàn cục. Nó toàn cục trong khía cạnh một đối tượng đơn toàn cục: chỉ có một session, và được truy cập từ bất kỳ nơi đâu. Biến toàn cục thường được xem như là một điều gì đó xấu, nhưng trong trường hợp này session có thể dùng như một trạm giao tiếp trung tâm cho các phần khác nhau của ứng dụng.
 
-### Changing the Session
+### Thay đổi Session
 
-////
+Session có hiệu lực mọi nơi trên client được dùng với đối tượng tên là `Session`. Để thiết lập giá trị session, bạn có thể gọi:
 
 ~~~js
 ❯ Session.set('pageTitle', 'A different title');
 ~~~
 <%= caption "Browser console" %>
 
-////
+Bạn có thể gọi lại giá trị đã thiết lập với `Session.get('mySessionProperty');`. Đây là một nguồn dữ liệu tương tác ngược, có nghĩa là nếu bạn đặt nó trong một bộ trợ giúp (helper), bạn sẽ thấy là đầu ra của helper sẽ thay đổi một cách tương tác khi mà biến Session thay đổi.
 
-////
+Để thử điều này, thêm dòng sau vào bản mẫu (layout) của template:
 
 ~~~html
 <header class="navbar navbar-default" role="navigation"> 
@@ -53,38 +53,38 @@ Template.layout.helpers({
 
 <% note do %>
 
-### A Note About Sidebar Code
+### Chú ý về Sidebar Code
 
-////
+Chú ý rằng code được đặc tả trong chương về sidebar không phải là phần chính trong luồng của cuốn sách. Vì vậy hoặc là bạn tạo một nhánh (branch) bây giờ (nếu như dùng Git), hoặc chắc chắn rằng bạn đã khôi phục thay đổi của bạn ở cuối chương này.
 
 <% end %>
 
-////
+Sự nạp lại tự động của Meteor ( được biết đến với tên là “hot code reload” hoặc HCR) đảm bảo duy trì biến Session, vì vậy ngay bây giờ bạn thấy "A different title" xuất hiện trên thanh nav bar. Nếu không, hãy gõ lại câu lệnh `Session.set()` phía trước.
 
-////
+Thêm nữa, nếu chúng ta thay đổi giá trị thêm một lần nữa (ở trên console trình duyệt), chúng ta sẽ thấy thêm một  tựa đề nữa xuất hiện:
 
 ~~~js
 ❯ Session.set('pageTitle', 'A brand new title');
 ~~~
 <%= caption "Browser console" %>
 
-////
+Session sẽ có hiệu lực tổng thể, vì vậy những thay đổi diễn ra mọi nơi của ứng dụng. Điều này mang đến cho chúng ta rất nhiều khả năng, nhưng cũng có thể là cạm bẫy nếu sử dụng quá nhiều. 
 
-////
+Dù thế nào đi nữa, một điều rất quan trọng phải được chỉ ra đó là đối tượng Session *không* chia sẻ giữa các người dùng, hoặc giữa các tab của trình duyệt. Đó là lý do nếu bạn mở ứng dụng trên một tab mới, bạn sẽ bắt gặp tựa đề của trang trống không.
 
 <% note do %>
 
-### Identical Changes
+### Thay đổi giống nhau
 
-////
+Nếu bạn thay đổi giá trị của biến Session với `Session.set()` nhưng với một giá trị giống nhau, Meteor đủ thông minh để bỏ qua tương tác ngược đó, và tránh gọi hàm không cần thiết.
 
 <% end %>
 
-### Introducing Autorun
+### Giới thiệu chạy tự động (autorun)
 
-////
+Chúng ta vừa thấy một ví dụ về nguồn dữ liệu tương tác ngược, và chứng kiến trực tiếp nó bên trong helper của một template. Nhưng trong khi một vài ngữ cảnh trong Meteor (như là helper của template) thừa hưởng tương tác ngược, phần lớn code của ứng dụng Meteor vẫn là mã code JavaScript cũ không tương tác ngược được.
 
-////
+Hãy giả sử rằng chúng ta có đoạn code như sau ở đâu đó trong ứng dụng:
 
 ~~~js
 helloWorld = function() {
@@ -92,11 +92,11 @@ helloWorld = function() {
 }
 ~~~
 
-////
+Mặc dù chúng ta gọi một biến Session, *ngữ cảnh* mà nó được gọi không tương tác ngược, nghĩa là chúng ta không nhận được `alert` mới mỗi khi biến số thay đổi.
 
-////
+Đây là nơi mà [Autorun](http://docs.meteor.com/#Tracker_autorun) xuất hiện. Như tên gọi của nó, đoạn code trong khối `autorun` sẽ tự động chạy và giữ nguyên trạng thái chạy mỗi lần nguồn dữ liệu tương tác ngược thay đổi.
 
-////
+Hãy thử gõ đoạn mã sau vào console trình duyệt:
 
 ~~~js
 ❯ Tracker.autorun( function() { console.log('Value is: ' + Session.get('pageTitle')); } );
@@ -104,7 +104,7 @@ Value is: A brand new title
 ~~~
 <%= caption "Browser console" %>
 
-////
+Như bạn có thể tưởng tượng, đoạn code trong khối `autorun` chạy một lần, xuất ra dữ liệu trên console. Bây giờ, hãy thử thay đổi lại tiêu đề: 
 
 ~~~js
 ❯ Session.set('pageTitle', 'Yet another value');
@@ -112,9 +112,9 @@ Value is: Yet another value
 ~~~
 <%= caption "Browser console" %>
 
-////
+Như có phép thuật! Khi mà giá trị session thay đổi, `autorun` biết rằng phải chạy lại nội dung của nó thêm lần nữa, xuất ra thêm lần nữa giá trị ra console.
 
-////
+Quay trở lại ví dụ trước của chúng ta, nếu chúng ta muốn kích hoạt alert mỗi lần biến session thay đổi, tất cả việc chúng ta phải làm là cho đoạn code vào khối `autorun`:
 
 ~~~js
 Tracker.autorun(function() {
@@ -122,15 +122,15 @@ Tracker.autorun(function() {
 });
 ~~~
 
-////
+Như chúng ta vừa thấy, `autorun` có thể rất hữu ích để theo dấu nguồn dữ liệu tương tác ngược và ra lệnh tác động ngược ngay lập tức lên chúng.
 
 ### Hot Code Reload
 
-////
+Trong suốt quá trình phát triển của Microscope, chúng ta đã sử dụng một tính năng tiết kiệm thời gian của Meteor: hot code reload (HCR). Khi chúng ta lưu một vài files mã nguồn, Meteor kiểm tra sự thay đổi và khởi động lại server Meteor một cách rõ ràng, báo cho mỗi client biết để nạp lại trang.
 
-////
+Điều này giống như là một thiết bị tự động nạp lại trang, nhưng với một điều khác biệt quan trọng.
 
-////
+Để biết được điều quan trọng đó, hãy bắt đầu bằng việc thiết lập lại giá trị biến session chúng ta đang sử dụng:
 
 ~~~js
 ❯ Session.set('pageTitle', 'A brand new title');
@@ -139,7 +139,7 @@ Tracker.autorun(function() {
 ~~~
 <%= caption "Browser console" %>
 
-////
+Nếu chúng ta nạp lại trình duyệt bằng tay, biến session của chúng ta sẽ tự động biến mất (vì hành động này tạo ra biến session mới). Mặt khác, nếu chúng ta kích hoạt hot code reload ( ví dụ, bằng việc lưu lại files nguồn), trang web sẽ được load lại, nhưng biến session sẽ vẫn trong trạng thái được thiết lập. Hãy thử nó ngay bây giờ!
 
 ~~~js
 ❯ Session.get('pageTitle');
@@ -147,11 +147,11 @@ Tracker.autorun(function() {
 ~~~
 <%= caption "Browser console" %>
 
-////
+Vì vậy nếu bạn sử dụng biến session để theo dấu những gì người dùng đã làm, HCR nên trong suốt với người dùng, vì nó duy trì giá trị của biến session. Điều này giúp chúng ta triển khai phiên bản mới của ứng dụng sản phẩm Meteor với một sự chắc chắn rằng người dùng sẽ bị gián đoạn ít nhất.
 
-////
+Hãy xem xét điều này một chút. Nếu chúng ta có thể giữ được tất cả trạng thái trên URL và session, chúng ta có thể thay đổi _mã nguồn đang chạy_ một cách trong suốt với mỗi ứng dụng client ở dưới chúng với sự gián đoạn ít nhất.
 
-////
+Hãy xem điều gì sẽ xảy ra nếu chúng ta làm mới trang bằng tay:
 
 ~~~js
 ❯ Session.get('pageTitle');
@@ -159,11 +159,12 @@ null
 ~~~
 <%= caption "Browser console" %>
 
-////
+Khi chúng ta làm mới trang, chúng ta mất session. Với HCR, Meteor lưu lại session tới bộ lưu trữ cục bộ và nạp lại nó thêm lần nữa để làm mới. Tuy nhiên, cách nạp hiện còn lại hợp lý: nếu người dùng nạp lại trang, nó giống như là họ truy cập vào cùng URL một lần nữa, và họ nên thiết lập lại trạng thái ban đầu mà bất kì người dùng nào cũng sẽ thấy khi bước vào URL đó.
 
-////
+Bài học quan trọng rút ra là:
 
-////
-////
+1. Luôn lưu trạng thái của người dùng trong Session hoặc trên URL để người dùng có thể ít bị gián đoạn nhất khi mà một lệnh hot code reload xảy ra.
 
-////
+2. Lưu bất kỳ trạng thái nào bạn muốn chia sẻ giữa các người dùng *bên trong bản thân URL*
+
+Điều này kết luận cho khám phá của chúng ta về Sesion, một trong những tính năng thuận tiện nhất của Meteor. Bây giờ, đừng quên khôi phúc lại những thay đổi của bạn trước khi di chuyển sang chương tiếp theo.
