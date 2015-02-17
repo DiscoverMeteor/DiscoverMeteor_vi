@@ -7,37 +7,37 @@ contents: Install Meteor.|Learn about the 5 types of Meteor packages.|Setup the 
 paragraphs: 53
 ---
 
-////
+Ấn tượng đầu tiên là quan trọng, và quá trình cài đặt của Meteor nên khá dễ dàng. Trong hầu hết các trường hợp, bạn sẽ được và chạy trong vòng chưa đầy năm phút.
 
-////
+Để bắt đầu, chúng ta có thể cài đặt Meteor bằng cách mở một cửa sổ terminal và gõ:
 
 ~~~bash
 curl https://install.meteor.com | sh
 ~~~
 
-////
+Điều này sẽ cài đặt các `meteor` thực thi trên hệ thống của bạn và có bạn đã sẵn sàng để sử dụng Meteor.
 
 <% note do %>
 
 ### *Not* Installing Meteor
 
-////
+Nếu bạn không thể (hoặc không muốn) cài đặt Meteor tại địa phương, chúng tôi khuyên bạn nên kiểm tra ra [Nitrous.io] (http://nitrous.io).
 
-////
+Nitrous.io là một dịch vụ cho phép bạn chạy các ứng dụng và chỉnh sửa mã nguồn của họ ngay trong trình duyệt của bạn, và chúng tôi đã viết [một hướng dẫn ngắn] (https://www.discovermeteor.com/blog/meteor-nitrous) để giúp bạn có được thiết lập.
 
-////
+Bạn có thể chỉ cần làm theo hướng dẫn mà đến (và bao gồm) "Cài đặt Meteor", và sau đó làm theo cùng với các cuốn sách một lần nữa bắt đầu từ "Tạo một App Simple" của chương này.
 
 <% end %>
 
 ### Creating a Simple App
 
-////
+Bây giờ chúng ta đã cài đặt Meteor, chúng ta hãy tạo ra một ứng dụng. Để làm được điều này, chúng tôi sử dụng công cụ dòng lệnh Meteor của 'meteor`:
 
 ~~~bash
 meteor create microscope
 ~~~
 
-////
+Lệnh này sẽ tải về Meteor, và thiết lập một cơ bản, sẵn sàng để sử dụng dự án Meteor cho bạn. Khi thực hiện xong, bạn sẽ thấy một thư mục, `microscope/`, có chứa những điều sau đây:
 
 ~~~bash
 .meteor
@@ -46,132 +46,131 @@ microscope.html
 microscope.js
 ~~~
 
-////
+Các ứng dụng mà Meteor đã tạo ra cho bạn là một ứng dụng soạn đơn giản chứng minh một vài mẫu đơn giản.
 
-////
+Mặc dù ứng dụng của chúng tôi không làm được gì nhiều, chúng tôi vẫn có thể chạy nó. Để chạy các ứng dụng, quay về terminal và gõ:
 
 ~~~bash
 cd microscope
 meteor
 ~~~
 
-////
+Bây giờ chỉ trình duyệt của bạn để `http://localhost:3000/` (hoặc tương đương 'http://0.0.0.0:3000/`) và bạn sẽ thấy một cái gì đó như thế này:
 
 <%= screenshot "2-1", "Meteor's Hello World." %>
 
 <%= commit "2-1", "Created basic microscope project." %>
 
-////
+Xin chúc mừng! Bạn đã có lần đầu tiên ứng dụng Meteor đang chạy của bạn. Bằng cách này, để ngăn chặn các ứng dụng tất cả các bạn cần phải làm là đưa lên các tab thiết bị đầu cuối mà các ứng dụng đang chạy, và nhấn ctrl + `C`.
 
-////
+Cũng lưu ý rằng nếu bạn đang sử dụng Git, đây là một thời điểm tốt để khởi tạo repo của bạn chỉ bằng git init`.
 
 <% note do %>
 
 ### Bye Bye Meteorite
 
-////
+Có một thời gian, nơi Meteor dựa vào một người quản lý gói bên ngoài gọi là meteorite. Kể từ phiên bản 0.9.0 Meteor, Meteorite là không cần thiết nữa vì tính năng của nó đã được đồng hóa vào Meteor chính nó.
 
-////
+Vì vậy, nếu bạn gặp bất kỳ tài liệu tham khảo để `mrt` tiện ích dòng lệnh của thiên thạch trong suốt cuốn sách này hoặc trong khi duyệt các tài liệu liên quan đến Meteor, bạn một cách an toàn có thể thay thế chúng bằng các` meteor` bình thường.
 
 <% end %>
 
 ### Adding a Package
 
-////
+Bây giờ chúng ta sẽ sử dụng hệ thống gói Meteor để thêm [Bootstrap] (http://getbootstrap.com/) khuôn khổ dự án của chúng tôi.
 
-////
+Điều này là không có khác nhau từ việc thêm Bootstrap theo cách thông thường bằng tay bao gồm cả CSS và JavaScript tập tin, ngoại trừ chúng ta dựa vào các nhà duy trì gói để giữ cho mọi thứ được cập nhật cho chúng tôi.
 
-////
+Trong khi chúng tôi đang ở đó, chúng tôi cũng sẽ thêm [gạch] (http://underscorejs.org/) gói. Gạch dưới là một thư viện tiện ích JavaScript, và nó rất hữu ích khi nói đến thao tác các cấu trúc dữ liệu JavaScript.
 
-////
+Theo văn bản này, các `gói underscore` vẫn là một phần của gói Meteor" chính thức ", đó là lý do tại sao nó không có một tác giả:
 
 ~~~bash
 meteor add mizzao:bootstrap-3
 meteor add underscore
 ~~~
 
-////
+Lưu ý rằng chúng ta đang thêm Bootstrap **3**. Một số ảnh chụp màn hình trong cuốn sách này được thực hiện với một phiên bản cũ của Microscope chạy Bootstrap **2**, có nghĩa là họ có thể trông hơi khác nhau.
 
 <%= commit "2-2", "Added bootstrap and underscore packages." %>
 
-////
+Ngay sau khi bạn đã thêm các gói Bootstrap bạn sẽ nhận thấy một sự thay đổi trong xương trần của chúng tôi ứng dụng:
 
 <%= screenshot "2-1b", "With Bootstrap." %>
 
-////
+Không giống như cách "truyền thống" của bao gồm cả tài sản bên ngoài, chúng tôi đã không có bất kỳ liên kết lên CSS hoặc các tập tin JavaScript, vì Meteor sẽ chăm sóc của tất cả những gì cho chúng tôi! Đó chỉ là một trong nhiều ưu điểm của gói Meteor.
 
 <% note do %>
 
 ### A Note on Packages
 
-////
+Khi nói về các gói trong bối cảnh của Meteor, nó trả tiền để được cụ thể. Meteor sử dụng năm loại cơ bản các gói:
 
-- ////
-- ////
-- ////
-- ////
-- ////
+- The Meteor lõi chính nó được chia thành các gói **nền tảng khác nhau Meteor**. Họ có với mọi ứng dụng Meteor, và bạn sẽ không bao giờ khá nhiều cần phải lo lắng về việc này.
+- Gói Meteor thường được gọi là "isopacks ** **", hoặc các gói đẳng cấu (có nghĩa là họ có thể làm việc trên cả máy khách và máy chủ). **Gói của bên thứ nhất** như `tài khoản-ui` hoặc` appcache` được duy trì bởi đội ngũ nòng cốt Meteor và [đi kèm với Meteor] (http://docs.meteor.com/#packages).
+- ** Gói của bên thứ ba ** chỉ isopacks phát triển bởi những người dùng khác đã được tải lên máy chủ của gói Meteor. Bạn có thể duyệt chúng trên [Atmosphere] (http://atmosphere.meteor.com) hoặc với các `lệnh search` sao băng.
+- ** ** Gói địa phương là các gói tùy chỉnh, bạn có thể tạo cho mình và đặt trong thư mục '/ packages`.
+- ** Gói NPM ** (Node.js Packaged Modules) là Node.js gói. Mặc dù họ không làm việc ra khỏi hộp với Meteor, họ *có thể* được sử dụng bởi các loại trước đây của các gói
 
 <% end %>
 
 ### The File Structure of a Meteor App
 
-////
+Trước khi chúng ta bắt đầu mã hóa, chúng ta phải lập dự án của chúng tôi đúng. Để đảm bảo chúng tôi có một xây dựng sạch, mở thư mục 'microscope` và xóa' microscope.html`, `microscope.js`, và` microscope.css`.
 
-////
+Tiếp theo, tạo ra bốn thư mục gốc bên trong `/ microscope`:` / client`, `/ server`,` / public`, và `/ lib`.
 
-////
+Tiếp theo, chúng ta cũng sẽ tạo rỗng 'và `main.html` file main.js` bên trong` / client`. Đừng lo lắng nếu điều này phá vỡ các ứng dụng cho doanh nghiệp, chúng tôi sẽ bắt đầu điền vào các tập tin trong các chương tiếp theo.
 
-////
+Chúng ta nên đề cập đến một số các thư mục này là đặc biệt. Khi nói đến mã chạy, Meteor có một vài quy tắc:
 
-- ////
-- ////
-- ////
-- ////
+- Mã trong `thư mục / server` chỉ chạy trên máy chủ.
+- Mã trong `thư mục / client` chỉ chạy trên máy khách.
+- Mọi thứ khác chạy trên cả máy khách và máy chủ.
+- Tài sản tĩnh của bạn (font chữ, hình ảnh, vv) đi trong `thư mục / public`.
 
-////
+Và nó cũng hữu ích để biết làm thế nào sẽ quyết định Meteor thứ tự nào để tải các tập tin của bạn:
 
-- ////
-- ////
-- ////
+- Các tập tin trong `/ lib` được nạp * trước * bất cứ điều gì khác.
+-. Bất kỳ 'chính * `tập tin được tải * sau * tất cả mọi thứ khác.
+- Mọi thứ khác tải trong thứ tự chữ cái được dựa trên tên file.
 
-////
+Lưu ý rằng mặc dù Meteor có những quy tắc, nó không thực sự buộc bạn phải sử dụng bất kỳ cấu trúc tập tin được xác định trước cho ứng dụng của bạn nếu bạn không muốn. Vì vậy, chúng tôi đề nghị các cơ cấu chỉ là cách chúng ta làm việc, không phải là một quy tắc đặt trong đá.
 
-////
-
+Chúng tôi khuyến khích bạn kiểm tra [docs Meteor chính thức] (http://docs.meteor.com/#structuringyourapp) nếu bạn muốn biết thêm chi tiết về điều này.
 <% note do %>
 
 ### Is Meteor MVC?
 
-////
+Nếu bạn đang đến từ Sao băng khuôn khổ khác như Ruby on Rails, bạn có thể tự hỏi nếu ứng dụng Meteor áp dụng MVC (Model View Controller) mô hình.
 
-////
+Câu trả lời ngắn gọn là không. Không giống như Rails, Meteor không áp đặt bất kỳ cấu trúc được xác định trước để ứng dụng của bạn. Vì vậy, trong cuốn sách này, chúng tôi sẽ đơn giản đặt ra mã theo cách mà làm cho ý nghĩa nhất đối với chúng ta, mà không lo lắng quá nhiều về các từ viết tắt.
 
 <% end %>
 
 ### No public?
 
-////
+OK, chúng ta nói dối. Chúng tôi không thực sự cần những công / `thư mục` với lý do đơn giản rằng Microscope không sử dụng bất kỳ tài sản tĩnh! Nhưng, vì hầu hết các ứng dụng Meteor khác sẽ bao gồm ít nhất là một vài hình ảnh, chúng tôi nghĩ điều quan trọng là để che đậy nó quá.
 
-////
+Bằng cách này, bạn cũng có thể nhận thấy một thư mục `.meteor` ẩn. Đây là nơi lưu trữ Meteor mã riêng của mình, và thay đổi mọi thứ trong đó thường là một ý kiến tồi. Trong thực tế, bạn không bao giờ thực sự cần phải tìm trong thư mục này ở tất cả. Các trường hợp ngoại lệ duy nhất này là các `.meteor / packages` và` .meteor / file release`, mà tương ứng được sử dụng để liệt kê các gói thông minh của bạn và phiên bản của Meteor để sử dụng. Khi bạn thêm gói và phát hành thay đổi Meteor, nó có thể hữu ích để kiểm tra các thay đổi những tập tin này.
 
 <% note do %>
 
 ### Underscores vs CamelCase
 
-////
+Điều duy nhất chúng ta sẽ nói về tuổi già gạch dưới (`my_variable`) vs camelCase (` myVariable`) tranh luận là nó không thực sự có vấn đề mà một trong những bạn chọn miễn là bạn dính vào nó.
 
-////
+Trong cuốn sách này, chúng tôi đang sử dụng camelCase vì đó là cách thông thường JavaScript để làm việc (sau khi tất cả, đó là JavaScript, không java_script!).
 
-////
+Các trường hợp ngoại lệ của luật này là các tên tập tin, mà sẽ sử dụng gạch dưới (`my_file.js`), và các lớp CSS, mà sử dụng dấu gạch nối (` .my-class`). Lý do cho điều này là trong các hệ thống tập tin, gạch chân là phổ biến nhất, trong khi các cú pháp CSS tự nó đã sử dụng dấu gạch nối (`font-family`,` text-align`, vv).
 
 <% end %>
 
 ### Taking Care of CSS
 
-////
+Cuốn sách này không phải là về CSS. Vì vậy, để tránh làm chậm bạn xuống với các chi tiết kiểu dáng, chúng tôi đã quyết định để làm cho toàn bộ stylesheet có sẵn từ đầu, vì vậy bạn không cần phải lo lắng về nó bao giờ trở lại.
 
-////
+CSS tự động được nạp và minified bởi Meteor, không giống như các tài sản khác tĩnh nó đi vào `/ client`, không phải` / public`. Đi trước và tạo ra một 'client / stylesheets / `thư mục bây giờ, và đặt này file` style.css` bên trong nó:
 
 ~~~css
 .grid-block, .main, .post, .comments li, .comment-form {
@@ -346,8 +345,8 @@ body {
 
 ### A Note on CoffeeScript
 
-////
+Trong cuốn sách này, chúng ta sẽ được viết trong JavaScript tinh khiết. Nhưng nếu bạn thích CoffeeScript, Meteor đã có bạn bảo hiểm. Đơn giản chỉ cần thêm các gói CoffeeScript và bạn sẽ được tốt để đi:
 
-////
+`meteor add coffeescript`
 
 <% end %>
