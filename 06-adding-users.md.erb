@@ -7,7 +7,7 @@ contents: Học về tài khoản người dùng trong Meteor.|Thêm vào tất 
 paragraphs: 27
 ---
 
-Cho đến bây giờ, chúng ta đã học cách tạo và hiểu thị những nội dung tĩnh một cách hợp lý và ráp chúng lại mới nhau thành một bộ prototype đơn giản.
+Cho đến bây giờ, chúng ta đã học cách tạo và hiểu thị những nội dung tĩnh một cách hợp lý và ráp chúng lại với nhau thành một bộ prototype đơn giản.
 
 Chúng ta cũng đã thấy UI của chúng ta đáp lại như thế nào đối với dữ liệu thay đổi, và dữ liệu được chèn vào hoặc được thay đổi xuất hiện ngay lập tức. Tuy vậy, ứng dụng của chúng ta vẫn què quặt bởi sự thật là chúng ta không thể nhập dữ liệu vào. Thực tế, chúng ta còn chưa có cả người dùng!
 
@@ -19,7 +19,7 @@ Trong hầu hết web framework, thêm tài khoản người dùng là một cô
 
 May mắn là Meteor đã làm việc đó cho bạn. Cảm ơn cách mà các gói package của Meteor quản lý code trên cả server (JavaScript) và client (JavaScript, HTML và CSS), chúng ta có thể có được một hệ thống tài khoản người dùng hầu như miễn phí.
 
-Chúng ta có thể sử dụng UI được dựng sẵn của Meteor để tạo tài khoản (với lệnh `meteor add accounts-ui`) nhưng do chúng ta đang xây dựng ứng dụng với Bootstap, chúng ta sẽ dùng gói `ian:accounts-ui-bootstrap-3` thay thế (đừng lo lắng, thứ khác biệt duy nhất chỉ là style hiển thị). Trong màn hình command line, hãy gõ:
+Chúng ta có thể sử dụng UI được dựng sẵn của Meteor để tạo tài khoản (với lệnh `meteor add accounts-ui`) nhưng do chúng ta đang xây dựng ứng dụng với Bootstrap, chúng ta sẽ dùng gói `ian:accounts-ui-bootstrap-3` thay thế (đừng lo lắng, thứ khác biệt duy nhất chỉ là style hiển thị). Trong màn hình command line, hãy gõ:
 
 ~~~bash
 meteor add ian:accounts-ui-bootstrap-3
@@ -27,9 +27,9 @@ meteor add accounts-password
 ~~~
 <%= caption "Terminal" %>
 
-Hai dòng lệnh trên tạo templete tài khoản cho chúng ta, và chúng ta có thể thêm vào site bằng việc sử dụng helper `{{> loginButtons}}`. Mẹo nhỏ: bạn có thể điều chỉnh xem muốn dropdown log-in hiển thị về phía nào bằng việc dùng thuộc tính `align` (ví dụ: `{{> loginButtons  align="right"}}`).
+Hai dòng lệnh trên tạo template tài khoản cho chúng ta, và chúng ta có thể thêm vào site bằng việc sử dụng helper `{{> loginButtons}}`. Mẹo nhỏ: bạn có thể điều chỉnh xem muốn dropdown log-in hiển thị về phía nào bằng việc dùng thuộc tính `align` (ví dụ: `{{> loginButtons  align="right"}}`).
 
-Chúng ta sẽ thêm vào button vào phần header. Và do phần header ngày càng trở nên to hơn, hãy cho thêm phòng cho template của nó (chúng ta sẽ đặt trong `client/templates/includes/`). Chúng ta sẽ thêm một số đánh dấu và class [như được định nghĩa bởi Bootstrap](http://getbootstrap.com/components/#navbar) để chắc chắn rằng mọi thứ trông đẹp mắt:
+Chúng ta sẽ thêm button vào phần header. Và do phần header ngày càng trở nên to hơn, hãy thêm phòng cho template của nó (chúng ta sẽ đặt trong `client/templates/includes/`). Chúng ta sẽ thêm một số đánh dấu và class [như được định nghĩa bởi Bootstrap](http://getbootstrap.com/components/#navbar) để chắc chắn rằng mọi thứ trông đẹp mắt:
 
 ~~~html
 <template name="layout">
