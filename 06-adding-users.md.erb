@@ -1,25 +1,25 @@
 ---
-title: Adding Users
+title: Thêm người dùng
 slug: adding-users
 date: 0006/01/01
 number: 6
-contents: Learn about user accounts in Meteor.|Add all the authentication we'll need for Microscope.|Use the built-in accounts-ui package to get an instant user interface.
+contents: Học về tài khoản người dùng trong Meteor.|Thêm vào tất cả chứng thực người dùng cần cho Microscope.|Dùng gói accounts-ui được dựng sẵn để tạo giao diện người dùng.
 paragraphs: 27
 ---
 
-////
+Cho đến bây giờ, chúng ta đã học cách tạo và hiểu thị những nội dung tĩnh một cách hợp lý và ráp chúng lại mới nhau thành một bộ prototype đơn giản.
 
-////
+Chúng ta cũng đã thấy UI của chúng ta đáp lại như thế nào đối với dữ liệu thay đổi, và dữ liệu được chèn vào hoặc được thay đổi xuất hiện ngay lập tức. Tuy vậy, ứng dụng của chúng ta vẫn què quặt bởi sự thật là chúng ta không thể nhập dữ liệu vào. Thực tế, chúng ta còn chưa có cả người dùng!
 
-////
+Hãy xem chúng ta có thể sửa điều đó như thế nào.
 
-### Accounts: users made simple
+### Accounts: người dùng được tạo ra đơn giản
 
-////
+Trong hầu hết web framework, thêm tài khoản người dùng là một công việc quen thuộc. Bạn phải làm điều đó trong hầu hết các dự án, nhưng nó chưa bao giờ dễ dàng như vậy. Thêm vào nữa, nếu bạn phải làm việc với OAuth hoặc là thiết kế chứng thực của bên thứ ba, mọi thứ trở nên xấu xí nhanh chóng.
 
-////
+May mắn là Meteor đã làm việc đó cho bạn. Cảm ơn cách mà các gói package của Meteor quản lý code trên cả server (JavaScript) và client (JavaScript, HTML và CSS), chúng ta có thể có được một hệ thống tài khoản người dùng hầu như miễn phí.
 
-////
+Chúng ta có thể sử dụng UI được dựng sẵn của Meteor để tạo tài khoản (với lệnh `meteor add accounts-ui`) nhưng do chúng ta đang xây dựng ứng dụng với Bootstap, chúng ta sẽ dùng gói `ian:accounts-ui-bootstrap-3` thay thế (đừng lo lắng, thứ khác biệt duy nhất chỉ là style hiển thị). Trong màn hình command line, hãy gõ:
 
 ~~~bash
 meteor add ian:accounts-ui-bootstrap-3
@@ -27,9 +27,9 @@ meteor add accounts-password
 ~~~
 <%= caption "Terminal" %>
 
-////
+Hai dòng lệnh trên tạo templete tài khoản cho chúng ta, và chúng ta có thể thêm vào site bằng việc sử dụng helper `{{> loginButtons}}`. Mẹo nhỏ: bạn có thể điều chỉnh xem muốn dropdown log-in hiển thị về phía nào bằng việc dùng thuộc tính `align` (ví dụ: `{{> loginButtons  align="right"}}`).
 
-////
+Chúng ta sẽ thêm vào button vào phần header. Và do phần header ngày càng trở nên to hơn, hãy cho thêm phòng cho template của nó (chúng ta sẽ đặt trong `client/templates/includes/`). Chúng ta sẽ thêm một số đánh dấu và class [như được định nghĩa bởi Bootstrap](http://getbootstrap.com/components/#navbar) để chắc chắn rằng mọi thứ trông đẹp mắt:
 
 ~~~html
 <template name="layout">
@@ -68,13 +68,13 @@ meteor add accounts-password
 ~~~
 <%= caption "client/templates/includes/header.html" %>
 
-////
+Bây giờ, khi truy cập vào ứng dụng, chúng ta sẽ thấy button để login tài khoản ở góc trên bên phải.
 
 <%= screenshot "6-1", "Meteor's built-in accounts UI" %>
 
-////
+Chúng ta có thể dùng nó để sign up, log in, tạo request để thay đổi mật khẩu, hoặc bất kỳ thứ gì khác mà một site bình thường cần có cho tài khoản có dùng mật khẩu.
 
-////
+Để bảo cho hệ thống tài khoản của chúng ta biết được rằng chúng ta muốn login dùng username, chúng ta chỉ cần đơn giản thêm vào khối cấu hình`Accounts.ui` trong một file mới tên là `config.js` vào bên trong `client/helpers/`:
 
 ~~~js
 Accounts.ui.config({
@@ -85,20 +85,20 @@ Accounts.ui.config({
 
 <%= commit "6-1", "Added accounts and added template to the header" %>
 
-### Creating Our First User
+### Tạo người dùng đầu tiên
 
-////
+Xin mời bạn tạo một tài khoản: Button "Sign in" sẽ thay đổi để hiển thị username của bạn. Điều này xác nhận rằng một tài khoản người dùng mới đã được tạo. Nhưng dữ liệu của tài khoản đó tới từ đâu?
 
-////
+Bằng việc thêm vào gói `accounts`, Meteor đã tạo ra một collection đặc biệt có thể truy cập từ `Meteor.users`. Để thấy nó, hãy mở console trình duyệt và nhập vào:
 
 ~~~js
 ❯ Meteor.users.findOne();
 ~~~
 <%= caption "Browser console" %>
 
-////
+Console sẽ trả về một object thể hiện người dùng của bạn: nếu quan sát kỹ hơn, bạn có thể thấy username ở đó, cũng như một thuộc tính `_id` duy nhất định danh bạn. Chú ý là bạn cũng có thể lấy ra người dùng đang log-in bằng với `Meteor.user()`.
 
-////
+Bây giờ hãy log out và tạo một tài khoản khác. `Meteor.user()` bây giờ sẽ trả về người dùng thứ hai đó. Nhưng chờ chút, hãy chạy lệnh:
 
 ~~~js
 ❯ Meteor.users.find().count();
@@ -106,9 +106,9 @@ Accounts.ui.config({
 ~~~
 <%= caption "Browser console" %>
 
-////
+Console trả về 1. Không phải là nó nên là 2 hay sao nhỉ? Hay là người dùng thứ nhất đã bị xoá đi? Nếu bạn thử login với người dùng đầu tiên, bạn sẽ điều đó không đúng.
 
-////
+Để chắc chắn hãy kiểm tra nguồn lưu trữ dữ liệu, là cơ sở dữ liệu Mongo. Chúng ta sẽ log in vào Mongo (với `meteor mongo` trên terminal) và kiểm tra:
 
 ~~~bash
 > db.users.count()
@@ -116,21 +116,21 @@ Accounts.ui.config({
 ~~~
 <%= caption "Mongo console" %>
 
-////
+Chắc chắn là có hai người dùng. Vậy tại sao chúng ta chỉ thấy một người dùng duy nhất ở một thời điểm trên trình duyệt?
 
-### A Mystery Publication!
+### Publication bí ẩn!
 
-////
+Nếu bạn suy nghĩ lại chương 4, bạn có thể đã nhớ ra rằng bằng việc tắt đi `autopublish`, chúng ta đã dừng việc cho collection tự động gửi dữ liệu từ server tới mỗi kết nối ở client. Chúng ta cần phải tạo cặp publication và subscription vào kênh dữ liệu.
 
-////
+Chúng ta vẫn chưa tạo ra publication nào đối với user. Vậy làm thế nào chúng ta có thể thấy được dữ liệu user?
 
-////
+Câu trả lời là gói accounts thực sự đã "auto-publish" người dùng đang log in. Nếu không, user đó đã không thể nào log in vào hệ thống được!
 
-////
+Tuy vậy, gói accounts chỉ publish duy nhất người dùng *hiện tại*. Điều này giải thích vì sao chúng ta không thấy thông tin tài khoản còn lại.
 
-////
+Bởi vậy, hệ thống publication chỉ publish duy nhất một user cho người dùng đang log in (và không publish gì nếu như bạn không log in).
 
-////
+Thêm vào nữa, dữ liệu của collection user dường như chứa đựng các trường không giống nhau giữa client và server. Trong Mongo, một user có rất nhiều dữ liệu trong nó. Để thấy điều đó, chúng ta chỉ việc quay lại terminal Mongo và gõ:
 
 ~~~bash
 > db.users.findOne()
@@ -159,7 +159,7 @@ Accounts.ui.config({
 ~~~
 <%= caption "Mongo console" %>
 
-////
+Mặt khác, trên trình duyệt thì object user được gọt đi nhiều, như bạn có thể thấy bằng việc gõ dòng lệnh:
 
 ~~~js
 ❯ Meteor.users.findOne();
@@ -167,7 +167,7 @@ Object {_id: "kYdBd9hr3fWPGPcii", username: "tmeasday"}
 ~~~
 <%= caption "Browser console" %>
 
-////
+Ví dụ này chỉ cho chúng ta thấy một collection phía local có thể *giữ an toàn tập con* của cơ sở dữ liệu thực. Người dùng đang log in chỉ có thể thấy đủ thông tin để thực hiện công việc cần thiết (trong trường hợp này là để sign in). Đây là một hướng hữu ích có thể học hỏi được, như bạn sẽ thấy sau đây.
 
-////
+Điều này không có nghĩa là bạn không thể tạo thêm dữ liệu user công khai nếu bạn muốn. Bạn có thể tham khảo [tài liệu Meteor](http://docs.meteor.com/#meteor_users) để thấy làm thế nào để publish thêm nhiều trường của collection `Meteor.users`.
 
