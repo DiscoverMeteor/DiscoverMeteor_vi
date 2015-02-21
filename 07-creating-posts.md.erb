@@ -1,19 +1,19 @@
 ---
-title: Creating Posts
+title: Tạo bài viết
 slug: creating-posts
 date: 0007/01/01
 number: 7
-contents: Learn how to submit a post client-side.|Implement a simple security check.|Restrict access to the post submit form.|Learn to use a server-side Method for added security.
+contents: Học cách làm thế nào để submit bài viết phía client|Thực hiện kiểm tra bảo mật đơn giản|Hạn chế truy cập tới form submit bài viết.|Học cách dùng method phía server để bảo mật hơn.
 paragraphs: 64
 ---
 
-////
+Chúng ta đã thấy đowcj việc tạo bài viết thông qua console dễ dàng như thế nào bằng việc gọi tương tác cơ sở dữ liệu `Posts.insert`. Tuy nhiên chúng ta không mong người dùng mở console và tạo bài viết như vậy.
 
-////
+Dần dần, chúng ta cần xây dựng giao diện người dùng để gửi những bài viết mới cho ứng dụng.
 
-### Building The New Post Page
+### Xây dựng trang tạo bài viết mới
 
-////
+Chúng ta bắt đầu bằng việc tạo route cho trang mới:
 
 ~~~js
 Router.configure({
@@ -37,9 +37,9 @@ Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 <%= caption "lib/router.js" %>
 <%= highlight "15" %>
 
-### Adding A Link To The Header
+### Thêm Đường Dẫn Cho Header
 
-////
+Với route đã được định nghĩa, chúng ta có thể thêm đường dẫn tới trang submit vào phần header:
 
 ~~~html
 <template name="header">
@@ -69,7 +69,7 @@ Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 <%= caption "client/templates/includes/header.html" %>
 <%= highlight "14~16" %>
 
-////
+Thiết lập route nghĩa là nếu người dùng truy cập vào URL `/submit`, Meteor sẽ hiển thị template `postSubmit`. Vì vậy hãy bắt đầu viết template:
 
 ~~~html
 <template name="postSubmit">
@@ -92,15 +92,15 @@ Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 ~~~
 <%= caption "client/templates/posts/post_submit.html" %>
 
-////
+Chú ý: có rất nhiều markup ở đây, tuy nhiên nó đơn giản tới từ Twitter Bootstrap. Trong khi chỉ có thành phần form là cần thiết, tất cả markup khác giúp ứng dụng của chúng ta trông đẹp mắt hơn. Hiển thị trông sẽ giống như sau:
 
 <%= screenshot "7-1", "The post submit form" %>
 
 ////
 
-### Creating Posts
+### Tạo bài viết
 
-////
+Hãy gắn kết trình xử lý sự kiện (event handler) tới sự kiện `submit` form. Tốt nhất là chúng ta sử dụng sự kiện `submit` (hơn là nói rằng sự kiện `click` trên một button), vì nó sẽ bao hàm tất cả các cách để submit (ví dụ như bấm enter).
 
 ~~~js
 Template.postSubmit.events({
@@ -121,32 +121,32 @@ Template.postSubmit.events({
 
 <%= commit "7-1", "Added a submit post page and linked to it in the header." %>
 
-////
+Hàm này sử dụng [jQuery](http://jquery.com) để phân tách giá trị (value) của nhiều trường trong form của chúng ta, và tạo ra một object post mới từ kết quả phân tách. Chúng ta cần chắc chắn là chúng ta `preventDefault` trên tham số `event` của handler để chắc chắn là trình duyệt không tự ý submit form.
 
-////
+Cuối cùng, chúng ta có thể định tuyến đến trang bài viết mới. Hàm `insert()` đối với một collection trả lại `_id` của object đã được chèn vào cơ sở dữ liệu, chính là cái mà hàm Router `go()` sẽ dùng để tạo ra URL cho chúng ta truy cập.
 
-////
+Kết quả đạt được là khi người dùng bấm submit, một bài viết mới được tạo ra, và người dùng sẽ ngay lập tức được đưa tới trang thảo luận cho bài viết mới đó.
 
-### Adding Some Security
+### Thêm một vài thiết lập an ninh
 
-////
+Tạo bài viết là một việc rất tốt, nhưng chúng ta không muốn để rất cả người thăm quan ngẫu nhiên làm điều đó: chúng ta muốn họ phải log in trước. Dĩ nhiên, chúng ta cũng có thể che giấu form tạo bài viết đối với người dùng đã log out. Tuy nhiên, người dùng vẫn có thể tạo bài viết trên console trình duyệt mà không cần log in, và chúng ta không muốn điều đó.
 
-////
+Rất biết ơn là an toàn dữ liệu được để sẵn bên trong collection Meteor; chỉ có điều là nó được tắt mặc định khi tạo project. Điều này giúp cho bạn bắt đầu một cách dễ dàng và bắt đầu xây dựng ứng dụng của bạn trong khi tạm để dành những phần nhàm chán đó về sau.
 
-////
+Ứng dụng của chúng ta không cần những bánh xe thực tập đó nữa, vì vậy hãy tháo bỏ chúng! Chúng ta sẽ xoá gói `insecure`:
 
 ~~~bash
 meteor remove insecure
 ~~~
 <%= caption "Terminal" %>
 
-////
+Sau khi làm điều đó, bạn sẽ nhận ra là form bài viết không còn làm việc một cách hiệu quả. Bởi vì không có gói `insecure`, việc chèn bài viết vào collection posts từ phía client *không được chấp nhận nữa*.
 
-////
+Chúng ta phải hoặc là thiết lập một số luật báo cho Meteor biết khi nào client được phép chèn bài viết, hoặc là làm việc đó ở phía server.
 
-### Allowing Post Inserts
+### Cho phép chèn bài viết
 
-////
+Để bắt đầu, chúng ta sẽ chỉ ra làm thế nào để cho phép client chèn bài viết, giúp cho form trở lại hoạt động bình thường. Chúng ta sẽ sử dụng một kỹ thuật khác, nhưng bây giờ, thứ sau đây sẽ giúp cho mọi thứ trở lại hoạt động:
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -163,29 +163,29 @@ Posts.allow({
 
 <%= commit "7-2", "Removed insecure, and allowed certain writes to posts." %>
 
-////
+Chúng ta gọi `Posts.allow`, báo cho Meteor biết là "đây là một hoàn cảnh mà client được phép thực hiện thao tác tới collection `Posts`". Trong trường hợp này, chúng ta bảo rằng "client được phép chèn bài viết miễn là nó có `userId`".
 
-////
+`userId` của user thực hiện việc thay đổi được chuyển qua gọi `allow` và `deny` (hoặc trả về `null` nếu không có user nào log in), là thứ mà hầu như lúc nào cũng có ích. Và do tài khoản người dùng được gắn với phần lõi của Meteor, chúng ta có thể tin tưởng rằng `userId` luôn đúng.
 
-////
+Chúng ta vừa thành công trong việc chắc chắn rằng bạn cần phải log in để tạo bài viết. Thử log out và tạo một bài viết; bạn sẽ thấy như sau trên console:
 
 <%= screenshot "7-2", "Insert failed: Access denied " %>
 
-////
+Tuy nhiên, chúng ta vẫn phải đổi mặt với một vài vấn đều:
 
-- ////
-- ////
-- ////
+- Người dùng trong trạng thái log out vẫn có thể vươn tới việc tạo form bài viết.
+- Bài viết không được gắn với user theo bất kỳ cách nào (và không có đoạn code nào trên server bắt buộc điều đó).
+- Nhiều bài viết có thể được tạo với cùng URL
 
-////
+Hãy cùng nhau sửa những vấn đề này.
 
-### Securing Access To The New Post Form
+### Thiết lập an ninh cho truy cập form tạo bài viết mới
 
-////
+Chúng ta sẽ bắt đầu bằng việc ngăn người dùng log out từ việc thấy form submit bài viết. Chúng ta sẽ làm điều đó từ cấp router, bằng việc định nghĩa *route hook*.
 
-////
+Hook ngăn chặn xử lý định tuyến và thay đổi tiềm tàng hành động mà router đảm đương. Bạn có thể nghĩ nó như là một người bảo vệ kiểm tra giấy chứng nhận trước khi để bạn vào (hoặc thoát ra).
 
-////
+Điều chúng ta cần làm là kiểm tra người dùng đã log in hay chưa, và nếu chưa thì đưa ra template `accessDenied` thay vì template `postSubmit` (chúng ta sẽ dừng router không cho làm bất kỳ điều gì khác). Vậy hãy thay đổi router.js như sau:
 
 ~~~js
 Router.configure({
@@ -218,7 +218,7 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 <%= caption "lib/router.js" %>
 <%= highlight "17~23,26" %>
 
-////
+Chúng ta cũng tạo template cho trang từ chối truy cập:
 
 ~~~html
 <template name="accessDenied">
@@ -232,19 +232,19 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 
 <%= commit "7-3", "Denied access to new posts page when not logged in." %>
 
-////
+Nếu bạn truy cập vào http://localhost:3000/submit/ mà không log in, bạn sẽ nhận được tin nhắn như bên dưới:
 
 <%= screenshot "7-3", "The access denied template" %>
 
-////
+Điều hay về route hook là nó cũng *tương tác ngược*. Điều đó có nghĩa là chúng ta không cần nghĩ về việc thiết lập callback mỗi khi người dùng log in: khi trang thái log in của người dùng thay đổi, template của trang Router ngay lập tức chuyển từ `accessDenied` thành `postSubmit` mà chúng ta không cần phải viết bất kỳ đoạn code nào để xử lý việc đó (và tiện thể, điều này hoạt động ngay cả với nhiều tab trình duyệt).
 
-////
+Log in và thử làm mới trang. Bạn sẽ có thể nhận ra là template trang từ chối truy cập thỉnh thoảng loé hiện ra trong một khoảnh khắc trước khi trang submit xuất hiện. Lý do cho điều này là Meteor bắt đầu đưa ra template ngay khi có thể, trước khi nó kịp nói chuyện với server và kiểm tra nếu người dùng hiện tại (được lưu trữ trên bộ lưu trữ cục bộ trên trình duyệt) tồn tại hay không.
 
-////
+Để tránh điều này (là một vấn đề chung bạn sẽ gặp nhiều hơn nếu xử lý với những rắc rối xuất phát từ độ trễ giữa client và server). Chúng ta sẽ chỉ hiển thị một màn hình đang nạp cho khoảnh khắc ngắn mà chúng ta đợi để biết nếu như người dùng đã truy cập hay chưa.
 
-////
+Sau hết thì tại thời điển này, chúng ta không biết nếu như người dùng đúng là có chứng thực log-in đúng hay không, và chúng ta không thể hiển thị cả template `accessDenied` hoặc `postSubmit` cho đến khi chúng ta xác nhận được.
 
-////
+Bởi vậy chúng ta sẽ thay đổi hook để sử dụng template đang nạp khi mà `Meteor.loggingIn()` ở trạng thái đúng:
 
 ~~~js
 //...
@@ -269,9 +269,9 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 
 <%= commit "7-4", "Show a loading screen while waiting to login." %>
 
-### Hiding the Link
+### Giấu đường dẫn
 
-////
+Cách dễ dàng nhất để tránh người dùng do nhầm lẫn mà cố gắng truy cập tới trang này khi mà họ đã log out là giấu đường dẫn đó đi. Chúng ta có thể làm điều này khá dễ dàng:
 
 ~~~html
 //...
@@ -287,27 +287,27 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 
 <%= commit "7-5", "Only show submit post link if logged in." %>
 
-////
+helper `currentUser` được cung cấp cho chúng ta bằng gói `accounts` và là Spacebars tương ứng với `Meteor.user()`. Vì nó tương tác ngược, đường dẫn sẽ xuất hiện hoặc biến mất khi bạn log in và log out.
 
-### Meteor Method: Better Abstraction and Security
+### Meteor Method: Trừ tượng hoá tốt hơn và an toàn hơn
 
-////
+Chúng ta vừa thành công trong việc bảo mật lối vào tới bài viết mới từ người dùng log out, và từ chối những người dùng đó từ việc tạo bài viết ngay cả khi họ gian lận và dùng console. Tuy nhiên vẫn còn một vài thứ chúng ta phải để ý:
 
-- ////
-- ////
-- ////
+- Đánh dấu thời gian của bài viết.
+- Chắc chắn rằng URL giống nhau không được tạo nhiều hơn một lần.
+- Thêm thông tin chi tiết về tác giả bài viết (ID, username,...).
 
-////
+Bạn có thể nghĩ rằng chúng ta có thể làm điều đó thông qua handler sự kiện `submit`. Thực tế là chúng ta sẽ nhanh chóng gặp phải những vấn đề sau.
 
-- ////
-- ////
-- ////
+- Về nhãn thời gian, chúng ta phải dựa vào thời gian phía máy của người dùng, điều đó không luôn đúng trong mọi trường hợp.
+- Client sẽ không biết được _tất cả_ URL được gửi tới trang. Chúng chỉ biết bài viết đang được hiển thị (chúng ta sẽ thấy điều này sau đây), vì vậy không có cách nào để cho URL đơn nhất phía client.
+- Cuối cùng, mặc dù chúng ta _có thể_ thêm cụ thể người dùng từ phía client, chúng ta sẽ không bắt buộc được độ chính xác của nó, điều có thể dẫn đến ứng dụng của chúng ta bị khai thác hết từ người dùng console trình duyệt.
 
-////
+Cho những lý do đó, tốt hơn là giữ cho handler sự kiện đơn giản, và nếu chúng ta làm nhiều hơn là thao tác chèn hoặc sửa đơn giản tới collection, chúng ta sử dụng **Method**.
 
-////
+Một Meteor Method là một hàm phía server được *gọi* (*call*) bởi phía client. Chúng ta không phải là hoàn toàn không biết về nó -- thực tế, phía sau màn hình, thao tác `insert`, `update` và `remove` của `Collection` đều là Method. Hãy xem làm thế nào để tạo ra Method của riêng chúng ta.
 
-////
+hãy cùng trở lại với `post_submit.js`. Thay vì chèn trực tiếp vào collection `Posts`, chúng ta sẽ gọi Method tên là `postInsert`:
 
 ~~~js
 Template.postSubmit.events({
@@ -332,19 +332,19 @@ Template.postSubmit.events({
 <%= caption "client/templates/posts/post_submit.js" %>
 <%= highlight "10~16" %>
 
-////
+Hàm `Meteor.call` gọi tên một Method ở tham số thứ nhất. Bạn có thể cung cấp tham số cho hàm call (trong trường hợp này, là object `post` chúng ta cấu tạo từ form), và cuối cùng gắn vào hàm callback, thứ sẽ chạy khi mà Method ở phía server đã thực hiện xong.
 
-////
+Callback của Meteor method luôn có hai tham số, `error` và `result`. Nếu vì bất kỳ lý do gì mà `error` tồn tại, chúng ta sẽ thông báo alert cho người dùng (sử dụng `return` để huỷ bỏ callback). Nếu như mọi thứ hoạt đúng, chúng ta sẽ đổi hướng thành công người dùng sang trang thảo luận cho bài viết vừa được tạo.
 
-### Security Check
+### Kiểm tra bảo mật
 
-////
+Chúng ta sẽ sử dụng cơ hội này để thêm vào một số thuộc tính bảo mật cho method bằng việc sử dụng gói [`audit-argument-checks`](http://docs.meteor.com/#auditargumentchecks).
 
-////
+Gói này giúp chúng ta kiểm tra object JavaScript theo một chuẩn định nghĩa trước. Trong trường hợp này, chúng ta sẽ dùng nó để kiểm tra xem người dùng gọi method đã log in hay chưa (bằng việc chắc chắn `Meteor.userId() là một chuỗi `String`), và xem object `postAttributes` được gửi như là một tham số tới method bao gồm chuỗi `title` và `url` hay không. Theo cách này, chúng ta không để cho những mảnh dữ liệu ngẫu nhiên vào cơ sở dữ liệu.
 
-////
+Hãy cùng định nghĩa method `postInsert` trong file `collections/posts.js`. Chúng ta sẽ xoá khối `allow()` từ `posts.js` bởi vì Meteor Methods dù sao  bỏ qua nó.
 
-////
+Chúng ta cũng sẽ sau đó `mở rộng` (`extend`) object `postAttributes` với thêm ba thuộc tính: `_id` và `username` của người dùng, cũng như tem thời gian lúc gửi bài `submitted` trước khi chèn toàn bộ mọi thứ vào cơ sở dữ liệu và trả về kết quả `_id` tới client (nói cách khác, người gọi ban đầu của method) bởi một object JavaScript.
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -381,17 +381,17 @@ Meteor.methods({
 
 <% note do %>
 
-### Bye Bye Allow/Deny
+### Tạm biệt Allow/Deny
 
-////
+Chú ý rằng method `_.extend()` là một phần của thư viện [Underscore](http://underscorejs.org), nó đơn giản giúp bạn “mở rộng” một object với những thuộc tính khác.
 
-////
+Nếu bạn muốn chạy một đoạn code trước mỗi lệnh `insert`, `update` hoặc `remove` *ngay cả trên server*, chúng tôi đề nghị kiểm tra gói [collection-hooks](https://github.com/matb33/meteor-collection-hooks).
 
 <% end %>
 
-### Preventing Duplicates
+### Tránh bản sao (duplicate)
 
-////
+Chúng ta sẽ tạo thêm kiểm tra nữa trước khi đóng gọi method. Nếu như một bài viết cùng URL đã được tạo trước đó, chúng ta sẽ không thêm đường dẫn lần thứ hai mà sẽ hướng người dùng sang bài viết đã tồn tại.
 
 ~~~js
 Meteor.methods({
@@ -428,11 +428,11 @@ Meteor.methods({
 <%= caption "collections/posts.js" %>
 <%= highlight "9~15" %>
 
-////
+Chúng ta đang tìm kiếm trên cơ sở dữ liệu của mình bất kỳ bài viết nào có cùng URL. Nếu như bất kỳ cái nào tìm được, chúng ta `return` `_id` của bài viết đó kèm với cờ `postExists: true` để cho client biết về tình huống này.
 
-////
+Và do chúng ta đã khởi động gọi `return`, method dừng lại tại thời điểm đó mà không chạy câu lệnh `insert`, do đó tránh được bản sao.
 
-////
+Điều còn lại là dùng thông tin `postExists` này để tạo mẩu tin cảnh báo tới helper sự kiện phía client:
 
 ~~~js
 Template.postSubmit.events({
@@ -463,9 +463,9 @@ Template.postSubmit.events({
 
 <%= commit "7-7", "Enforce post URL uniqueness." %>
 
-### Sorting Posts
+### Sắp xếp bài viết
 
-////
+Bây giờ chúng ta đã có ngày submit trên tất cả bài viết, và sẽ rất hợp lý nếu chúng được sắp xếp theo thuộc tính này. Để làm điều đó, chúng ta có thể sử dụng toán tử `sort` của Meteor. Toán tử này bao gồm object có chứa khoá sắp xếp và một dấu chỉ ra chúng được sắp xếp tăng hay giảm.
 
 ~~~js
 Template.postsList.helpers({
@@ -479,6 +479,6 @@ Template.postsList.helpers({
 
 <%= commit "7-8", "Sort posts by submitted timestamp." %>
 
-////
+Chúng ta đã làm việc nhiều một chút, nhưng cuối cùng có được một giao diện để người dùng nhập nội dùng vào ứng dụng một cách an toàn!
 
-////
+Nhưng một ứng dụng cho phép tạo nội dung cũng đồng thời phải có cách để sửa hoặc xoá nội dung. Đó sẽ là điều được bàn đến trong chương tiếp theo.
