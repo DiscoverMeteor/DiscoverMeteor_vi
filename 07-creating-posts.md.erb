@@ -7,7 +7,7 @@ contents: Học cách làm thế nào để submit bài viết phía client|Th�
 paragraphs: 64
 ---
 
-Chúng ta đã thấy đowcj việc tạo bài viết thông qua console dễ dàng như thế nào bằng việc gọi tương tác cơ sở dữ liệu `Posts.insert`. Tuy nhiên chúng ta không mong người dùng mở console và tạo bài viết như vậy.
+Chúng ta đã thấy được việc tạo bài viết thông qua console dễ dàng như thế nào bằng việc gọi tương tác cơ sở dữ liệu `Posts.insert`. Tuy nhiên chúng ta không mong người dùng mở console và tạo bài viết như vậy.
 
 Dần dần, chúng ta cần xây dựng giao diện người dùng để gửi những bài viết mới cho ứng dụng.
 
@@ -129,9 +129,9 @@ Kết quả đạt được là khi người dùng bấm submit, một bài vi�
 
 ### Thêm một vài thiết lập an ninh
 
-Tạo bài viết là một việc rất tốt, nhưng chúng ta không muốn để rất cả người thăm quan ngẫu nhiên làm điều đó: chúng ta muốn họ phải log in trước. Dĩ nhiên, chúng ta cũng có thể che giấu form tạo bài viết đối với người dùng đã log out. Tuy nhiên, người dùng vẫn có thể tạo bài viết trên console trình duyệt mà không cần log in, và chúng ta không muốn điều đó.
+Tạo bài viết là một việc rất tốt, nhưng chúng ta không muốn để ất cả người thăm quan ngẫu nhiên làm điều đó: chúng ta muốn họ phải log in trước. Dĩ nhiên, chúng ta cũng có thể che giấu form tạo bài viết đối với người dùng đã log out. Tuy nhiên, người dùng vẫn có thể tạo bài viết trên console trình duyệt mà không cần log in, và chúng ta không muốn điều đó.
 
-Rất biết ơn là an toàn dữ liệu được để sẵn bên trong collection Meteor; chỉ có điều là nó được tắt mặc định khi tạo project. Điều này giúp cho bạn bắt đầu một cách dễ dàng và bắt đầu xây dựng ứng dụng của bạn trong khi tạm để dành những phần nhàm chán đó về sau.
+Rất biết ơn là an toàn dữ liệu  được để sẵn bên trong collection Meteor; chỉ có điều là nó được tắt mặc định khi tạo project. Điều này giúp cho bạn bắt đầu một cách dễ dàng và bắt đầu xây dựng ứng dụng của bạn trong khi tạm để dành những phần nhàm chán đó về sau.
 
 Ứng dụng của chúng ta không cần những bánh xe thực tập đó nữa, vì vậy hãy tháo bỏ chúng! Chúng ta sẽ xoá gói `insecure`:
 
@@ -171,9 +171,9 @@ Chúng ta vừa thành công trong việc chắc chắn rằng bạn cần phả
 
 <%= screenshot "7-2", "Insert failed: Access denied " %>
 
-Tuy nhiên, chúng ta vẫn phải đổi mặt với một vài vấn đều:
+Tuy nhiên, chúng ta vẫn phải đổi mặt với một vài vấn đề:
 
-- Người dùng trong trạng thái log out vẫn có thể vươn tới việc tạo form bài viết.
+- Người dùng trong trạng thái log out vẫn có thể tiếp cận tạo form bài viết.
 - Bài viết không được gắn với user theo bất kỳ cách nào (và không có đoạn code nào trên server bắt buộc điều đó).
 - Nhiều bài viết có thể được tạo với cùng URL
 
@@ -183,7 +183,7 @@ Hãy cùng nhau sửa những vấn đề này.
 
 Chúng ta sẽ bắt đầu bằng việc ngăn người dùng log out từ việc thấy form submit bài viết. Chúng ta sẽ làm điều đó từ cấp router, bằng việc định nghĩa *route hook*.
 
-Hook ngăn chặn xử lý định tuyến và thay đổi tiềm tàng hành động mà router đảm đương. Bạn có thể nghĩ nó như là một người bảo vệ kiểm tra giấy chứng nhận trước khi để bạn vào (hoặc thoát ra).
+Hook ngăn chặn xử lý định tuyến và thay đổi hành động mà router mặc định đảm đương. Bạn có thể nghĩ nó như là một người bảo vệ kiểm tra giấy chứng nhận trước khi để bạn vào (hoặc thoát ra).
 
 Điều chúng ta cần làm là kiểm tra người dùng đã log in hay chưa, và nếu chưa thì đưa ra template `accessDenied` thay vì template `postSubmit` (chúng ta sẽ dừng router không cho làm bất kỳ điều gì khác). Vậy hãy thay đổi router.js như sau:
 
@@ -236,7 +236,7 @@ Nếu bạn truy cập vào http://localhost:3000/submit/ mà không log in, b�
 
 <%= screenshot "7-3", "The access denied template" %>
 
-Điều hay về route hook là nó cũng *tương tác ngược*. Điều đó có nghĩa là chúng ta không cần nghĩ về việc thiết lập callback mỗi khi người dùng log in: khi trang thái log in của người dùng thay đổi, template của trang Router ngay lập tức chuyển từ `accessDenied` thành `postSubmit` mà chúng ta không cần phải viết bất kỳ đoạn code nào để xử lý việc đó (và tiện thể, điều này hoạt động ngay cả với nhiều tab trình duyệt).
+Điều hay về route hook là nó cũng *tương tác ngược*. Điều đó có nghĩa là chúng ta không cần nghĩ về việc thiết lập callback mỗi khi người dùng log in: khi tr thái log in của người dùng thay đổi, template của trang Router ngay lập tức chuyển từ `accessDenied` thành `postSubmit` mà chúng ta không cần phải viết bất kỳ đoạn code nào để xử lý việc đó (và tiện thể, điều này hoạt động ngay cả với nhiều tab trình duyệt).
 
 Log in và thử làm mới trang. Bạn sẽ có thể nhận ra là template trang từ chối truy cập thỉnh thoảng loé hiện ra trong một khoảnh khắc trước khi trang submit xuất hiện. Lý do cho điều này là Meteor bắt đầu đưa ra template ngay khi có thể, trước khi nó kịp nói chuyện với server và kiểm tra nếu người dùng hiện tại (được lưu trữ trên bộ lưu trữ cục bộ trên trình duyệt) tồn tại hay không.
 
@@ -307,7 +307,7 @@ Cho những lý do đó, tốt hơn là giữ cho handler sự kiện đơn gi�
 
 Một Meteor Method là một hàm phía server được *gọi* (*call*) bởi phía client. Chúng ta không phải là hoàn toàn không biết về nó -- thực tế, phía sau màn hình, thao tác `insert`, `update` và `remove` của `Collection` đều là Method. Hãy xem làm thế nào để tạo ra Method của riêng chúng ta.
 
-hãy cùng trở lại với `post_submit.js`. Thay vì chèn trực tiếp vào collection `Posts`, chúng ta sẽ gọi Method tên là `postInsert`:
+ãy cùng trở lại với `post_submit.js`. Thay vì chèn trực tiếp vào collection `Posts`, chúng ta sẽ gọi Method tên là `postInsert`:
 
 ~~~js
 Template.postSubmit.events({
@@ -340,11 +340,11 @@ Callback của Meteor method luôn có hai tham số, `error` và `result`. Nế
 
 Chúng ta sẽ sử dụng cơ hội này để thêm vào một số thuộc tính bảo mật cho method bằng việc sử dụng gói [`audit-argument-checks`](http://docs.meteor.com/#auditargumentchecks).
 
-Gói này giúp chúng ta kiểm tra object JavaScript theo một chuẩn định nghĩa trước. Trong trường hợp này, chúng ta sẽ dùng nó để kiểm tra xem người dùng gọi method đã log in hay chưa (bằng việc chắc chắn `Meteor.userId() là một chuỗi `String`), và xem object `postAttributes` được gửi như là một tham số tới method bao gồm chuỗi `title` và `url` hay không. Theo cách này, chúng ta không để cho những mảnh dữ liệu ngẫu nhiên vào cơ sở dữ liệu.
+Gói này giúp chúng ta kiểm tra object JavaScript theo một chuẩn định nghĩa trước. Trong trường hợp này, chúng ta sẽ dùng nó để kiểm tra xem người dùng gọi method đã log in hay chưa (bằng việc chắc chắn `Meteor.userId()` là một chuỗi `String`), và xem object `postAttributes` được gửi như là một tham số tới method bao gồm chuỗi `title` và `url` hay không. Theo cách này, chúng ta không để cho những mảnh dữ liệu ngẫu nhiên vào cơ sở dữ liệu.
 
 Hãy cùng định nghĩa method `postInsert` trong file `collections/posts.js`. Chúng ta sẽ xoá khối `allow()` từ `posts.js` bởi vì Meteor Methods dù sao  bỏ qua nó.
 
-Chúng ta cũng sẽ sau đó `mở rộng` (`extend`) object `postAttributes` với thêm ba thuộc tính: `_id` và `username` của người dùng, cũng như tem thời gian lúc gửi bài `submitted` trước khi chèn toàn bộ mọi thứ vào cơ sở dữ liệu và trả về kết quả `_id` tới client (nói cách khác, người gọi ban đầu của method) bởi một object JavaScript.
+Chúng ta cũng sẽ sau đó `mở rộng` (`extend`) object `postAttributes` với thêm ba thuộc tính: `_id` và `username` của người dùng, cũng như tem thời gian lúc gửi bài `submitted` trước khi chèn toàn bộ mọi thứ vào cơ sở dữ liệu và trả về kết quả `_id` tới client (nói cách khác,  gọi ban đầu của method) bởi một object JavaScript.
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -479,6 +479,6 @@ Template.postsList.helpers({
 
 <%= commit "7-8", "Sort posts by submitted timestamp." %>
 
-Chúng ta đã làm việc nhiều một chút, nhưng cuối cùng có được một giao diện để người dùng nhập nội dùng vào ứng dụng một cách an toàn!
+Chúng ta đã làm việc nhiều một chút, nhưng cuối cùng có được một giao diện để người dùng nhập nội  vào ứng dụng một cách an toàn!
 
-Nhưng một ứng dụng cho phép tạo nội dung cũng đồng thời phải có cách để sửa hoặc xoá nội dung. Đó sẽ là điều được bàn đến trong chương tiếp theo.
+Nhưng một ứng dụng cho phép tạo nội dung cũng đồng thời phải có cách để biên tập hoặc xoá nội dung. Đó sẽ là điều được bàn đến trong chương tiếp theo.
