@@ -1,15 +1,18 @@
 ---
-title: Editing Posts
+title: Biên tập bài viết
 slug: editing-posts
 date: 0008/01/01
 number: 8
-contents: Add a form for editing your posts.|Set up edit permissions.|Restrict which properties can be edited.
-paragraphs: 30
+points: 5
+photoUrl: http://www.flickr.com/photos/ikewinski/9473337133/
+photoAuthor: Mike Lewinski
+contents: Thêm form để biên tập bài viết của bạn.|Thiết lập quyền hạn biên tập.|Hạn chế thuộc tính nào có thể biên tập được.
+paragraphs: 29
 ---
 
-////
+Bây giờ chúng ta đã có thể tạo bài viết, bước tiếp theo sẽ là biên tập và xoá chúng. Trong khi code UI để làm việc đó khá là dễ dàng, đây là thời điểm thích hợp để nói về việc làm thế nào Meteor quản lý quyền hạn.
 
-////
+Ban đầu hãy lắp ráp router trước. Chúng ta sẽ thêm vào route để truy cập trang biên tập bài viết và thiết lập ngữ cảnh dữ liệu cho nó.
 
 ~~~js
 Router.configure({
@@ -51,9 +54,9 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 <%= caption "lib/router.js" %>
 <%= highlight "15~18" %>
 
-### The Post Edit Template
+### Template biên tập bài viết
 
-////
+Chúng ta bây giờ có thể tập trung vào template. Template `postEdit` của chúng ta sẽ khá là tiêu chuẩn:
 
 ~~~html
 <template name="postEdit">
@@ -78,7 +81,7 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 ~~~
 <%= caption "client/templates/posts/post_edit.html" %>
 
-////
+Và sau đây là file `post_edit.js` đi kèm với nó:
 
 ~~~js
 Template.postEdit.events({
@@ -115,19 +118,19 @@ Template.postEdit.events({
 ~~~
 <%= caption "client/templates/posts/post_edit.js" %>
 
-////
+Bây giờ thì phần lớn đoạn code có lẽ đã trở lên thân thuộc với bạn.
 
-////
+Chúng ta có hai hàm callback cho sự kiện của template: một cho sự kiện `submit` và một cho sự kiện `click` vào đường dẫn xoá.
 
-////
+Callback xoá khá là đơn giản: giữ kín sự kiện click mặc định, sau đó hỏi người dùng xác nhận. Nếu bạn nhận nó, thu được ID bài viết hiện tại từ ngữ cảnh dữ liệu của template, xoá nó, và cuối cùng đổi hướng người dùng về trang chủ (homepage).
 
-////
+Callback cập nhật thì dài hơn một chút, nhưng cũng không quá phức tạp hơn. Sau khi xoá bỏ sự kiện mặc định và lấy ra bài viết hiện tại, chúng ta lấy giá trị từ trường của form từ trang và lưu trữ chúng trong object `postProperties`.
 
-////
+Chúng ta sau đó gửi object tới Method `Collection.update()` sử dụng toán tử [`$set`](http://docs.mongodb.org/manual/reference/operator/update/set/) (thứ sẽ thay đổi một bộ các trường được đặc tả trong khi giữ nguyên những trường còn lại), và dùng callbakc để hiển thị hoặc lỗi nếu việc update thất bại, hoặc đưa người dùng trở lại trang bài viết nếu như việc update thành công.
 
-### Adding Links
+### Thêm đường dẫn
 
-////
+Chúng ta cũng thêm vào đường dẫn vào bài viết để người dùng có thể truy cập được vào trang biên tập bài viết.
 
 ~~~html
 <template name="postItem">
@@ -146,7 +149,7 @@ Template.postEdit.events({
 <%= caption "client/templates/posts/post_item.html" %>
 <%= highlight "5~8" %>
 
-////
+Dĩ nhiên, chúng ta không muốn hiển thị đường dẫn biên tập tới bất kỳ ai khác. Đây là lúc mà helper `ownPost` xuất hiện:
 
 ~~~js
 Template.postItem.helpers({
@@ -167,13 +170,13 @@ Template.postItem.helpers({
 
 <%= commit "8-1", "Added edit posts form." %>
 
-////
+Trang biên tập form của chúng ta trông khá ổn, nhưng chúng ta không thực sự biên tập bất kỳ thứ gì bây giờ. Điều gì đang diễn ra?
 
-### Setting Up Permissions
+### Thiết lập quyền hạn
 
-////
+Vì chúng ta đã xoá bỏ gói `insecure`, tất cả thay đổi từ client đều bị từ chối.
 
-////
+Để thay đổi điều này, chúng ta sẽ thiết lập một vài luật về quyền hạn. Đầu tiên, tạo một file `permissions.js` bên trong `lib`. Điều này đảm bảo rằng logic quyền hạn được nạp đầu tiên (và hữu dụng đối với cả hai môi trường):
 
 ~~~js
 // check that the userId specified owns the documents
@@ -183,9 +186,9 @@ ownsDocument = function(userId, doc) {
 ~~~
 <%= caption "lib/permissions.js" %>
 
-////
+Trong chương về [Tạo bài viết](/chapter/creating-posts), chúng ta đã loại bỏ Method `allow()` bởi vì chúng ta chỉ muốn chèn thêm bài viết mới từ Method phía server (thứ bỏ qua `allow()`).
 
-////
+Nhưng bây giờ vì chúng ta biên tập và xoá bài viết từ phía client, hãy quay trở lại `posts.js` và thêm khối `allow()` vào:
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -202,11 +205,11 @@ Posts.allow({
 
 <%= commit "8-2", "Added basic permission to check the post's owner." %>
 
-### Limiting Edits
+### Hạn chế biên tập
 
-////
+Chỉ vì bạn có thể biên tập bài viết của mình, điều đó cũng không có nghĩa là bạn nên biên tập *mọi* thuộc tính. Ví dụ, chúng ta không muốn người dùng có thể tạo bài viết và gán cho một ai đó khác.
 
-////
+Vì vậy chúng ta sẽ dùng callback `deny()` của Meteor để chắc chắn rằng người dùng chỉ có thể biên tập một số trường nhất định:
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -230,30 +233,30 @@ Posts.deny({
 
 <%= commit "8-3", "Only allow changing certain fields of posts." %>
 
-////
+Chúng ta đang nói về mảng `fieldNames` mà có chứa danh cách những trường đang được thay đổi, và sử dụng Method `without` của [Underscore](http://underscorejs.org/) để trả về một mảng con chứa những trường mà *không phải* `url` hoặc `title`.
 
-////
+Nếu mọi việc bình thường, mảng đó sẽ trống không và độ dài của nó sẽ là 0. Nếu ai đó cố làm điều gì đó gượng ép, độ dài của mảng sẽ trở thành 1 hoặc lớn hơn, và callback sẽ trả về `true` (do đó từ chối việc cập nhật).
 
-////
+Bạn có thể đã nhận ra rằng không nơi nào trong đoạn code biên tập bài viết kiểm tra đường dẫn bị trùng lặp. Điều này có nghĩa là một người dùng có thể submit đường dẫn và sau đó thay đổi đường dẫn của nó để vượt qua đoạn kiểm tra đó. Giải pháp cho vấn đề này có thể cũng là sử dụng Meteor method cho việc biên tập bài viết, nhưng chúng tôi sẽ dành công việc đó như một bài tập cho độc giả.
 
 <% note do %>
 
-### Method Calls vs Client-side Data Manipulation
+### Method Calls vs điều khiển dữ liệu phía client
 
-////
+Để tạo bài viết, chúng ta đang sử dụng Meteor method `postInsert`, nhưng ngược lại khi biên tập và xoá chúng, chúng ta đang gọi `update` và `remove` trực tiếp ở phía client và hạn chế truy cập thông qua `allow` và `deny`.
 
-////
+Khi nào thì phù hợp để làm theo cách này hay cách kia?
 
-////
+Khi mà mọi thứ khá rõ ràng và bạn có thể diễn đạt một cách thoả đáng các luật thông qua `allow` và `deny`, thường thì sẽ đơn giản hơn khi mà làm trực tiếp trên client.
 
-////
+Tuy nhiên, ngay khi bạn bắt đầu cần phải làm thứ bên ngoài tầm kiểm soát của người dùng (ví dụ như gắn tem thời gian cho bài viết hoặc chỉ định nó cho người dùng đúng), thường thì tốt hơn khi dùng Method.
 
-////
+Gọi Method cũng thường hợp lý hơn trong một vài hoàn cảnh:
 
-- ////
-- ////
-- ////
+- Khi mà bạn muốn biết hoặc trả về giá trị dựa vào callback hơn là đợi cho tương tác ngước và đồng bộ truyền lại.
+- Cho hàm với cơ sở dữ liệu nặng, mà việc gửi dữ liệu lớn như vậy đắt giá.
+- Khi tổng hợp và tập hợp dữ liệu (ví dụ như đếm, trung bình, tổng).
 
-////
+[Kiểm tra blog của chúng tôi](https://www.discovermeteor.com/blog/meteor-methods-client-side-operations/) cho việc khảo sát sâu hơn chủ đề này.
 
 <% end %>
