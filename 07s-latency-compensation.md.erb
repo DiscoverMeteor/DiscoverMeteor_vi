@@ -1,49 +1,49 @@
 ---
-title: Latency Compensation
+title: Đền Bù Độ Trễ
 slug: latency-compensation
 date: 0007/01/02
 number: 7.5
 sidebar: true
-contents: Understand latency compensation.|Slow your app down and see what's going on.|Learn how Meteor Methods call each other.
+contents: Hiểu về đền bù độ trễ.|Làm chậm ứng dụng của bạn và xem điều gì đang diễn ra.|Học cách làm thế nào Meteor Methods gọi lẫn nhau.
 paragraphs: 32
 ---
 
-////
+Trong chương trước, chúng tôi đã giới thiệu một khái niệm mới trong thế giới Meteor:**Methods**
 
 <%= diagram "latency1", "Without latency compensation", "pull-right" %>
 
-////
+Một Meteor Method là một cách thực thi chuỗi các lệnh một cách có cấu trúc trên phía server. Trong ví dụ của chúng ta, Method được sử dụng bởi vì chúng ta muốn chắc chắn rằng bài viết mới được gắn tag với tên tác giả và id cũng như thời gian hiện tại của server.
 
-////
+Tuy nhiên, nếu như Meteor thực hiện Methods theo cách cơ bản nhất, chúng ta đã có vấn đề. Xem xét chuỗi những sự kiện sau đây (chú ý: tem thời gian được tạo ngẫu nhiêu phục vụ cho mục đích minh hoạ):
 
-- ////
-- ////
-- ////
+- *+0ms:* Người dùng bấm vào button submit và trình duyệt gọi Method.
+- *+200ms:* Server tạo thay đổi tới cơ sở dữ liệu Mongo.
+- *+500ms:* Client nhận những thay đổi này, cập nhật vào UI.
 
-////
+Nếu đây là cách mà Meteor được vận hành, sẽ có một khoảng thời gian lag giữa quá trình diễn ra hoạt động và việc nhìn thấy kết quả (độ lag đó nhiều hay ít tuỳ thuộc vào bạn gần hay xa server). Chúng ta không thể chấp nhận điều đó trong một hệ thống web hiện đại!
 
-### Latency Compensation
+### Đền bù độ trễ
 
 <%= diagram "latency2", "With latency compensation", "pull-right" %>
 
-////
+Để tránh vấn đề này, Meteor giới thiệu một khái niệm gọi là **đền bù độ trễ**. Khi định nghĩa Method `post`, chúng ta đặt nó trong một file ở đường dẫn `collections/`. Điều này có nghĩa là nó khả dụng cho server *và cho cả client* -- và nó sẽ chạy ở cả hai phía!
 
-////
+Khi tạo lệnh gọi Method, client gửi lệnh gọi đó lên server, nhưng đồng thời cũng *mô phỏng* hoạt động của Method ở phía collection client. Vì vậy tiến trình hoạt động sẽ như sau:
 
-- ////
-- ////
-- ////
-- ////
+- *+0ms:* Người dùng bấm vào button submit và trình duyệt gọi Method.
+- *+0ms:* Client mô phỏng hoạt động của Method đối với collection phía client và thay đổi UI phản ảnh thay đổi đó.
+- *+200ms:* Server tạo thay đổi tới cơ sở dữ liệu Mongo.
+- *+500ms:* Client nhận thay đổi đó và phục hồi lại những thay đổi từ mô phỏng, thay thế bằng thay đổi từ phía server (thứ mà hầu như giống nhau). UI thay đổi phản ánh lại.
 
-////
+Kết quả là người dùng thấy thay đổi ngay lập tức. Khi server trả lại hồi đáp một lúc sau đó, có thể có hoặc không một vài thay đổi khi mà dữ liệu phía server tải xuống. Một điều học được từ đó là chúng ta nên cố gắng để sao cho mô phỏng tài liệu thật gần nhất có thể.
 
-### Observing Latency Compensation
+### Theo dõi đền bù độ trễ
 
-////
+Chúng ta có thể thay đổi một chút đối với việc gọi method `post` để thấy điều đó diễn ra. Để làm điều này, chúng ta sẽ dùng hàm `Meteor._sleepForMs()` để trì hoãn việc gọi method năm giây, nhưng (quan trọng) *chỉ ở phía server*.
 
-////
+Chúng ta sẽ sử dụng `isServer` để hỏi Meteor xem là Method đang được gọi ra từ client (vai trò “stub”) hoặc trên server. [Stub](http://docs.meteor.com/#methods_header) tức là việc mô phỏng Method mà Meteor chạy trên client song song, trong khi Method "thực" đang được chạy trên server.
 
-////
+Vì vậy chúng ta sẽ hỏi Meteor xem đoạn có phải đoạn code đang được thực thi trên server hay không. Nếu vậy, chúng ta sẽ trì hoãn việc gọi năm giây và thêm vào chuỗi `(server)` vào cuối của tiêu đề bài viết. Nếu không phải server, chúng ta cũng có thể thêm vào chuỗi `(client)`.
 
 ~~~js
 Posts = new Mongo.Collection('posts');
@@ -90,9 +90,9 @@ Meteor.methods({
 <%= caption "collections/posts.js" %>
 <%= highlight "11~17" %>
 
-////
+Nếu chúng ta dừng lại ở đó, sự trình diễn sẽ không thực sự thuyết phục. Tại thời điểm này, nó chỉ giống như là bài viết được tạm dừng năm giây trước khi được đổi hướng tới danh sách bài viết, và không nhiều thứ khác xảy ra.
 
-////
+Để biết tại sao, hãy quay trở lại handler sự kiện submit bài viết:
 
 ~~~js
 Template.postSubmit.events({
@@ -120,11 +120,11 @@ Template.postSubmit.events({
 ~~~
 <%= caption "client/templates/posts/post_submit.js" %>
 
-////
+Chúng ta đã đặt lệnh gọi `Router.go()` bên trong callback của method call. Điều đó có nghĩa là form sẽ đợi cho đến khi method hoàn tất rồi mới chuyển hướng.
 
-////
+Điều này thường sẽ là hành động đúng. Xét cho cùng thì bạn không thể chuyển hướng người dùng trước khi bạn biết là bài viết của họ đã hợp lệ hay không. Bởi vì sẽ rất là lộn xộn nếu như người dùng bị chuyển hướng một lần, rồi sau đó lại bị chuyển hướng lại về trang submit bài viết để sửa lại dữ liệu trong một vài giây.
 
-////
+Tuy nhiên cho mục đích của ví dụ này, chúng ta muốn thấy kết quả ngay lập tức. Vì vậy chúng ta sẽ thay đổi lệnh gọi route để chuyển hướng tới route `postsList` (chúng ta không thể chuyển hướng bài viết bởi vì chúng ta không biết `_id` của nó bên ngoài method), đưa nó ra khỏi callback, và chúng ta sẽ thấy điều gì xảy ra:
 
 ~~~js
 Template.postSubmit.events({
@@ -156,29 +156,29 @@ Template.postSubmit.events({
 
 <%= scommit "7-5-1", "Demonstrate the order that posts appear using a sleep." %>
 
-////
+Nếu chúng ta tạo một bài viết bây giờ, chúng ta sẽ thấy đền bù độ trễ rõ ràng. Đầu tiên, một bài viết sẽ được chèn vào với `(client)` trong tiêu đề (bài viết đầu trong danh sách, kết nối tới GitHub):
 
 <%= screenshot "s5-1", "Our post as first stored in the client collection" %>
 
-////
+Năm giây sau đó, nó sẽ được thay thế bằng tài liệu thực đã được chèn vào từ phía server:
 
 <%= screenshot "s5-2", "Our post once the client receives the update from the server collection" %>
 
 ### Client Collection Methods
 
-////
+Có thể bạn đã nghĩ rằng Methods trở nên phức tạp sau điều này, nhưng thực tế chúng khá là đơn giản. Chúng ta thực sự đã thấy ba Methods rất đơn giản: Method biến đổi collection, `insert`, `update` và `remove`.
 
-////
+Khi bạn định nghĩa một collection phía server tên là `'posts'`, bạn hoàn toàn đang định nghĩa ba Methods: `posts/insert`, `posts/update` và  `posts/delete`. Nói cách khác, khi bạn gọi `Posts.insert()` ở phía collection client, bạn đang gọi Method đền bù độ trễ mà nó làm hai việc:
 
-////
-////
+1. Kiểm tra xem nếu chúng ta có thể thực hiện sự biến đổi bằng cách gọi callback `allow` và `deny` (điều này tuy nhiên không cần thiết đối với mô phỏng).
+2. Thực sự tạo thay đổi đối với dữ liệu lưu bên dưới.
   
 ### Methods Calling Methods
 
-////
+Nếu bạn đang theo kịp, có thể bạn đã nhận ra rằng Method `post` của chúng ta gọi một Method khác (`posts/insert`) khi chúng ta chèn bài biết. Điều này xảy ra như thế nào?
  
-////
+Khi mà mô phỏng (phiên bản phía client của Method) đang được chạy, chúng ta mô phỏng `insert` (chúng ta chèn vào collection phía client), nhưng chúng ta *không làm* việc gọi thực tế `insert` phía server, như chúng ta có thể suy ra, phiên bản *phía server* của `post` thực hiện việc này.
 
-////
+Bởi thế, khi mà Method `post` phía server gọi `insert`, không có sự lo lắng nào về mô phỏng, và công đoạn chèn dữ liệu diễn ra trơn tru.
 
-////
+Như đã làm trước đó, đừng quên phục hồi những thay đổi của bạn trước khi di chuyển sang chương tiếp theo.
