@@ -18,11 +18,11 @@ paragraphs: 49
 curl https://install.meteor.com | sh
 ~~~
 
-Điều này sẽ cài đặt các `meteor` thực thi trên hệ thống của bạn và có bạn đã sẵn sàng để sử dụng Meteor.
+Điều này sẽ cài đặt các `meteor` thực thi trên hệ thống của bạn và bạn đã sẵn sàng để sử dụng Meteor.
 
 <% note do %>
 
-### *Not* Installing Meteor
+### *Không* Cài đặt Meteor
 
 Nếu bạn không thể (hoặc không muốn) cài đặt Meteor tại địa phương, chúng tôi khuyên bạn nên kiểm tra ra [Nitrous.io] (http://nitrous.io).
 
@@ -51,7 +51,7 @@ microscope.js
 
 Các ứng dụng mà Meteor đã tạo ra cho bạn là một ứng dụng soạn đơn giản chứng minh một vài mẫu đơn giản.
 
-Mặc dù ứng dụng của chúng tôi không làm được gì nhiều, chúng tôi vẫn có thể chạy nó. Để chạy các ứng dụng, quay về terminal và gõ:
+Mặc dù ứng dụng của chúng tôi không làm được gì nhiều, chúng ta vẫn có thể chạy nó. Để chạy các ứng dụng, quay về terminal và gõ:
 
 ~~~bash
 cd microscope
@@ -78,7 +78,7 @@ Vì vậy, nếu bạn gặp bất kỳ tài liệu tham khảo để `mrt` ti�
 
 <% end %>
 
-### Adding a Package
+### Thêm một Package
 
 Bây giờ chúng ta sẽ sử dụng hệ thống gói Meteor để thêm [Bootstrap] (http://getbootstrap.com/) khuôn khổ dự án của chúng tôi.
 
@@ -89,7 +89,7 @@ Trong khi chúng tôi đang ở đó, chúng tôi cũng sẽ thêm [gạch] (htt
 Theo văn bản này, các `gói underscore` vẫn là một phần của gói Meteor" chính thức ", đó là lý do tại sao nó không có một tác giả:
 
 ~~~bash
-meteor add mizzao:bootstrap-3
+meteor add twbs:bootstrap
 meteor add underscore
 ~~~
 
@@ -117,9 +117,9 @@ Khi nói về các gói trong bối cảnh của Meteor, nó trả tiền để 
 
 <% end %>
 
-### The File Structure of a Meteor App
+### Cấu trúc file của một Meteor App
 
-Trước khi chúng ta bắt đầu mã hóa, chúng ta phải lập dự án của chúng tôi đúng. Để đảm bảo chúng tôi có một xây dựng sạch, mở thư mục 'microscope` và xóa' microscope.html`, `microscope.js`, và` microscope.css`.
+Trước khi chúng ta bắt đầu code, chúng ta phải lập dự án theo đúng cach. Để đảm bảo chúng ta có một cấu trúc thoáng, mở thư mục 'microscope` và xóa' microscope.html`, `microscope.js`, và` microscope.css`.
 
 Tiếp theo, tạo ra bốn thư mục gốc bên trong `/ microscope`:` / client`, `/ server`,` / public`, và `/ lib`.
 
@@ -141,11 +141,12 @@ Và nó cũng hữu ích để biết làm thế nào sẽ quyết định Meteo
 Lưu ý rằng mặc dù Meteor có những quy tắc, nó không thực sự buộc bạn phải sử dụng bất kỳ cấu trúc tập tin được xác định trước cho ứng dụng của bạn nếu bạn không muốn. Vì vậy, chúng tôi đề nghị các cơ cấu chỉ là cách chúng ta làm việc, không phải là một quy tắc đặt trong đá.
 
 Chúng tôi khuyến khích bạn kiểm tra [docs Meteor chính thức] (http://docs.meteor.com/#structuringyourapp) nếu bạn muốn biết thêm chi tiết về điều này.
+
 <% note do %>
 
 ### Is Meteor MVC?
 
-Nếu bạn đang đến từ Sao băng khuôn khổ khác như Ruby on Rails, bạn có thể tự hỏi nếu ứng dụng Meteor áp dụng MVC (Model View Controller) mô hình.
+Nếu bạn đang đến từ framework khác như Ruby on Rails, bạn có thể tự hỏi nếu ứng dụng Meteor áp dụng MVC (Model View Controller) mô hình.
 
 Câu trả lời ngắn gọn là không. Không giống như Rails, Meteor không áp đặt bất kỳ cấu trúc được xác định trước để ứng dụng của bạn. Vì vậy, trong cuốn sách này, chúng tôi sẽ đơn giản đặt ra mã theo cách mà làm cho ý nghĩa nhất đối với chúng ta, mà không lo lắng quá nhiều về các từ viết tắt.
 
@@ -153,7 +154,7 @@ Câu trả lời ngắn gọn là không. Không giống như Rails, Meteor khô
 
 ### No public?
 
-OK, chúng ta nói dối. Chúng tôi không thực sự cần những công / `thư mục` với lý do đơn giản rằng Microscope không sử dụng bất kỳ tài sản tĩnh! Nhưng, vì hầu hết các ứng dụng Meteor khác sẽ bao gồm ít nhất là một vài hình ảnh, chúng tôi nghĩ điều quan trọng là để che đậy nó quá.
+OK, đó chỉ là chuyện đùa. Chúng ta không thực sự cần những công / `thư mục` với lý do đơn giản rằng Microscope không sử dụng bất kỳ tài sản tĩnh! Nhưng, vì hầu hết các ứng dụng Meteor khác sẽ bao gồm ít nhất là một vài hình ảnh, chúng tôi nghĩ điều quan trọng là để che đậy nó quá.
 
 Bằng cách này, bạn cũng có thể nhận thấy một thư mục `.meteor` ẩn. Đây là nơi lưu trữ Meteor mã riêng của mình, và thay đổi mọi thứ trong đó thường là một ý kiến tồi. Trong thực tế, bạn không bao giờ thực sự cần phải tìm trong thư mục này ở tất cả. Các trường hợp ngoại lệ duy nhất này là các `.meteor / packages` và` .meteor / file release`, mà tương ứng được sử dụng để liệt kê các gói thông minh của bạn và phiên bản của Meteor để sử dụng. Khi bạn thêm gói và phát hành thay đổi Meteor, nó có thể hữu ích để kiểm tra các thay đổi những tập tin này.
 
