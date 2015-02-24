@@ -1,43 +1,47 @@
 ---
-title: Allow and Deny
+title: Cho phép và Từ chối
 slug: allow-and-deny
 date: 0008/01/02
 number: 8.5
+points: 10
 sidebar: true
-contents: Learn about Allow and Deny callbacks.|Understand in which order callbacks are called.
-paragraphs: 13
+photoUrl: http://www.flickr.com/photos/ikewinski/9475104376/
+photoAuthor: Mike Lewinski
+contents: Học về callback Cho phép (Allow) và Từ chối (Deny).|Hiểu xem callback được gọi theo thứ tự như thế nào.
+paragraphs: 16
 ---
 
-////
+Hệ thống bảo mật của Meteor cho phép chúng ta quản lý việc sửa đổi cơ sở dữ liệu mà không cần phải định nghĩa Methods trong mọi lần muốn thay đổi.
 
-////
+Bởi vì chúng ta cần phải làm những công việc bổ trợ như là trang trí bài viết với những thuộc tính bổ sung và thực hiện hành động đặc biệt khi URL đã được tạo, việc sử dụng một Method đặc biệt `post` rất hợp lý trong trường hợp tạo một bài viết. 
 
-////
+Tuy nhiên, chúng ta không thực sự cần tạo thêm Method mới cho việc sửa và xoá bài viết. Chúng ta chỉ cần kiểm tra xem người dùng có quyền để thực hiện những hành động này hay không, và điều này được làm dễ dàng với callback `allow` và `deny`.
 
-////
+Sử dụng những callback này giúp chúng ta mô tả rõ hơn về thay đổi cơ sở dữ liệu, và tuyên bố được kiểu cập nhật nào được phép sử dụng. Việc chúng được tích hợp kèm với hệ thống tài khoản (account system) là một điểm cộng nữa.
 
-### Multiple callbacks
+### Tổ hợp callback
 
-////
+Chúng ta có thể định nghĩa hàm callback `allow` nhiều tuỳ theo nhu cầu. Chúng ta chỉ cần _ít nhất một_ trong số chúng trả về `true` cho thay đổi đang diễn ra. Bởi vậy khi mà `Posts.insert` được gọi trên trình duyệt (kể cả gọi từ ứng dụng phía client hoặc là từ console), server sẽ lần lượt gọi bất kỳ đoạn kiểm tra allow-`insert` nào có thể cho tới khi tìm thấy một hàm trả về true. Nếu nó không tìm thấy thì việc insert sẽ không được thực hiện, và sẽ trả về lỗi `403` cho client.
 
-////
+Tương tự, chúng ta cũng có thể khai báo một hoặc nhiều callback `deny`. Nếu _bất kỳ_ một trong số callback đó trả về `true`, thay đổi sẽ bị huỷ bỏ và `403` sẽ được trả về. Logic ở đây là, để cho một lệnh `insert` thành công, một hoặc nhiều callback `allow` `insert` và _mọi_ callback `deny` `insert` sẽ được thực thi.
 
 <%= diagram "allow_deny", "Note: n/e stands for Not Executed" %>
 
-////
+Nói một cách khác, Meteor dời xuống danh sách callback bắt đầu với `deny`, rồi tới `allow`, và thực thi mỗi callback cho đến khi một trong số chúng trả về `true`.
 
-////
+Một trong những ví dụ thực hành cho mô hình này là có hai callback `allow()`, một kiểm tra xem bài viết có thuộc về người dùng hiện tại hay không, một kiểm tra xem người dùng hiện tại có quyền quản trị hay không. Nếu người dùng hiện tại là quản trị, điều này đảm bảo rằng họ có thể cập nhật bất kỳ bài viết nào, bởi vì một trong số callback sẽ trả về true.
 
-### Latency Compensation
+### Đền bù độ trễ
 
-////
+Hãy nhớ lại rằng những Method thay đổi cơ sở dữ liệu ( ví dụ như là `.update()`) đều có thể đền bù độ trễ, giống như bất kỳ Method nào khác. Ví dụ, nếu bạn thử xoá một bài viết không thuộc sở hữu của mình ở trong console dòng lệnh, bạn sẽ thấy bài viết biến mất vì collection ở local bị mất tài liệu đó, nhưng sau đó sẽ hiển thị lại do server thông báo lại rằng, thực tế tài liệu đã không bị xoá.
 
-////
+Tất nhiên động thái này không phải là một vấn đề khi được khởi động từ console (rốt cuộc, nếu người dùng định thử và làm rối tung dữ liệu trên console, nó thực sự không phải vấn đề của bạn đối với thứ hiện thị trên trình duyệt _của họ_). Tuy nhiên, bạn cần phải chắc chắn rằng điều này không xảy ra đối với giao diện người dùng. Ví dụ, bạn cần phải chịu bỏ sức để chắc chắn rằng bạn không đang hiển thị button xoá tài liệu mà người dùng không được phép xoá.
 
-////
+May mắn là, do bạn có thể chia sẻ code chứa quyền hạn giữa client và server (ví dụ, bạn có thể viết một hàm thư viện `canDeletePost(user, post)` và đặt nó trong đường dẫn chung `/lib`), nên làm như vậy thường sẽ không phải code lại nhiều.
 
-### Server-side Permissions
 
-////
+### Quyền hạn phía server
 
-////
+Xin nhớ lại rằng hệ thống quyền hạn chỉ áp dụng cho thay đổi cơ sở dữ liệu từ phía client. Ở trên server, Meteor mặc định là _tất cả_ thao tác đều được cho phép.
+
+Điều này có nghĩa là nếu bạn muốn viết một Method `deletePost` ở phía server mà có thể gọi từ client, bất kỳ ai cũng có thể xoá bất kỳ bài viết nào. Vì vậy chắc hẳn bạn không muốn vậy cho tới khi đã kiểm tra quyền hạn với Meteor trước.
