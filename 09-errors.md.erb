@@ -3,21 +3,24 @@ title: Errors
 slug: errors
 date: 0009/01/01
 number: 9
-contents: Create a better mechanism for displaying errors and messages.|Implement stricter form validation.|Add in-line error reporting to our forms.
-paragraphs: 56
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/9413892879/
+photoAuthor: Mike Lewinski
+contents: Tạo  cấu tốt hơn để hiển thị lỗi và thông báo.|Thực hiện kiểm tra form chặt chẽ hơn.|Thêm thông báo lỗi tức thời cho form.
+paragraphs: 31
 ---
 
-////
+Việc đơn thuần sử dụng dialog `alert()` của trình duyệt để cảnh báo người dùng khi có vấn đề với việc submit form thường không làm thoả mãn, và chắc chắn việc đó cũng không tạo ra UX tốt được. Chúng ta có thể làm tốt hơn.
 
-////
+Để thay thế, chúng ta sẽ xây dựng một cơ cấu thông báo lỗi linh hoạt hơn để thông báo cho người dùng điều gì đang diễn ra mà không phá hỏng luồng ứng dụng.
 
-////
+Chúng ta sẽ cài đặt một hệ thống đơn giản hiển thị lỗi ở góc trên bên phải cửa sổ, giống như ứng dụng [Growl](http://growl.info/) nổi tiếng của hệ điều hành Mac.
 
-### Introducing Local Collections
+### Giới thiệu về Local Collections
 
-////
+Để bắt đầu, chúng ta cần tạo một collection để lưu trữ lỗi. Để cho những thông báo lỗi này chỉ hữu hiệu với session hiện tại và không cần phải lưu dài hạn, chúng ta sẽ sử dụng một thứ mới, đó là tạo *collection cục bộ* (local collection).Điều này có nghĩa là collection `Errors` chỉ tồn tại *trong trình duyệt* và sẽ không đồng bộ ngược với server.
 
-////
+Để đạt được điều này, chúng ta tạo thông báo lỗi bên trong thư mục `client` (để cho collection chỉ tồn tại phía client), và với tên MongoDB cho collection là `null` (vì dữ liệu của collection sẽ không bao giờ được lưu vào cơ sở dữ liệu phía server):
 
 ~~~js
 // Local (client-only) collection
@@ -25,7 +28,7 @@ Errors = new Mongo.Collection(null);
 ~~~
 <%= caption "client/helpers/errors.js" %>
 
-////
+Bây giờ, sau khi đã tạo được collection, chúng ta có thể thêm hàm `throwError` để gọi khi muốn thêm thông báo lỗi. Chúng ta không cần phải lo lắng về `allow` hoặc `deny` hoặc bất kỳ vấn đề bảo mật nào, vì collection “cục bộ” đối với người dùng hiện tại.
 
 ~~~js
 throwError = function(message) {
@@ -34,11 +37,11 @@ throwError = function(message) {
 ~~~
 <%= caption "client/helpers/errors.js" %>
 
-////
+Điểm thuận lợi để lưu thông báo lỗi với collection cục bộ là, cũng như mọi collection khác, nó tương tác ngược -- nghĩa là chúng ta có thể hiển thị lỗi một cách có tương tác giống như hiển thị bất kỳ dữ liệu collection nào khác.
 
-### Displaying Errors
+### Hiển thị lỗi
 
-////
+Chúng ta sẽ thêm thông báo lỗi ở trên cùng layout chính:
 
 ~~~html
 <template name="layout">
@@ -54,7 +57,7 @@ throwError = function(message) {
 <%= caption "client/templates/application/layout.html" %>
 <%= highlight "4" %>
 
-////
+Bây giờ hãy cùng tạo `errors` và template `error` trong `errors.html`:
 
 ~~~html
 <template name="errors">
@@ -76,15 +79,15 @@ throwError = function(message) {
 
 <% note do %>
 
-### Twin Templates
+### Templates ghép đôi
 
-////
+Bạn sẽ nhận ra rằng chúng ta đang đặt hai template vào trong cùng một file. Cho đến bây giờ, chúng ta đã bám sát quy ước "một file, một template", nhưng Meteor vẫn hoạt động tốt dù tất cả template của chúng ta được đặt vào một file chung (mặc dù điều này sẽ tạo ra một file `main.html` rất lộn xộn!).
 
-////
+Trong trường hợp hiện tại, vì cả hai template đều khá là ngắn gọn, chúng ta có thể tạo ra ngoại lệ và để chúng vào trong cùng một file. Việc này làm cho kho chứa của chúng ta sạch sẽ hơn.
 
 <% end %>
 
-////
+Chúng ta chỉ cần tạo template helper nữa là mọi thứ sẽ ổn!
 
 ~~~js
 Template.errors.helpers({
@@ -95,7 +98,7 @@ Template.errors.helpers({
 ~~~
 <%= caption "client/templates/includes/errors.js" %>
 
-////
+Bạn có thể thử thông báo lỗi vừa tạo bằng tay. Bạn chỉ cần mở console trình duyệt và gõ:
 
 ~~~js
 throwError("I'm an error!");
@@ -107,21 +110,21 @@ throwError("I'm an error!");
 
 <% note do %>
 
-### Two Kinds of Errors
+### Hai loại Lỗi
 
-////
+Tại thời điểm này, việc phân biệt giữ lỗi “cấp độ ứng dụng” và lỗi “cấp độ code” là rất quan trọng.
 
-////
+Lỗi **cấp độ ứng dụng** thường tạo ra do hành động của người dùng, và người dùng có thể làm gì đó sau khi nó xảy ra. Những lỗi này bao gồm cả lỗi về kiểm tra form, lỗi về quyền truy cập, lỗi “không tìm thấy”, và nhiều lỗi khác nữa. Đây là những lỗi mà bạn muốn hiển thị cho người dùng để chỉ cho họ cách sửa bất kỳ vấn đề gì họ đã mắc phải.
 
-////
+Lỗi **cấp độ code** thì khác, là những lỗi xảy ra không mong muốn do sai sót khi code, và bạn thường *không* muốn trực tiếp hiển thị ra cho người dùng. Thay vào đó là theo dõi bằng công cụ từ bên thứ ba, ví dụ như là [Kadira](http://kadira.io).
 
-////
+Trong chương này, chúng ta sẽ tập trung vào việc khắc phục loại lỗi thứ nhất, chứ không tập trung vào việc tìm sai sót code.
 
 <% end %>
 
-### Creating errors
+### Tạo thông báo lỗi
 
-////
+Chúng ta đã biết cách hiển thị thông báo lỗi, nhưng chúng ta vẫn cần phải kích hoạt trước khi có thể nhìn thấy. Chúng ta vừa thực hiện một bối cảnh lỗi khá tốt: cảnh báo về việc bị trùng lặp bài viết. Chúng ta đơn giản sẽ thay thế `alert` trong helper sự kiện `postSubmit` với hàm `throwError` vừa thiết lập:
 
 ~~~js
 Template.postSubmit.events({
@@ -150,7 +153,7 @@ Template.postSubmit.events({
 <%= caption "client/templates/posts/post_submit.js" %>
 <%= highlight "13,17" %>
 
-////
+Chúng ta sẽ làm điều tương tự cho helper sự kiện `postEdit`:
 
 ~~~js
 Template.postEdit.events({
@@ -181,13 +184,13 @@ Template.postEdit.events({
 
 <%= commit "9-2", "Actually use the error reporting." %>
 
-////
+Hãy thử tạo một bài viết và thêm vào URL là `http://meteor.com`. Do URL này đã được gắn với một bài viết trước đó, bạn sẽ thấy:
 
 <%= screenshot "9-2", "Triggering an error" %>
 
-### Clearing Errors
+### Làm sạch thông báo lỗi
 
-////
+Bạn vừa nhận ra rằng thông báo lỗi biến mất sau khi đã xuất hiện một vài giây. Điều này thực sự là do một đoạn CSS chúng ta đã thêm vào stylesheet ngay từ lúc bắt đầu cuốn sách:
 
 ~~~css
 @keyframes fadeOut {
@@ -206,29 +209,29 @@ Template.postEdit.events({
 ~~~
 <%= caption "client/stylesheets/style.css" %>
 
-////
+Chúng ta đang định nghĩa một đoạn CSS animaton `fadeOut` để đặc tả 4 keyframe cho độ thuộc tính độ trong suốt (0%, 10%, 90%, và 100% của khoảng thời gian diễn animation) và áp dụng vào class `.alert`.
 
-////
+Đoạn animation sẽ chạy trong 2700 mili giây, sử dụng phương trình đo thời gian `ease-in`, chạy với độ trễ là 0 giây, chạy đúng một lần, và cuối cùng dừng lại ở keyframe cuối cùng khi mọi thứ đã xong xuôi.
 
 <% note do %>
 
 ### Animations vs Animations
 
-////
+Có thể bạn đang tự hỏi tại sao mình lại dùng animation trên nền CSS (thứ được định nghĩa trước và ngoài khả năng kiểm soát của cúng ta), thay vì dùng animation được quản lý bởi chính bản thân Meteor.
 
-////
+Trong khi Meteor đúng là có cung cấp sự hỗ trợ cho việc chèn animation, chúng ta muốn chương này tập trung vào thông báo lỗi. Vì vậy chúng ta sử dụng animation CSS đơn giảngiản và chúng ta sẽ dành những công việc trang hoàng trong chương về Animation.
 
 <% end %>
 
-////
+Hiện tại mọi thứ hoạt động, nhưng nếu bạn kích hoạt nhiều lỗi (bằng việc submit cùng một đường dẫn ba lần chẳng hạn), bạn sẽ nhận ra rằng chúng bị chồng đống lên nhau:
 
 <%= screenshot "9-3", "Stack overflow." %>
 
-////
+Điều này là do trong khi thành phần `.alert` biến mất khi nhìn *bằng mắt* nhưng thực ra vẫn tồn tại trong DOM. Chúng ta cần sửa điều này.
 
-////
+Đây chính là tình huống mà Meteor có thể toả sáng. Vì collection `Errors` tương tác ngược, tất cả việc chúng ta cần làm là xoá thông báo lỗi cũ ra khỏi collection!
 
-////
+Chúng ta sẽ dùng hàm `Meteor.setTimeout` để đặc tả một hàm callback sẽ được chạy sau mỗi khoảng thời gian tạm ngừng (trong trường hợp này là 3000 mili giây).
 
 ~~~js
 Template.errors.helpers({
@@ -249,15 +252,15 @@ Template.error.rendered = function() {
 
 <%= commit "9-3", "Clear errors after 3 seconds." %>
 
-////
+Hàm callback [`rendered`](http://docs.meteor.com/#template_rendered) kích hoạt mỗi khi template được đưa ra trình duyệt. Bên trong hàm callback, `this` tham chiếu tới template hiện tại, và `this.data` để chúng ta truy cập tới dữ liệu của object đang được đưa ra (render). Trong trường hợp của chúng ta, chính là một thông báo lỗi.
 
-### Seeking Validation
+### Lục tìm Kiểm tra
 
-////
+Cho đến bây giờ, chúng ta vẫn chưa thêm một kiểm tra (validation) nào cho form. Ít nhất thì chúng ta cũng mong muốn người dùng cung cấp cả URL và tựa đề cho bài viết mới. Vì vậy hãy cùng chắc chắn họ sẽ làm như vậy.
 
-////
+Chúng ta sẽ làm hai việc để chỉ ra những trường bị thiếu: thứ nhất, chúng ta sẽ đưa ra một class CSS đặc biệt `has-error` cho vào `div` cha của bất kỳ trường nào của form có vấn đề. Thứ hai, chúng ta sẽ hiển thị một thông báo lỗi hữu ích như bên dưới.
 
-////
+Để bắt đầu, hãy thêm vào template `postSubmit` những helper sau:
 
 ~~~html
 <template name="postSubmit">
@@ -283,17 +286,17 @@ Template.error.rendered = function() {
 <%= caption "client/templates/posts/post_submit.html" %>
 <%= highlight "3,7,10,14" %>
 
-////
+Chú ý rằng chúng ta đã thêm vào tham số (theo trình tự là `url` và `title`) cho mỗi helper. Điều này giúp chúng ta có thể dùng lại helper cho hai lần, thay đổi hoạt động dựa vào tham số.
 
-////
+Bây giờ cho phần thú vị: làm cho những helper này làm việc thú vị.
 
-////
+Chúng ta sẽ dùng **Session** để lưu object `postSubmitErrors` chứa bất kỳ lỗi tiềm tàng nào. Khi mà người dùng tương tác với form, object này sẽ thay đổi, nghĩa là sẽ tương tác để hiển thị lại nội dung và hình thức của form.
 
-////
+Trước tiên, chúng ta sẽ khởi tạo object mỗi khi template `postSubmit` được tạo. Điều này giúp chắc chắn là người dùng sẽ không thấy lỗi cũ tồn đọng từ trang truy cập trước đó.
 
-////
+Sau đó chúng ta định nghĩa hai template helper. Chúng cùng nhìn vào thuộc tính `field` của `Session.get('postSubmitErrors')` (khi mà `field` là `url` hoặc `title` tuỳ thuộc vào nơi chúng ta gọi helper).
 
-////
+Trong khi `errorMessage` chỉ đơn giản trả về bản thân tin thông báo, `errorClass` kiểm tra *sự có mặt* của tin thông báo và trả về `has-error` nếu có lỗi tồn tại.
 
 ~~~js
 Template.postSubmit.created = function() {
@@ -311,7 +314,7 @@ Template.postSubmit.helpers({
 ~~~
 <%= caption "client/templates/posts/post_submit.js" %>
 
-////
+Bạn có thể kiểm tra rằng helper của chúng ta đang hoạt động đúng bằng việc mở console trình duyệt và gõ vào như bên dưới:
 
 ~~~js
 Session.set('postSubmitErrors', {title: 'Warning! Intruder detected. Now releasing robo-dogs.'});
@@ -320,9 +323,9 @@ Session.set('postSubmitErrors', {title: 'Warning! Intruder detected. Now releasi
 
 <%= screenshot "9-4", "Red alert! Red alert!" %>
 
-////
+Bước tiếp theo là thực sự lắp ráp Session object `postSubmitErrors` tới form.
 
-////
+Trước khi làm vậy, chúng ta sẽ tạo một hàm `validatePost` trong `posts.js` để xem trong object `post`, và trả về object `errors` mà chứa đựng bất kỳ lỗi xác đáng nào (tức là, khi mà trường `title` hoặc `url` bị thiếu):
 
 ~~~js
 //...
@@ -344,7 +347,7 @@ validatePost = function (post) {
 <%= caption "lib/collections/posts.js" %>
 <%= highlight "3~13" %>
 
-////
+Chúng ta sẽ gọi hàm này từ helper sự kiện `postSubmit`:
 
 ~~~js
 Template.postSubmit.events({
@@ -377,15 +380,15 @@ Template.postSubmit.events({
 <%= caption "client/templates/posts/post_submit.js" %>
 <%= highlight "10~12" %>
 
-////
+Chú ý rằng chúng ta đang dùng `return` để huỷ thực thi của helper nếu như có lỗi xảy ra mà không phải bởi vì chúng ta muốn trả về giá trị này ở chỗ nào đó.
 
 <%= screenshot "9-5", "Caught red-handed." %>
 
-### Server-side Validation
+### Kiểm tra phía Server
 
-////
+Chúng ta vẫn chưa thực sự kết thúc. Chúng ta đang kiểm tra sự có mặt của URL và tựa đề ở phía *client*, nhưng còn về phía *server* thì sao? Sau tất cả, rất có thể sẽ có ai đó sẽ cố nhập vào bài viết trống bằng tay với việc gọi method `postInsert` thông qua console trình duyệt.
 
-////
+Mặc dù chúng ta không cần hiển thị thông báo lỗi nào ở phía server, chúng ta vẫn sẽ dùng cùng hàm `validatePost`. Ngoại trừ việc là lần này chúng ta sẽ gọi bên trong *method* `postInsert`, và không chỉ với sự kiện helper:
 
 ~~~js
 Meteor.methods({
@@ -426,21 +429,21 @@ Meteor.methods({
 <%= caption "lib/collections/posts.js" %>
 <%= highlight "9~11" %>
 
-////
+Xin được nhắc lại, người dùng thường không cần phải thấy thông báo “You must set a title and URL for your post”. Nó sẽ chỉ hiện ra nếu như ai đó muốn vượt qua giao diện người dùng chúng ta đã làm cẩn thận, thay vào đó là sử dụng trực tiếp console. 
 
-////
+Để kiểm tra điều này, mở cửa sổ console trình duyệt và thử gõ bài viết không có URL:
 
 ~~~js
 Meteor.call('postInsert', {url: '', title: 'No URL here!'});
 ~~~
 
-////
+Nếu bạn đã thực hiện công việc đầy đủ, bạn sẽ thấy được một đoạn code đáng sợ đi kèm với thông báo “You must set a title and URL for your post”.
 
 <%= commit "9-4", "Validate post contents on submission." %>
 
-### Edition Validation
+### Kiểm tra lỗi khi Biên tập
 
-////
+Để mọi thứ hợp lý, chúng ta cũng sẽ dùng đoạn kiểm tra với việc *biên tập* bài viết. Mã code sẽ trông khá giống. Đầu tiên, với template:
 
 ~~~html
 <template name="postEdit">
@@ -468,7 +471,7 @@ Meteor.call('postInsert', {url: '', title: 'No URL here!'});
 <%= caption "client/templates/posts/post_edit.html" %>
 <%= highlight "3,7,10,14" %>
 
-////
+Sau đó, với template helper:
 
 ~~~js
 Template.postEdit.created = function() {
@@ -523,9 +526,9 @@ Template.postEdit.events({
 <%= caption "client/templates/posts/post_edit.js" %>
 <%= highlight "1~12,25~27,32" %>
 
-////
+Cũng giống như chúng ta đã làm cho form submit bài viết, chúng ta cũng muốn kiểm tra bài viết trên server. Ngoài việc bạn sẽ phải nhớ ra là chúng ta không dùng một method để biên tập bài viết, mà sẽ gọi `update` trực tiếp từ client.
 
-////
+Điều này có nghĩa là chúng ta sẽ cần có hàm callback `deny` thay thế:
 
 ~~~js
 //...
@@ -542,10 +545,10 @@ Posts.deny({
 <%= caption "lib/collections/posts.js" %>
 <%= highlight "3~8" %>
 
-////
+Chú ý rằng tham số `post` tham chiếu đến bài viết *đang tồn tại*. Trong trường hợp này, chúng ta muốn kiểm tra việc *update*, do đó chúng ta sẽ gọi `validatePost` với nội dung `modifier` của thuộc tính `$set` (như trong `Posts.update({$set: {title: ..., url: ...}})`).
 
-////
+Điều này hoạt động vì `modifier.$set` chứa cùng thuộc tính `title` và `url` như toàn thể object `url`. Dĩ nhiên, nó không nghĩa là mọi cập nhật bộ phận chỉ ảnh hưởng tới `title` hoặc `url` sẽ thất bại, nhưng trong thực hành điều này không phải là một vấn đề.
 
-////
+Bạn có thể nhận ra rằng đây là callback `deny` thứ hai của chúng ta. Khi thêm vào nhiều callback `deny`, hành động sẽ thất bại nếu như bất kỳ một trong số chúng trả về `true`. Trong trường hợp này, điều đó có nghĩa là `update` sẽ thành công chỉ khi mà nó hướng tới trường `title` và `url`, và không có trường nào trong hai trường bị trống.
 
 <%= commit "9-5", "Validate post contents when editing." %>
