@@ -6,7 +6,7 @@ number: 9
 points: 10
 photoUrl: http://www.flickr.com/photos/ikewinski/9413892879/
 photoAuthor: Mike Lewinski
-contents: Tạo  cấu tốt hơn để hiển thị lỗi và thông báo.|Thực hiện kiểm tra form chặt chẽ hơn.|Thêm thông báo lỗi tức thời cho form.
+contents: Tạo cơ cấu tốt hơn để hiển thị lỗi và thông báo.|Thực hiện kiểm tra form chặt chẽ hơn.|Thêm thông báo lỗi tức thời cho form.
 paragraphs: 31
 ---
 
@@ -41,7 +41,7 @@ throwError = function(message) {
 
 ### Hiển thị lỗi
 
-Chúng ta sẽ thêm thông báo lỗi ở trên cùng layout chính:
+Chúng ta sẽ thêm thông báo lỗi ở phía trên cùng của layout chính:
 
 ~~~html
 <template name="layout">
@@ -57,7 +57,7 @@ Chúng ta sẽ thêm thông báo lỗi ở trên cùng layout chính:
 <%= caption "client/templates/application/layout.html" %>
 <%= highlight "4" %>
 
-Bây giờ hãy cùng tạo `errors` và template `error` trong `errors.html`:
+Bây giờ hãy cùng tạo template `errors` và `error` trong `errors.html`:
 
 ~~~html
 <template name="errors">
@@ -87,7 +87,7 @@ Trong trường hợp hiện tại, vì cả hai template đều khá là ngắn
 
 <% end %>
 
-Chúng ta chỉ cần tạo template helper nữa là mọi thứ sẽ ổn!
+Chúng ta chỉ cần tạo helper cho template nữa là mọi thứ sẽ ổn!
 
 ~~~js
 Template.errors.helpers({
@@ -114,17 +114,17 @@ throwError("I'm an error!");
 
 Tại thời điểm này, việc phân biệt giữ lỗi “cấp độ ứng dụng” và lỗi “cấp độ code” là rất quan trọng.
 
-Lỗi **cấp độ ứng dụng** thường tạo ra do hành động của người dùng, và người dùng có thể làm gì đó sau khi nó xảy ra. Những lỗi này bao gồm cả lỗi về kiểm tra form, lỗi về quyền truy cập, lỗi “không tìm thấy”, và nhiều lỗi khác nữa. Đây là những lỗi mà bạn muốn hiển thị cho người dùng để chỉ cho họ cách sửa bất kỳ vấn đề gì họ đã mắc phải.
+Lỗi **cấp độ ứng dụng** thường tạo ra do hành động của người dùng, và người dùng có thể làm gì đó sau khi nó xảy ra. Những lỗi này bao gồm cả lỗi về kiểm tra form, lỗi về quyền truy cập, lỗi “không tìm thấy”, và nhiều lỗi khác nữa. Đây là những lỗi mà bạn muốn hiển thị cho người dùng để chỉ cho họ cách sửa bất kỳ vấn đề gì họ đang mắc phải.
 
 Lỗi **cấp độ code** thì khác, là những lỗi xảy ra không mong muốn do sai sót khi code, và bạn thường *không* muốn trực tiếp hiển thị ra cho người dùng. Thay vào đó là theo dõi bằng công cụ từ bên thứ ba, ví dụ như là [Kadira](http://kadira.io).
 
-Trong chương này, chúng ta sẽ tập trung vào việc khắc phục loại lỗi thứ nhất, chứ không tập trung vào việc tìm sai sót code.
+Trong chương này, chúng ta sẽ tập trung vào việc khắc phục loại lỗi thứ nhất, chứ không tập trung vào việc khắc phục lỗi sai sót do code.
 
 <% end %>
 
 ### Tạo thông báo lỗi
 
-Chúng ta đã biết cách hiển thị thông báo lỗi, nhưng chúng ta vẫn cần phải kích hoạt trước khi có thể nhìn thấy. Chúng ta vừa thực hiện một bối cảnh lỗi khá tốt: cảnh báo về việc bị trùng lặp bài viết. Chúng ta đơn giản sẽ thay thế `alert` trong helper sự kiện `postSubmit` với hàm `throwError` vừa thiết lập:
+Chúng ta đã biết cách hiển thị thông báo lỗi, nhưng chúng ta vẫn cần phải kích hoạt trước khi có thể nhìn thấy. Chúng ta vừa thực hiện một bối cảnh lỗi khá tốt: cảnh báo về việc bị trùng lặp bài viết. Đơn giản hãy thay thế `alert` trong helper sự kiện `postSubmit` với hàm `throwError` vừa thiết lập:
 
 ~~~js
 Template.postSubmit.events({
@@ -153,7 +153,7 @@ Template.postSubmit.events({
 <%= caption "client/templates/posts/post_submit.js" %>
 <%= highlight "13,17" %>
 
-Chúng ta sẽ làm điều tương tự cho helper sự kiện `postEdit`:
+Chúng ta sẽ làm điều tương tự cho sự kiện của helper `postEdit`:
 
 ~~~js
 Template.postEdit.events({
@@ -209,7 +209,7 @@ Bạn vừa nhận ra rằng thông báo lỗi biến mất sau khi đã xuất 
 ~~~
 <%= caption "client/stylesheets/style.css" %>
 
-Chúng ta đang định nghĩa một đoạn CSS animaton `fadeOut` để đặc tả 4 keyframe cho độ thuộc tính độ trong suốt (0%, 10%, 90%, và 100% của khoảng thời gian diễn animation) và áp dụng vào class `.alert`.
+Chúng ta đang định nghĩa một đoạn CSS animaton `fadeOut` để đặc tả 4 keyframe cho thuộc tính độ trong suốt (0%, 10%, 90%, và 100% của khoảng thời gian diễn animation) và áp dụng vào class `.alert`.
 
 Đoạn animation sẽ chạy trong 2700 mili giây, sử dụng phương trình đo thời gian `ease-in`, chạy với độ trễ là 0 giây, chạy đúng một lần, và cuối cùng dừng lại ở keyframe cuối cùng khi mọi thứ đã xong xuôi.
 
@@ -219,17 +219,17 @@ Chúng ta đang định nghĩa một đoạn CSS animaton `fadeOut` để đặc
 
 Có thể bạn đang tự hỏi tại sao mình lại dùng animation trên nền CSS (thứ được định nghĩa trước và ngoài khả năng kiểm soát của cúng ta), thay vì dùng animation được quản lý bởi chính bản thân Meteor.
 
-Trong khi Meteor đúng là có cung cấp sự hỗ trợ cho việc chèn animation, chúng ta muốn chương này tập trung vào thông báo lỗi. Vì vậy chúng ta sử dụng animation CSS đơn giảngiản và chúng ta sẽ dành những công việc trang hoàng trong chương về Animation.
+Trong khi Meteor đúng là có cung cấp sự hỗ trợ cho việc chèn animation, chúng ta muốn chương này tập trung vào thông báo lỗi. Vì vậy chúng ta sử dụng animation CSS đơn giản và chúng ta sẽ dành những công việc trang hoàng trong chương về Animation.
 
 <% end %>
 
-Hiện tại mọi thứ hoạt động, nhưng nếu bạn kích hoạt nhiều lỗi (bằng việc submit cùng một đường dẫn ba lần chẳng hạn), bạn sẽ nhận ra rằng chúng bị chồng đống lên nhau:
+Hiện tại mọi thứ đã hoạt động, nhưng nếu bạn kích hoạt nhiều lỗi (bằng việc submit cùng một đường dẫn ba lần chẳng hạn), bạn sẽ nhận ra rằng chúng bị chồng đống lên nhau:
 
 <%= screenshot "9-3", "Stack overflow." %>
 
 Điều này là do trong khi thành phần `.alert` biến mất khi nhìn *bằng mắt* nhưng thực ra vẫn tồn tại trong DOM. Chúng ta cần sửa điều này.
 
-Đây chính là tình huống mà Meteor có thể toả sáng. Vì collection `Errors` tương tác ngược, tất cả việc chúng ta cần làm là xoá thông báo lỗi cũ ra khỏi collection!
+Đây chính là một trong những tình huống mà Meteor toả sáng. Vì collection `Errors` tương tác ngược, tất cả việc chúng ta cần làm là xoá thông báo lỗi cũ ra khỏi collection!
 
 Chúng ta sẽ dùng hàm `Meteor.setTimeout` để đặc tả một hàm callback sẽ được chạy sau mỗi khoảng thời gian tạm ngừng (trong trường hợp này là 3000 mili giây).
 
@@ -286,9 +286,9 @@ Chúng ta sẽ làm hai việc để chỉ ra những trường bị thiếu: th
 <%= caption "client/templates/posts/post_submit.html" %>
 <%= highlight "3,7,10,14" %>
 
-Chú ý rằng chúng ta đã thêm vào tham số (theo trình tự là `url` và `title`) cho mỗi helper. Điều này giúp chúng ta có thể dùng lại helper cho hai lần, thay đổi hoạt động dựa vào tham số.
+Chú ý rằng chúng ta đã thêm vào tham số (theo trình tự là `url` và `title`) cho mỗi helper. Điều này giúp chúng ta có thể dùng lại helper cho cả hai lần, thay đổi hoạt động dựa vào tham số.
 
-Bây giờ cho phần thú vị: làm cho những helper này làm việc thú vị.
+Bây giờ sẽ là phần thú vị: làm cho những helper này thực sự hoạt động.
 
 Chúng ta sẽ dùng **Session** để lưu object `postSubmitErrors` chứa bất kỳ lỗi tiềm tàng nào. Khi mà người dùng tương tác với form, object này sẽ thay đổi, nghĩa là sẽ tương tác để hiển thị lại nội dung và hình thức của form.
 
@@ -380,7 +380,7 @@ Template.postSubmit.events({
 <%= caption "client/templates/posts/post_submit.js" %>
 <%= highlight "10~12" %>
 
-Chú ý rằng chúng ta đang dùng `return` để huỷ thực thi của helper nếu như có lỗi xảy ra mà không phải bởi vì chúng ta muốn trả về giá trị này ở chỗ nào đó.
+Chú ý rằng chúng ta đang dùng `return` chỉ để huỷ thực thi của helper nếu như có lỗi xảy ra mà không phải bởi vì chúng ta muốn trả về giá trị này ở chỗ nào đó.
 
 <%= screenshot "9-5", "Caught red-handed." %>
 
@@ -429,7 +429,7 @@ Meteor.methods({
 <%= caption "lib/collections/posts.js" %>
 <%= highlight "9~11" %>
 
-Xin được nhắc lại, người dùng thường không cần phải thấy thông báo “You must set a title and URL for your post”. Nó sẽ chỉ hiện ra nếu như ai đó muốn vượt qua giao diện người dùng chúng ta đã làm cẩn thận, thay vào đó là sử dụng trực tiếp console. 
+Xin được nhắc lại, người dùng thường không cần phải thấy thông báo “You must set a title and URL for your post”. Nó sẽ chỉ hiện ra nếu như ai đó muốn vượt qua giao diện người dùng chúng ta đã làm cẩn thận, bằng cách là sử dụng trực tiếp console. 
 
 Để kiểm tra điều này, mở cửa sổ console trình duyệt và thử gõ bài viết không có URL:
 
@@ -526,7 +526,7 @@ Template.postEdit.events({
 <%= caption "client/templates/posts/post_edit.js" %>
 <%= highlight "1~12,25~27,32" %>
 
-Cũng giống như chúng ta đã làm cho form submit bài viết, chúng ta cũng muốn kiểm tra bài viết trên server. Ngoài việc bạn sẽ phải nhớ ra là chúng ta không dùng một method để biên tập bài viết, mà sẽ gọi `update` trực tiếp từ client.
+Cũng giống như chúng ta đã làm cho form submit bài viết, chúng ta cũng muốn kiểm tra bài viết trên server. Bạn sẽ phải nhớ là chúng ta không dùng một method để biên tập bài viết, mà sẽ gọi `update` trực tiếp từ client.
 
 Điều này có nghĩa là chúng ta sẽ cần có hàm callback `deny` thay thế:
 
