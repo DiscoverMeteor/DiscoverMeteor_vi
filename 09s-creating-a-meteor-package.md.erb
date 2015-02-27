@@ -1,20 +1,23 @@
 ---
-title: Creating a Meteor Package
+title: Tạo một Meteor Package 
 slug: creating-a-meteor-package
 date: 0009/01/02
 number: 9.5
+points: 10
 sidebar: true
-contents: Write a local in-app package.|Write some tests for your package.|Release your package on Atmosphere.
-paragraphs: 19
+photoUrl: http://www.flickr.com/photos/rxb/7779426142/
+photoAuthor: Richard
+contents: Viết một gói package tích hợp cục bộ.|Viết một số mã kiểm thử cho package.|Release package của bạn trên Atmosphere.
+paragraphs: 22
 ---
 
-////
+Chúng ta vừa mới tạo mô hình thông báo lỗi mà có thể tái sử dụng, vậy tại sao không đóng gói nó lại và chia sẻ với toàn bộ cộng đồng Meteor nhỉ?
 
-////
+Để bắt đầu, chắc chắn rằng bạn có một tài khoản phát triển của Meteor. Bạn có thể yêu cầu một tài khoản tại [meteor.com](meteor.com), nhưng cũng có thể là bạn đã tại sẵn khi bạn đăng ký cuốn sách này! Dù trong trường hợp nào, hãy kiểm tra tên tài khoản của bạn, vì nó sẽ được dùng trong suốt chương này.
 
-////
+Chúng ta sẽ sử dụng tài khoản tên là `tmeasday` cho chương này -- bạn cũng có thể thay thế bằng tài khoản của riêng mình. 
 
-////
+Trước hết chúng ta cần phải tạo cấu trúc cho package để lưu trú vào đó. Việc này có thể thực hiện bằng lệnh `meteor create --package tmeasday:errors`. Chú ý rằng Meteor sẽ tạo một thư mục tên là `packages/tmeasday:errors/` với một số file bên trong. Chúng ta sẽ bắt đầu bằng việc biên tập lại file `package.js`. File này thông báo cho Meteor biết package nên được dùng như thế nào, và object hoặc hàm nào cần phải xuất ra. 
 
 ~~~js
 Package.describe({
@@ -36,9 +39,9 @@ Package.onUse(function (api, where) {
 ~~~
 <%= caption "packages/tmeasday:errors/package.js" %>
 
-////
+Khi mà phát triển một gói package dùng cho thế giới thực, sẽ rất tốt nếu chúng ta nhập vào phần `git` của `Package.describe` với kho chứa Git URL (ví dụ như là `https://github.com/tmeasday/meteor-errors.git`). Bằng cách này người dùng có thể đọc mã nguồn của bạn, và (mặc định là bạn dùng GitHub) readme của gói package cũng sẽ xuất hiện trên Atmosphere.
 
-////
+Hãy cùng thêm ba file vào package. (Chúng ta có thể xoá bỏ bản mẫu mà Meteor đưa vào) Chúng ta có thể lấy những file này từ Microscope mà không cần phải thay đổi nhiều trừ một số thuộc tính namespacing và một vài tinh chỉnh nhỏ cho API:
 
 ~~~js
 Errors = {
@@ -86,9 +89,9 @@ Template.meteorError.rendered = function() {
 ~~~
 <%= caption "packages/tmeasday:errors/errors_list.js" %>
 
-### Testing the package out with Microscope
+### Kiểm thử gói package với Microscope
 
-////
+Bây giờ chúng ta sẽ thử kiểm tra cục bộ với Microscope để chắc chắn rằng code được thay đổi hoạt động tốt. Để kết nối gói package với dự án của chúng ta, hãy chạy lệnh `meteor add tmeasday:errors`. Sau đó, chúng ta cần xoá những file tồn tại mà đã bị dự thừa sau khi có package mới:
 
 ~~~bash
 rm client/helpers/errors.js
@@ -97,7 +100,7 @@ rm client/templates/includes/errors.js
 ~~~
 <%= caption "removing old files on the bash console" %>
 
-////
+Một điều nữa chúng ta cần phải làm là cập nhật một số thay đổi để API đúng:
 
 ~~~html
   {{> header}}
@@ -124,13 +127,13 @@ Posts.update(currentPostId, {$set: postProperties}, function(error) {
 
 <%= scommit "9-5-1", "Created basic errors package and linked it in." %>
 
-////
+Sau khi những thay đổi đã được tạo, chúng ta sẽ có được hoạt động như trước khi tạo package.
 
-### Writing tests
+### Viết mã kiểm thử
 
-////
+Việc đầu tiên khi phát triển một package là kiểm thử đối với ứng dụng, nhưng việc tiếp theo phải làm là viết mã kiểm thử để kiểm tra hoạt động của package.
 
-////
+Hãy cùng tạo một file kiểm thử dùng Tinytest để làm việc này:
 
 ~~~js
 Tinytest.add("Errors - collection", function(test) {
@@ -157,11 +160,11 @@ Tinytest.addAsync("Errors - template", function(test, done) {
 ~~~
 <%= caption "packages/tmeasday:errors/errors_tests.js" %>
 
-////
+Trong đoạn kiểm thử này, chúng ta kiểm tra hoạt động cơ bản của hàm `Meteor.Errors`, và ngoài ra cũng kiểm tra thêm lần nữa code trong `rendered` của template vẫn hoạt động đúng.
 
-////
+Chúng ta sẽ không đi vào tất cả khía cạnh của việc viết kiểm thử cho Meteor package, (vì API vẫn chưa phải là bản cuối cùng và vẫn còn thay đổi rất nhiều), nhưng hi vọng rằng nó đủ để tìm hiểu cách thức hoạt động.
 
-////
+Để bảo cho Meteor biết làm thế nào để chạy kiểm thử trong `package.js`, sử dụng đoạn mã sau:
 
 ~~~js
 Package.onTest(function(api) {
@@ -175,7 +178,7 @@ Package.onTest(function(api) {
 
 <%= scommit "9-5-2", "Added tests to the package." %>
 
-////
+Sau đó chúng ta có thể chạy kiểm thử với:
 
 ~~~bash
 meteor test-packages tmeasday:errors
@@ -184,11 +187,11 @@ meteor test-packages tmeasday:errors
 
 <%= screenshot "s7-1", "Passing all tests" %>
 
-### Releasing the package
+### Release Package
 
-////
+Bây giờ, chúng ta sẽ release package và làm cho nó hiện hữu với toàn bộ thế giới. Chúng ta làm việc này bằng cách đẩy nó lên server package của Meteor, và cho nó vào trong Atmopshere.
 
-////
+May mắn thay việc đó khá đơn giản. Chúng ta chỉ cần `cd` tới thư mục của package, và chạy lệnh `meteor publish --create`:
 
 ~~~bash
 cd packages/tmeasday:errors
@@ -196,7 +199,7 @@ meteor publish --create
 ~~~
 <%= caption "Terminal" %>
 
-////
+Bây giờ gói package đã được release, chúng ta có thể xoá nó ra khỏi dự án và thêm vào sau đó một cách trực tiếp:
 
 ~~~bash
 rm -r packages/errors
@@ -206,4 +209,6 @@ meteor add tmeasday:errors
 
 <%= scommit "9-5-4", "Removed package from development tree." %>
 
-////
+Bạn sẽ thấy Meteor tải package lần đầu tiên. Chúng ta đã làm rất tốt!
+
+Như với các chương sidebar khác, chắc chắn rằng bạn đã khôi phục lại những thay đổi trước khi đi tiếp (hoặc là chắcxem xét chúng kỹ càng trong khi đi tiếp phần còn lại của cuốn sách).
