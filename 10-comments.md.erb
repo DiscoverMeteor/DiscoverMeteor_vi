@@ -1,16 +1,19 @@
 ---
-title: Comments
+title: Bình luận
 slug: comments
 complete: 100
 date: 0010/01/01
 number: 10
-contents: Display existing comments.|Add a comment posting form.|Learn how to load only the current post's comments.|Add a comment count property to posts.
-paragraphs: 36
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/9414222270/
+photoAuthor: Mike Lewinski
+contents: Hiển thị bình luận.|Thêm form gửi bình luận cho bài viết.|Học cách chỉ hiển thị bình luận của bài viết hiện tại.|Thêm thuộc tính đếm số bình luận.
+paragraphs: 34
 ---
 
-////
+Mục tiêu của trang tin tức mạng xã hội là để tạo một cộng đồng người dùng. Và nó sẽ trở nên khó khăn nếu như chúng ta không cung cấp một cách để mọi người giao tiếp với nhau. Vì vậy trong chương này, hãy cùng nhau thêm vào bình luận!
 
-////
+Chúng ta sẽ bắt đầu bằng việc tạo một collection mới để lưu bình luận vào, và cũng sẽ thêm vào một số dữ liệu cố định vào collection đó.
 
 ~~~js
 Comments = new Mongo.Collection('comments');
@@ -75,7 +78,7 @@ if (Posts.find().count() === 0) {
 ~~~
 <%= caption "server/fixtures.js" %>
 
-////
+Đừng quen việc publish và subscribe cho collection mới:
 
 ~~~js
 Meteor.publish('posts', function() {
@@ -104,15 +107,15 @@ Router.configure({
 
 <%= commit "10-1", "Added comments collection, pub/sub and fixtures." %>
 
-////
+Chú ý rằng để kích hoạt đoạn code này, bạn cần phải dùng `meteor reset` để làm sạch cơ sở dữ liệu. Sau khi đã thiết lập lại, cũng không được quên tạo một tài khoản mới và đăng nhập trở lại!
 
-////
+Đầu tiên, chúng ta đã tạo một vài người dùng (hoàn toàn là tài khoản giả), chèn vào cơ sở dữ liệu và sử dụng `id` để chọn chúng ra khỏi cơ sở dữ liệu sau đấy. Sau đó chúng ta thêm vào bình luận cho mỗi người dùng trong bài viết đầu tiên, liên kết bình luận với bài viết (bằng `postId`), và người dùng (bằng `userId`). Chúng ta cũng đã thêm ngày gửi và nội dung cho mỗi bình luận, cùng với `author`, một trường được chuẩn hoá.
 
-////
+Ngoài ra, chúng ta đã bổ xung thêm định tuyến để đợi cho *mảng* chứa cả những bình luận và subscription của các bài viết.
 
-### Displaying comments
+### Hiển thị bình luận
 
-////
+Việc lưu bình luận vào cơ sở dữ liệu đã được xong xuôi, nhưng chúng ta cũng cần phải hiển thị chúng trên trang thảo luận. Hi vọng rằng quá trình này đã trở lên quen thuộc với bạn, và bạn có được ý tưởng những bước cần phải thực hiện:
 
 ~~~html
 <template name="postPage">
@@ -138,9 +141,9 @@ Template.postPage.helpers({
 <%= caption "client/templates/posts/post_page.js" %>
 <%= highlight "2~4" %>
 
-////
+Chúng ta đặt khối `{{#each comments}}` bên trong template của bài viết, để cho đối tượng `this` là một bài viết bên trong helper `comments`. Để tìm ra bình luận tương ứng, chúng ta kiểm tra những bình luận được gắn với bài viết thông qua thuộc tính `postId`.
 
-////
+Bằng việc dùng những gì chúng ta đã được học về helper và Spacebar, việc dịch ra một mình luận là khá hiển nhiên. Chúng ta sẽ tạo ra một thư mục `comments` bên trong thư mục `templates` để lưu thông tin về bình luận, và một template `commentItem` bên trong nó:
 
 ~~~html
 <template name="commentItem">
@@ -155,7 +158,7 @@ Template.postPage.helpers({
 ~~~
 <%= caption "client/templates/comments/comment_item.html" %>
 
-////
+Hãy cùng tạo một template helper để định dạng ngày `submitted` theo một chuẩn thân thiện hơn:
 
 ~~~js
 Template.commentItem.helpers({
@@ -166,7 +169,7 @@ Template.commentItem.helpers({
 ~~~
 <%= caption "client/templates/comments/comment_item.js" %>
 
-////
+Sau đó, chúng ta sẽ hiển thị số lượng bình luận cho mỗi bài viết:
 
 ~~~html
 <template name="postItem">
@@ -186,7 +189,7 @@ Template.commentItem.helpers({
 <%= caption "client/templates/posts/post_item.html" %>
 <%= highlight "6,7" %>
 
-////
+Và thêm helper `commentsCount` vào `post_item.js`:
 
 ~~~js
 Template.postItem.helpers({
@@ -208,15 +211,15 @@ Template.postItem.helpers({
 
 <%= commit "10-2", "Display comments on `postPage`." %>
 
-////
+Bây giờ bạn có thể hiển thị được những bình luận đã thêm và sẽ thấy được như sau:
 
 <%= screenshot "10-1", "Displaying comments" %>
 
-### Submitting Comments
+### Thêm bình luận
 
-////
+Hãy thêm vào một cách thức để người dùng của chúng ta có thể tạo bình luận. Công đoạn để làm điều đó khá là giống với những gì chúng ta đã làm khi tạo bài viết.
 
-////
+Chúng ta sẽ bắt đầu bằng việc tạo một form để thêm bình luận ở cuối mỗi bài viết:
 
 ~~~html
 <template name="postPage">
@@ -238,7 +241,7 @@ Template.postItem.helpers({
 <%= caption "client/templates/posts/post_page.html" %>
 <%= highlight "10~14" %>
 
-////
+Và sau đó tạo template cho form bình luận:
 
 ~~~html
 <template name="commentSubmit">
@@ -256,7 +259,7 @@ Template.postItem.helpers({
 ~~~
 <%= caption "client/templates/comments/comment_submit.html" %>
 
-////
+Để đăng bình luận, chúng ta sẽ gọi method `comment` trong `comment_submit.js` mà hoạt động của nó cũng giống như khi đăng bài viết:
 
 ~~~js
 Template.commentSubmit.created = function() {
@@ -300,7 +303,7 @@ Template.commentSubmit.events({
 ~~~
 <%= caption "client/templates/comments/comment_submit.js" %>
 
-////
+Cũng giống như việc chúng ta đã làm với Meteor method `post` ở phía server, chúng ta tạo Meteor method `commet` để thêm bình luận, kiểm tra xem mọi thứ có hợp lệ hay không, và cuối cùng là thêm bình luận mới đó vào trong collection.
 
 ~~~js
 Comments = new Mongo.Collection('comments');
@@ -334,23 +337,23 @@ Meteor.methods({
 
 <%= commit "10-3", "Created a form to submit comments." %>
 
-////
+Việc đang làm không có gì là trang hoàng, chúng ta chỉ kiểm tra xem người dùng có đang đăng nhập, bình luận có nội dung, và nó được liên kết tới một bài viết.
 
 <%= screenshot "10-2", "The comment submit form" %>
 
-### Controlling the Comments Subscription
+### Điều khiển Subscription cho bình luận
 
-////
+Như mọi thứ đã đúng vị trí, chúng ta đang publish tất cả bình luận trên tất cả các bài viết cho tất cả client. Điều này có vẻ khá là lãng phí. Xét cho cùng, chúng ta cũng chỉ muốn dùng một tập con nhỏ dữ liệu tại một thời điểm. Vì vậy, hãy cùng cải tiến việc xuất bản và đăng theo dõi để quản lý cho đúng bình luận nào cần phải xuất bản.
 
-////
+Nếu chúng ta suy nghĩ về điều đó, thì lần duy nhất cần phải đăng theo dõi xuất bản của `comments` là khi một người dùng truy cập vào một trang đơn lẻ, và chúng ta chỉ muốn tải tập con những bình luận liên quan đến bài viết đó.
 
-////
+Bước đầu tiên sẽ thay đổi cách chúng ta subscribe tới bình luận. Cho tới bây giờ, chúng ta đã subscribe ở mức *router*, nghĩa là chúng ta tải tất cả dữ liệu một lần khi bộ định tuyến được khởi tạo.
 
-////
+Nhưng bây giờ chúng ta muốn việc subscribe phụ thuộc vào tham số của đường dẫn, và tham số đó hiển nhiên là sẽ thay đổi tại bất kỳ thời điểm nào. Bởi vậy chúng ta sẽ cần chuyển đoạn code subscribe từ mức *router* sang mức *route*.
 
-////
+Điều này có thêm một hệ quả nữa: thay vì tải dữ liệu ngay từ lúc khởi tạo ứng dụng, chúng ta sẽ tải khi mà bước vào một *route*. Điều này có nghĩa là sẽ có một khoảng thời gian đợi để trình duyệt tải, nhưng điều này là một điểm lùi không thể tránh khỏi trừ khi bạn định luôn luôn tải trước toàn bộ phần tử của dữ liệu.
 
-////
+Đầu tiên, chúng ta sẽ dừng việc tải trước tất cả bình luận trong khối `configure` bằng việc xoá bỏ `Meteor.subscribe('comments')` (nói cách khác, trở lại trạng thái chúng ta đã có trước đó):
 
 ~~~js
 Router.configure({
@@ -365,7 +368,7 @@ Router.configure({
 <%= caption "lib/router.js" %>
 <%= highlight "5" %>
 
-////
+Và chúng ta sẽ thêm vào một hàm `waitOn` ở mức *route* cho route `postPage`:
 
 ~~~js
 //...
@@ -383,7 +386,7 @@ Router.route('/posts/:_id', {
 <%= caption "lib/router.js" %>
 <%= highlight "5~7" %>
 
-////
+Chúng ta đang thêm `this.params._id` như một tham số cho việc subscribe. Vì vậy hãy dùng thông tin đó để chắc chắn rằng dữ liệu bình luận đã được bó hẹp lại chỉ trong bài viết hiện tại:
 
 ~~~js
 Meteor.publish('posts', function() {
@@ -400,17 +403,17 @@ Meteor.publish('comments', function(postId) {
 
 <%= commit "10-4", "Made a simple publication/subscription for comments." %>
 
-////
+Chỉ có một vấn đề: khi chúng ta quay lại trang chủ, nó sẽ hiển thị rằng mọi bài viết đều có 0 bình luận:
 
 <%= screenshot "10-3", "Our comments are gone!" %>
 
-### Counting Comments
+### Đếm số lượng bình luận
 
-////
+Lý do cho vấn đề này khá là rõ ràng: chúng ta chỉ nạp bình luận tại route `postPage`, vì vậy khi chúng ta gọi tới `Comments.find({postId: this._id})` trong helper `commentsCount`, Meteor không thể tìm ra được dữ liệu phía client cần thiết cho chúng ta.
 
-////
+Cách tốt nhất để giải quyết vấn đề này là *tiêu chuẩn hoá* số lượng bình luận trên bài viết (nếu bạn không chắc về nghĩa của từ này, cũng đừng lo lắng vì chúng ta sẽ làm rõ trong phần sidebar tiếp theo!). Mặc dù vậy như bạn thấy, đoạn code trở nên phức tạp hơn một chút, nhưng chúng ta được lợi ích là hiệu suất được tăng nên do không cần phải publish _tất cả_ bình luận.
 
-////
+Chúng ta sẽ đạt được điều này bằng cách thêm vào thuộc tính `commentsCount` vào cấu trúc dữ liệu của `post`. Để bắt đầu, chúng ta cập nhật dữ liệu cố định bài viết (và dùng `meteor reset` để nạp lại -- đừng quên tạo một tài khoản mới sau đó):
 
 ~~~js
 // Fixture data 
@@ -474,9 +477,9 @@ if (Posts.find().count() === 0) {
 <%= caption "server/fixtures.js" %>
 <%= highlight "20,21,45,46,54,55" %>
 
-////
+Như thông thường khi cập nhật dữ liệu tĩnh của file, bạn cần phải `meteor reset` cơ sở dữ liệu để chắc chắn nó hoạt động.
 
-////
+Sau đó, chúng ta chắc chắn rằng tất cả bài viết đều bắt đầu với 0 bình luận:
 
 ~~~js
 //...
@@ -495,7 +498,7 @@ var postId = Posts.insert(post);
 <%= caption "collections/posts.js" %>
 <%= highlight "6,7" %>
 
-////
+Và sau đó, chúng ta cập nhật `commentsCount` tương ứng mỗi khi một bình luận mới được tạo, bằng việc sử dụng toán tử `$inc` của Mongo (nghĩa là tăng giá trị của trường thêm một):
 
 ~~~js
 //...
@@ -516,8 +519,8 @@ return Comments.insert(comment);
 <%= caption "collections/comments.js "%>
 <%= highlight "9,10" %>
 
-////
+Cuối cùng, chúng ta có thể đơn giản xoá bỏ helper `commentsCount` từ `client/templates/posts/post_item.js` vì trường đó giờ có thể nhập vào trực tiếp từ bài viết.
 
 <%= commit "10-5", "Denormalized the number of comments into the post." %>
 
-////
+Bây giờ người dùng đã có thể nói chuyện với nhau, và sẽ thật đáng tiếc nếu như họ bị bỏ lỡ mất bình luận của người khác. Và chương tiếp theo sẽ chỉ cho bạn cách cài đặt thông báo (notification) để ngăn chặn điều đáng tiếc đó!
