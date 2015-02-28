@@ -411,7 +411,7 @@ Chỉ có một vấn đề: khi chúng ta quay lại trang chủ, nó sẽ hi�
 
 Lý do cho vấn đề này khá là rõ ràng: chúng ta chỉ nạp bình luận tại route `postPage`, vì vậy khi chúng ta gọi tới `Comments.find({postId: this._id})` trong helper `commentsCount`, Meteor không thể tìm ra được dữ liệu phía client cần thiết cho chúng ta.
 
-Cách tốt nhất để giải quyết vấn đề này là *tiêu chuẩn hoá* số lượng bình luận trên bài viết (nếu bạn không chắc về nghĩa của từ này, cũng đừng lo lắng vì chúng ta sẽ làm rõ trong phần sidebar tiếp theo!). Mặc dù vậy như bạn thấy, đoạn code trở nên phức tạp hơn một chút, nhưng chúng ta được lợi ích là hiệu suất được tăng nên do không cần phải publish _tất cả_ bình luận.
+Cách tốt nhất để giải quyết vấn đề này là *bất chuẩn hoá* số lượng bình luận trên bài viết (nếu bạn không chắc về nghĩa của từ này, cũng đừng lo lắng vì chúng ta sẽ làm rõ trong phần sidebar tiếp theo!). Mặc dù vậy như bạn thấy, đoạn code trở nên phức tạp hơn một chút, nhưng chúng ta được lợi ích là hiệu suất được tăng nên do không cần phải publish _tất cả_ bình luận.
 
 Chúng ta sẽ đạt được điều này bằng cách thêm vào thuộc tính `commentsCount` vào cấu trúc dữ liệu của `post`. Để bắt đầu, chúng ta cập nhật dữ liệu cố định bài viết (và dùng `meteor reset` để nạp lại -- đừng quên tạo một tài khoản mới sau đó):
 

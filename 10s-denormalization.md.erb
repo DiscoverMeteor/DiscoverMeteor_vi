@@ -1,50 +1,53 @@
 ---
-title: Denormalization
+title: Bất chuẩn hoá
 slug: denormalization
 date: 0010/01/02
 number: 10.5
+points: 10
 sidebar: true
-contents: Understand what denormalization is.|Compare Mongo with traditional relational databases.|Learn when you should *not* denormalize your data. 
+photoUrl: http://www.flickr.com/photos/ikewinski/9283093547/
+photoAuthor: Mike Lewinski
+contents: Tìm hiểu thế nào là bất chuẩn hoá.|So sánh Mongo với cơ sở dữ liệu quan hệ truyền thống.|Học xem khi nào thì bạn *không* nên chuẩn hoá dữ liệu. 
 paragraphs: 15
 ---
 
-////
+Bất chuẩn hoá dữ liệu có nghĩa là không lưu trữ nó ở dạng "bình thường". Nói cách khác, bất chuẩn hoá (denormalization) có nghĩa là có nhiều bản sao chép của cùng một bộ dữ liệu được cài vào.
 
-////
+Trong chương trước, chúng ta đã thực hiện công việc bất chuẩn hoá đối với số lượng bình luận của object bài viết nhằm mục đích tránh phải nạp lại tất cả bình luận mọi lần. Theo ý nghĩa của mô hình dữ liệu, đây là một sự dư thừa, do chúng ta hoàn toàn có thể đếm số lượng bản ghi một cách chính xác tại mọi thời điểm để tìm ra con số đó (bỏ qua vấn đề hiệu suất).
 
-////
+Bất chuẩn hoá thường có nghĩa là thêm việc cho người lập trình. Trong ví dụ của chúng ta, mỗi lần chúng ta thêm vào hoặc xoá bỏ một bình luận nào đó, chúng ta đồng thời phải thay đổi bài viết tương ứng để chắc chắn rằng trường `commentsCount` vẫn đúng. Đây chính là lý do vì sao những bộ cơ sở dữ liệu quan hệ sẽ cau mày vì cách tiếp cận này.
 
-////
+Tuy nhiên, cách tiếp cận truyền thống cũng có điểm trừ của nó: nếu như không có thuộc tính `commentsCount`, chúng ta đã phải gửi _tất cả_ dữ liệu bình luận xuống trong mỗi lần chỉ để đếm tổng của chúng, đó chính là cách mà chúng ta đã làm ban đầu. Bất chuẩn hoá giúp chúng ta tránh được điều này.
 
 <% note do %>
 
-### A Special Publication
+### Publiction đặc biệt
 
-////
+Cũng *sẽ* có thể nếu như chúng ta tạo một bản public riêng mà nhiệm vụ của nó chỉ là gửi đi số lượng bình luận mà chúng ta quan tâm (ví dụ như là số lượng bình luận của bài viết mà đang được hiển thị, thông qua câu query tổng hợp ở phía server).
 
-////
+Nhưng điều đó cũng phải được xem xét dựa trên độ phức tạp mà code public mang lại có thực sự dễ chịu hơn so với việc tạo bất chuẩn hoá hay không.
 
 <% end %>
 
-////
+Dĩ nhiên, việc xem xét đó cũng là một phần đặc thù của ứng dụng: Nếu như bạn viết code mà tính toàn vẹn của dữ liệu ở mức quan trọng tối cao, thì tốt hơn hết là tránh việc dữ liệu không đồng nhất sẽ quan trọng hơn nhiều so với việc chú trọng tới hiệu suất tăng thêm được. 
 
-### Embedding Documents or Using Multiple Collections
+### Tài liệu lồng nhau hay là sử dụng nhiều collection
 
-////
+Nếu như bạn đã trải nghiệm với Mongo, bạn có thể đã ngạc nhiên khi thấy chúng ta tạo ra một collection mới chỉ cho bình luận: tại sao lại không nhúng bình luận thành một danh sách bên trong tài liệu bài viết?
 
-////
+Đó là vì nhiều công cụ trong Meteor làm việc tốt hơn ở cấp độ collection. Ví dụ:
 
-////
-////
-////
-////
+1. Helper `{{#each}}` làm việc rất hiệu quả khi mà lặp lại trên một con trỏ (là kết quả của `collection.find()`). Điều tương tự không đúng khi mà lặp trên một mảng object của một tài liệu lớn.
+2. Phép toán `allow` và `deny` đều ở mức tài liệu, và do đó sẽ dễ dàng hơn để đảm bảo mỗi thay đổi của bình luận đơn lẻ được sửa đúng mà sẽ phức tạp hơn nhiều khi làm việc cùng phép toán ở mức bài viết.
+3. DDP hoạt động ở mức thuộc tính cấp cao nhất trong tài liệu -- điều này có nghĩa là nếu như `comments`là một thuộc tính của `post`, mỗi lần bình luận được viết trên một bài viết, thì server sẽ gửi toàn bộ cập nhật của danh sách bình luận của bài viết đó tới mỗi kết nối client.
+4. Public và subscribe sẽ dễ dàng hơn nhiều ở mức tài liệu. Ví dụ, bạn sẽ thấy khó khăn nếu muốn phân trang bình luận của bài viết, trừ khi bình luận đó ở trên collection riêng của nó.
 
-////
+Mongo đề nghị dữ liệu lồng nhau để giảm thiểu chi phí cho câu truy vấn khi tìm nạp dữ liệu. Tuy nhiên, điều này sẽ ít khi là vấn đề khi dùng kiến trúc của Meteor: trong hầu hết thời gian, chúng ta truy vấn bình luận ở phía *client*, nơi mà việc truy cập tới cơ sở dữ liệu hầu như là miễn phí.
 
 <% note do %>
 
-### The Downsides of Denormalization
+### Điểm trừ của việc bất chuẩn hoá
 
-////
+Có một số quan điểm khá tốt nói rằng bạn *không nên* sử dụng bất chuẩn hoá cho dữ liệu. Cho một trường hợp mà tốt hơn là không nên dùng bất chuẩn hoá, chúng tôi đề xuất [Why You Should Never Use MongoDB](http://www.sarahmei.com/blog/2013/11/11/why-you-should-never-use-mongodb/) được viết bởi Sarah Mei.
 
 <% end %>
