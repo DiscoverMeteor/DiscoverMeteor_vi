@@ -1,24 +1,27 @@
 ---
-title: Pagination
+title: Phân trang
 slug: pagination
 date: 0012/01/01
 number: 12
-contents: Learn more about Meteor's subscriptions, and how we can use them to control data.|Implement infinite-style pagination.|Use the `iron-router-progress` package to implement a nifty iOS-style progress bar.|Create a special subscription to deal with direct links to posts page.
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/8625379401/
+photoAuthor: Mike Lewinski
+contents: Học thêm về subscribe của Meteor, và làm thế nào chúng ta dùng chúng để điều khiển dữ liệu.|Cài đặt phân trang với mô hình không giới hạn (infinite-style).|Sử dụng gói `iron-router-progress` để cài đặt thanh tiến độ (progress bar) đúng mốt iOS.|Tạo subscribe đặc biệt để làm việc với đường dẫn trực tiếp tới bài viết.
 paragraphs: 67
 ---
 
 
-////
+Mọi thứ đang diễn ra tuyệt vời với Microscope, và chúng ta có thể mong chờ thu nhận khả quan khi phát hành sản phẩm ra thế giới.
 
-////
+Vì vậy chúng ta cũng nên suy nghĩ một chút về hệ quả hiệu suất của số lượng bài viết được nhập vào trang web khi nó cất cánh!
 
-////
+Chúng ta đã nói trước đó làm thế nào collection phía client nên chứa tập con của dữ liệu trên server, và chúng ta cũng đã thành công trong việc dùng nó cho collection thông báo và bình luận.
 
-////
+Tại thời điểm hiện tại, tuy nhiên chúng ta vẫn đang publish tất cả bài viết cùng một lúc, tới tất cả kết nối từ người dùng. Dần dần, sẽ có hàng nghìn đường dẫn được tạo, và điều đó sẽ trở thành vấn đề. Để giải quyết nó, chúng ta cần phải phân trang cho bài viết.
 
-### Adding More Posts
+### Thêm bài viết nữa
 
-////
+Đầu tiên, đối với dữ liệu tĩnh của chúng ta, hãy nạp đủ số bài viết để việc phân trang thực sự có ý nghĩa:
 
 ~~~js
 // Fixture data 
@@ -50,25 +53,25 @@ if (Posts.find().count() === 0) {
 <%= caption "server/fixtures.js" %>
 <%= highlight "15~24" %>
 
-////
+Sau khi chạy `meteor reset` và bắt đầu ứng dụng thêm một lần nữa, bạn sẽ thấy thứ gì đó như sau:
 
 <%= screenshot "12-1", "Displaying dummy data. " %>
 
 <%= commit "12-1", "Added enough posts that pagination is necessary." %>
 
-### Infinite Pagination
+### Phân trang vô hạn
 
-////
+Chúng ta sẽ bắt đầu việc phân trang theo phong cách "vô hạn". Điều chúng ta sẽ làm là ban đầu hiển thị, chẳng hạn 10 bài viết trên màn hình, với một đường dẫn “load more” (nạp thêm) được gắn ở cuối trang. Khi bấm vào đường dẫn này, 10 bài viết sẽ hiển thị thêm trên danh sách và tiếp tục *mãi mãi* như vậy. Điều này có nghĩa là chúng ta có thể quản lý hệ thống phân trang bằng một tham số đơn biểu diễn số lượng bài viết để hiển thị trên màn hình.
 
-////
+Bây giờ chúng ta cần một cách để thông báo cho server biết được về tham số này để có thể biết được bao nhiêu bài viết cần gửi tới client. Nó xảy ra vì chúng ta đã subscribe tới publish `posts` trên router, vì vậy chúng ta sẽ lợi dụng điều này và để router quản lý việc phân trang.
 
-////
+Cách dễ nhất để làm điều này là đơn giản để tham số hạn chế số lượng bài viết trên đường dẫn, URLs khi đó sẽ có dạng là `http://localhost:3000/25`. Một điểm cộng nữa cho việc dùng URL như vậy là nếu bạn đang hiển thị 25 bài viết và do sơ suất bị nạp lại trình duyệt thì bạn vẫn sẽ nhìn thấy 25 bài viết khi mà trang đã được nạp xong.
 
-////
+Để làm được điều này một cách đúng đắn, chúng ta cần thay đổi cách subscribe tới bài viết. Cũng giống như cách chúng ta đã làm đối với chương *Tạo bình luận*, chúng ta sẽ cần phải di chuyển code cho việc subscribe từ *router* sang mức *route*.
 
-////
+Điều này có thể khá là khó hiểu khi nói cùng một lúc, nhưng sẽ trở nên rõ ràng hơn với đoạn code.
 
-////
+Đầu tiên, chúng ta dừng việc subscribe tới publish `posts` ở trong khối `Router.configure()`. Hãy đơn giản xoá `Meteor.subscribe('posts')`, để lại chỉ subscribe về `notifications`:
 
 ~~~js
 Router.configure({
@@ -83,7 +86,7 @@ Router.configure({
 <%= caption "lib/router.js" %>
 <%= highlight "6" %>
 
-////
+Chúng ta sẽ thêm vào một tham số `postsLimit`cho đường dẫn của route. Thêm vào `?` sau tên của tham số nghĩa là nó không bắt buộc. Điều đó có nghĩa là route của chúng ta sẽ hợp lệ không chỉ với `http://localhost:3000/50`, mà còn với cả `http://localhost:3000`. 
 
 ~~~js
 //...
@@ -97,11 +100,11 @@ Router.route('/:postsLimit?', {
 <%= caption "lib/router.js" %>
 <%= highlight "3" %>
 
-////
+Rất quan trọng phải chú ý rằng một đường dẫn với dạng `/:parameter?` sẽ tổ hợp với tất cả đường dẫn có thể. Vì mỗi route sẽ phân tách lần lượt để xem nó có khớp với đường dẫn hiện tại hay không, chúng ta cần phải chắc chắn rằng chúng ta tổ chức route theo thứ tự đặc trưng riêng giảm dần
 
-////
+Nói cách khác, route mà mục đích đặc trưng hơn ví dụ như là `/posts/:_id` nên xuất hiện trước, và route tới `postsList` nên được đưa xuống **vị trí cuối cùng** của nhóm route vì nó thường khớp với mọi trường hợp.
 
-////
+Bây giờ là lúc chúng ta ứng phó với vấn đề subscribe và tìm kiếm dữ liệu thích hợp. Chúng ta cần phải giải quyết vấn đề khi mà tham số `postsLimit` không xuất hiện, nên chúng ta sẽ gán nó với một giá trị mặc định. Chúng ta sẽ dùng “5” để thực sự có đủ phòng hiển thị phân trang.
 
 ~~~js
 //...
@@ -119,7 +122,7 @@ Router.route('/:postsLimit?', {
 <%= caption "lib/router.js" %>
 <%= highlight "5~8" %>
 
-////
+Bạn sẽ nhận ra rằng chúng ta đang đưa ra một object Javascript ({sort: {submitted: -1}, limit: postsLimit}) kèm với việc publish `posts`. Object này được dùng như là tham số `options` cho câu khai báo phía server `Posts.find()`. Hãy cùng chuyển sang code phía server để thi hành điều này:
 
 ~~~js
 Meteor.publish('posts', function(options) {
@@ -144,15 +147,15 @@ Meteor.publish('notifications', function() {
 
 <% note do %>
 
-### Passing Parameters
+### Gửi thông báo
 
-////
+Đoạn code publish của chúng ta có kết quả thông báo cho server rằng nó có thể tin tưởng vào bất kỳ object JavaScript nào gửi từ phía client (trong trường hợp của chúng ta, `{limit: postsLimit}`) để phục vụ như là `options` của câu lệnh `find()`. Điều này làm cho người dùng có thể submit bất kỳ thông tin thêm nào họ muốn thông qua console trình duyệt.
 
-////
+Trong trường hợp của chúng ta, điều này là vô hại, vì tất cả người dùng có thể làm là sắp xếp lại bài viết một cách khác biệt, hoặc là thay đổi giới hạn (thứ chúng ta muốn có thể thay đổi được từ đầu). Mặc dù trong ứng dụng thực tế, có thể cũng cần phải hạn chế chính tham số hạn chế đó!
 
-////
+May mắn là bằng việc dùng `check()` chúng ta biết được người dùng không thể lén đưa thêm tuỳ chọn vào (ví dụ `fields`, thứ trong vài trường hợp có thể phơi bày ra dữ liệu cá nhân của tài liệu).
 
-////
+Dù vậy, một kiểu mẫu bảo mật hơn cũng có thể gửi từng tham số riêng lẻ thay vì cả object, để chắc chắn rằng bạn vẫn giữ quyền kiểm soát dữ liệu của mình:
 
 ~~~js
 Meteor.publish('posts', function(sort, limit) {
@@ -162,9 +165,9 @@ Meteor.publish('posts', function(sort, limit) {
 
 <% end %>
 
-////
+Bây giờ khi mà chúng ta đã subscribe ở mức route, nó sẽ hợp lý hơn nếu chúng ta thiết lập văn cảnh dữ liệu trong cùng một chỗ. Chúng ta sẽ đi chệch so với kiểu mẫu trước đó và tạo hàm `data` trả về object JavaScript thay vì đơn giản trả về một con trỏ. Điều này giúp chúng ta tạo ra một văn cảnh dữ liệu *có tên*, mà sẽ được gọi là `posts`.
 
-////
+Điều này có nghĩa là đơn giản thay vì hoàn toàn khả dụng với `this` ở trong template, bối cảnh dữ liệu của chúng ta sẽ khả dụng ở `posts`. Xa rời thành phần nhỏ này, đoạn code của chúng ta trông khá quen thuộc:
 
 ~~~js
 //...
@@ -188,11 +191,11 @@ Router.route('/:postsLimit?', {
 <%= caption "lib/router.js" %>
 <%= highlight "9~14" %>
 
-////
+Và vì chúng ta đang thiết lập bối cảnh dữ liệu ở mức route, chúng ta có thể thoát khỏi một cách an toàn từ helper của template `posts` bên trong fiel `posts_list.js` và chỉ đơn giản xoá nội dung của file.
 
-////
+Chúng ta đặt tên cho bối cảnh dữ liệu là `posts` (giống với tên helper), vì vậy chúng ta không cần phải tiếp xúc với template `postList`!
 
-////
+Hãy cùng nắp chúng lại. Sau đây là code của file `router.js` sau khi chúng ta đã làm mới và cải tiến:
 
 ~~~js
 Router.configure({
@@ -253,39 +256,39 @@ Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
 
 <%= commit "12-2", "Augmented the postsList route to take a limit." %>
 
-////
+Hãy cùng thử xem hệ thống phân trang của chúng ta đang hoạt động như thế nào. Chúng ta bây giờ có khả năng hiển htij một con số tuỳ ý số bài viết trên trang chủ đơn giản bằng việc thay đổi tham số của URL. Ví dụ, thử truy cập vào `http://localhost:3000/3`. Bạn sẽ thấy thứ gì đó như sau:
 
 <%= screenshot "12-2", "Controlling the number of posts on the homepage. " %>
 
 <% note do %>
 
-### Why Not Pages?
+### Tại sao không dùng theo trang? 
 
-////
+Tại sao chúng ta lại dùng phương pháp tiếp cân “phân trang vô hạn” mà không phải là hiển thị các trang riêng biệt cho mỗi 10 bài viết, giống như là cách Google làm đối với kết quả tìm kiếm? Đây là hệ quả của lý thuyết thời gian thực bao quát bởi Meteor.
 
-////
+Hãy tưởng tượng là bạn đang phân trang collection `Posts` dùng mô hình phân trang kết quả Google, và hiện tại chúng ta đang ở trang thứ 2, nơi chứa bài viết từ 10 đến 20. Điều gì sẽ xảy ra nếu như người dùng nào đó xoá bất kỳ bài nào trong 10 bài viết trước đó?
 
-////
+Vì ứng dụng của chúng ta theo thời gian thưc, bộ dữ liệu của chúng ta sẽ thay đổi. Bài viết thứ 10 sẽ trở thành bài viết thứ 9, và biến mất khỏi màn hình hiển thị, trong khi bài viết thứ 11 sẽ nằm trong danh sách. Điều này sẽ khiến người dùng thấy là bài viết của mình đang bị thay đổi mà không có lý do!
 
-////
+Ngay cả khi chúng ta chấp nhận lỗ hổng UX này, phân trang theo phương pháp truyền thống cũng khó cho việc thực hiện xét về mặt kỹ thuật.
 
-////
+Hãy cùng quay trở lại ví dụ trước của chúng ta. Chúng ta đang publish bài viết thứ 10 tới 20 từ collection `Posts`, nhưnng làm thế nào để tìm những bài viết này từ phía client? Bạn không thể nhặt bài viết từ 10 đến 20, vì chỉ có 10 bài viết trên dữ liệu phía client.
 
-////
+Một giải pháp cho việc này là publish 10 bài viết này từ phía server, và sau đó thực hiện `Posts.find()` phía client để chọn ra *tất cả* bài viết đã được publish.
 
-////
+Điều này hoạt động tốt nếu như bạn chỉ có một subscribe duy nhất. Nhưng điều gì sẽ xảy ra nếu như bạn bắt đầu có nhiều hơn một subscribe bài viết, như chúng ta sẽ sớm thực hiện?
 
-////
+Giả dụ một subscribe hỏi bài viết từ thứ 10 đến 20, và một cái khác từ bài viết 30 đến 40. Bạn bây có tổng cộng 20 bài viết được nạp phía client, và sẽ không có cách nào để biết bài viết nào thuộc về subscribe nào.
 
-////
+Vì tất cả lý do đó, phân trang theo phương pháp truyền thống không thực sự hợp lý khi làm việc với Meteor.
 
 <% end %>
 
-### Creating a Route Controller
+### Tạo một Controller cho Route
 
-////
+Có thể bạn đã nhận ra rằng chúng ta đang lặp lại `var limit = parseInt(this.params.postsLimit) || 5;` hai lần. Thêm nữa, việc hard-code số “5” thực ra cũng không phải là lý tưởng. Không đến mức là ngày tận thế, tuy nhiên luôn luôn tốt hơn nếu như chúng ta theo sát nguyên tắc DRY (Don't Repeat Yourself) khi có thể, hãy cùng xem chúng ta có thể điều chỉnh một chút như thế nào.
 
-////
+Chúng ta sẽ giới thiệu một khái niệm mới của Iron Router, *Route Controller*. Một route controller là một cách đơn giản để ghép nhóm tính năng route với nhau vào một gói có thể dùng được mà bất kỳ route nào cũng có thể kế thừa từ nó. Ngay bây giờ chúng ta sẽ chỉ dùng nó cho một route đơn lẻ, nhưng bạn sẽ thấy trong chương tiếp theo tính năng này hữu hiệu như thế nào.
 
 ~~~js
 //...
@@ -318,23 +321,23 @@ Router.route('/:postsLimit?', {
 <%= caption "lib/router.js" %>
 <%= highlight "3~18, 25" %>
 
-////
+Hãy xem xét từng bước một. Đầu tiên, chúng ta tạo một controller bằng việc mở rộng `RouteController`. Chúng ta sau đó thiết lập thuộc tính `template` giống như đã làm trước đó, và thêm một thuộc tính mới là `increment`.
 
-////
+Sau đó chúng ta định nghĩa một hàm `limit` mới mà nó trả về giới hạn hiện tại và một hàm `findOptions` mà sẽ trả về object tuỳ chọn. Điều này dường như là một bước thêm vào, nhưng chúng ta sẽ làm rõ nó sau đây.
 
-////
+Tiếp theo, chúng ta định nghĩa hàm `waitOn` và `data` như lúc trước, ngoại trừ chúng sẽ sử dụng hàm `findOptions` chúng ta tạo trước đó.
 
-////
+Bởi vì controller của chúng ta gọi tới `PostsListController` và route có tên là `postsList`, Iron Router sẽ tự động dùng controller. Vì vậy chúng ta chỉ cần bỏ đi `waitOn` và `data` từ định nghĩa route (vì bây giờ controller sẽ xử lý chúng). Nếu chúng ta cần sử dụng controller với một tên khác, chúng ta có hteer đã dùng tuỳ chọn `controller` (chúng ta sẽ thấy một ví dụ dùng cái này trong chương tiếp theo).
 
 <%= commit "12-3", "Refactored postsLists route into a RouteController." %>
 
-### Adding A Load More Link
+### Thêm vào một đường dẫn nạp thêm
 
-////
+Chúng ta đã có một hệ thống phân trang hoạt động, và code của chúng ta trông cũng khá ổn. Duy chỉ có một vấn đề: không có cách nào để thực sự *dùng* hệ thống phân trang đó ngoại trừ việc thay đổi URL bằng tay. Điều này thực sự là không tạo nên trải nghiệm người dùng tốt, vì vậy hãy cùng thay đổi điều này.
 
-////
+Điều chúng ta muốn làm cũng khá đơn giản. Chúng ta sẽ thêm một button “load more” ở cuối danh sách bài viết, thứ sẽ tăng số lượng bài viết đang hiển thị thêm 5 mỗi lần được bấm vào. Vì vậy nếu đang trên URL `http://localhost:3000/5`, bấm vào “load more” sẽ mang tới `http://localhost:3000/10`. Nếu như bạn làm đến bước này trong cuốn sách, chúng tôi tin rằng bạn có thể xử lý một chút toán!
 
-////
+Như đã làm từ trước, chúng ta sẽ thêm vào logic phân trang trên route. Bạn có nhớ rằng chúng ta đã đặt tên bối cảnh dữ liệu một cách rõ ràng hơn là chỉ dùng một con trỏ không tên? Thực ra, không có một luật nào nói rằng hàm `data` chỉ có thể nhận con trỏ, vì vậy chúng ta sẽ dùng kỹ thuật tương tự để tạo ra URL cho button “load more”.
 
 ~~~js
 //...
@@ -369,25 +372,25 @@ PostsListController = RouteController.extend({
 <%= caption "lib/router.js" %>
 <%= highlight "15~25" %>
 
-////
+Hãy cùng xem xét sâu hơn về router. Hãy nhớ rằng route `postList` (thứ được thừa hưởng từ controller `PostsListController` chúng ta đang làm việc trên) nhận tham số là `postsLimit`.
 
-////
+Vì vậy khi mà chúng ta cung cấp `{postsLimit: this.limit() + this.increment} cho `this.route.path()`, chúng ta đang bảo cho route `postList` tạo ra đường dẫn của riêng nó sử dụng object JavaScript như là bối cảnh dữ liệu.
 
-////
+Nói cách khác, đây chính xác là cách làm giống như là dùng helper Spacebar `{{pathFor 'postsList'}}`, ngoại trừ việc chúng ta thay `this` bằng bối cảnh dữ liệu chúng ta tự tạo.
 
-////
+Chúng ta đang lấy đường dẫn đó và thêm nó vào bối cảnh dữ liệu cho template, nhưng *chỉ* khi có nhiều bài viết để hiển thị. Cách chúng ta làm điều đó có một chút mẹo.
 
-////
+Chúng ta biết rằng `this.limit()` trả về số lượng bài viết hiện tại chúng ta muốn hiển thị, thứ có thể là giá trị của URL hiện tại, hoặc giá trị mặc định (5) nếu như URL không chứa tham số.
 
-////
+Mặt khác, `this.posts` tham chiếu tới con trỏ hiện tại, vì vậy `this.posts.count()` tham chiếu tới số lượng bài viết mà thực sự nằm trong con trỏ.
 
-////
+Điều mà chúng ta đang nói tới đây là nếu như chúng ta hỏi về `n` bài viết và chúng ta nhận được `n`, chúng ta sẽ hiển thị button “load more”. Nhưng nếu chúng ta hỏi cho `n` và nhận được *ít hơn* `n`, thì điều đó có nghĩa là chúng ta đã đạt tới giới hạn và sẽ dùng việc hiển thị button.
 
-////
+Điều đó nói lên rằng, hệ thống của chúng ta sẽ thất bại trong một trường hợp: khi mà số lượng khoản mục trong cơ sở dữ liệu *đúng bằng* `n`. Nếu điều đó xay ra, client sẽ hỏi `n` bài viết và nhận được `n` trở lại và vẫn hiển thị button “load more”, không nhận ra rằng không còn khoản mục nào nữa.
 
-////
+Đáng tiếc là không có cách đơn giản nào để giải quyết vấn đề này, vì vậy ngay bây giờ chúng ta phải chấp nhận việc cài đặt không hoàn hảo này.
 
-////
+Mọi việc còn tồn lại là thêm vào một đường dẫn “load more” ở cuối của danh sách bài viết, chắc chắn rằng chỉ hiển thị nếu như thực sự còn thêm bài viết để nạp:
 
 ~~~html
 <template name="postsList">
@@ -405,21 +408,21 @@ PostsListController = RouteController.extend({
 <%= caption "client/templates/posts/posts_list.html" %>
 <%= highlight "7~10" %>
 
-////
+Đây là thứ mà danh sách bài viết của bạn sẽ hiển thị:
 
 <%= screenshot "12-3", "The “load more” button. " %>
 
 <%= commit "12-4", "Added nextPath() to the controller and use it to step through posts." %>
 
-### A Better User Experience
+### Trải nghiệm người dùng tốt hơn
 
-////
+Hệ thống phân trang của chúng ta hiện tại đã hoạt động tốt, nhưng vẫn còn vấn đề khá rắc rối: mỗi lần bấm vào “load more” thì router hỏi xem có bài viết không, tính năng `waitOn` của Iron Router gửi cho chúng ta template `loading` trong khi đợi bài viết mới tới. Kết quả là chúng ta bị chuyển tới đầu trang mỗi lần, và cần phải cuộn xuống dưới cùng để duyệt tiếp.
 
-////
+Vì vậy, chúng ta phải bảo Iron Router không subscribe `waitOn` nữa. Thay vào đó, chúng ta sẽ định nghĩa subscribe trong một `subscribe` hook.
 
-////
+Chú ý rằng chúng ta không *trả về* subscribe này trong phần hook. Trả về nó (là cách mà `subscribe` hook thường làm) sẽ kích hoạt loading hook toàn cục, và đó chính là điều chúng ta cần phải tránh. Thay vào đó chúng ta sử dụng `subscribe` hook như một chỗ thuận tiện để định nghĩa subscribe của chúng ta, đơn giản là dùng hook `onBeforeAction`. 
 
-////
+Chúng ta cũng sẽ gửi kèm một biến `ready` tham chiếu tới `this.postsSub.ready` như một phần của bối cảnh dữ liệu. Điều này sẽ để chúng ta báo cho template khi nào việc subscribe bài viết đã hoàn thành.
 
 ~~~js
 //...
@@ -455,7 +458,7 @@ PostsListController = RouteController.extend({
 <%= caption "lib/router.js" %>
 <%= highlight "12~14, 23" %>
 
-////
+Chúng ta sẽ sau đó kiểm tra biến `ready` trong template để hiển thị một spinner ở cuối của danh sách bài viết trong khi đang nạp dữ liệu mới:
 
 ~~~html
 <template name="postsList">
@@ -479,17 +482,17 @@ PostsListController = RouteController.extend({
 
 <%= commit "12-5", "Add a spinner to make pagination nicer." %>
 
-### Accessing Any Post
+### Truy cập bất kỳ bài viết nào
 
-////
+Chúng ta hiện tại đang nạp vào năm bài viết mới nhất mặc định, nhưng điều xảy ra khi mà ai đó truy cập tới một trang bài viết đơn lẻ?
 
 <%= screenshot "12-4", "An empty template." %>
 
-////
+Nếu bạn thử nó, bạn sẽ đối mặt với lỗi “not found” (không tìm thấy). Điều này hợp lý: Chúng ta vừa bảo router subscribe tới bộ xuất bản `posts` khi nạp route `postsList`, nhưng chúng ta đã không bảo nó nên làm điều gì với route `postPage`.
 
-////
+Nhưng xa hơn nữa, chúng ta đều biết làm thế nào để subscribe tới một danh sách `n` bài viết mới nhất. Làm thế nào để chúng ta hỏi server cho một bài viết đặc thù? Chúng tôi sẽ tiết lộ cho bạn một bí mật ở đây: bạn có thể có nhiều hơn là một publish cho mỗi collection!
 
-////
+Vậy để lấy lại những bài viết đã mất, chúng ta sẽ tạo một publish mới, khác với `singlePost` mà chỉ publish một bài viết, định danh bởi `_id`.
 
 ~~~js
 Meteor.publish('posts', function(options) {
@@ -506,7 +509,7 @@ Meteor.publish('singlePost', function(id) {
 <%= caption "server/publications.js" %>
 <%= highlight "5~7" %>
 
-////
+Bây giờ, hãy cùng subscribe tới bài viết đúng từ phía client. Chúng ta đã subscribe tới bản xuất bản `comments` trên hàm `waitOn` của route `postPage`, vì vậy chúng ta có thể đơn giản thêm vào subscribe tới `singlePost`. Và đừng quên thêm vào subscribe tới route `postEdit`, vì nó cũng cần dữ liệu tương tự:
 
 ~~~js
 //...
@@ -537,4 +540,4 @@ Router.route('/posts/:_id/edit', {
 
 <%= commit "12-6","Use a single post subscription to ensure that we can always see the right post." %>
 
-////
+Sau khi mọi thứ với phân trang đã hoàn tất, ứng dụng của chúng ta không còn gặp vấn đề khi mở rộng, và người dùng chắc chắn còn cung cấp nhiều đường dẫn hơn trước. Vì vậy sẽ rất tuyệt nếu chúng ta có một cách để xếp hạng những đường dẫn này! Nếu bạn vẫn chưa biết cách làm, đó chính là thứ sẽ được giới thiệu trong chương tiếp theo!
