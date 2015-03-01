@@ -20,9 +20,9 @@ Bây giờ khi mà người dùng đã có thể viết bình luận trên các 
 
 Chúng ta sẽ tạo một thông báo mỗi khi ai đó viết bình luận vào bài viết của bạn. Trong tương lai, tính năng thông báo có thể mở rộng để đáp ứng nhiều tình huống, nhưng tạm thời nó sẽ chỉ đủ để giúp người dùng được cho biết điều gì đang diễn ra.
 
-Hãy cùng tạo collection `Notifications`, và một hàm `createCommentNotification` mà nhiệm vụ của nó sẽ là chèn một thông báo khớp với mỗi bình luận trên một trong những bài viết của bạn.
+Hãy cùng tạo collection `Notifications`, và một hàm `createCommentNotification` mà nhiệm vụ của nó sẽ là chèn một thông báo khớp với mỗi bình luận trên mỗi bài viết của bạn.
 
-Vì chúng ta sẽ cập nhật thông báo từ phía client, chúng ta cần phải chắc chắn rằng gọi `allow` có khả năng chống nhiễu bên ngoài. Do đó cần phải kiểm tra rằng:
+Vì chúng ta sẽ cập nhật thông báo từ phía client, chúng ta cần phải chắc chắn rằng việc gọi `allow` có khả năng chống nhiễu bên ngoài. Do đó cần phải kiểm tra rằng:
 
 - Người dùng gọi lệnh `update` sở hữu thông báo được sửa đổi.
 - Người dùng chỉ cập nhật một trường đơn lẻ.
@@ -198,7 +198,7 @@ Và tạo template `notifications` và `notificationItem` (chúng dùng chung c�
 
 Kế hoạch là để cho mỗi thông báo chứa một đường dẫn tới bài viết được viết bình luận, và tên của người dùng đã viết bình luận.
 
-Tiếp đó, chúng ta cần chắc chắn rằng đã chọn đúng danh sách thông báo trog helper, và cập nhật những thông báo đó thành "read" (đã đọc) khi mà người dùng bấm vào đường dẫn đó.
+Tiếp đó, chúng ta cần chắc chắn rằng đã chọn đúng danh sách thông báo trong helper, và cập nhật những thông báo đó thành "read" (đã đọc) khi mà người dùng bấm vào đường dẫn đó.
 
 ~~~js
 Template.notifications.helpers({
