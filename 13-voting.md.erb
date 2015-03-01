@@ -1,33 +1,36 @@
 ---
-title: Voting
+title: Tính năng bỏ phiếu
 slug: voting
 date: 0013/01/01
 number: 13
-contents: Build a system where users can vote on posts.|Rank our posts by vote on a "best" post page.|Learn how to write a general Spacebars helper.|Learn a little more about data security in Meteor.|Cover some interesting performance considerations in MongoDB.
-paragraphs: 55
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/8561920811/
+photoAuthor: Mike Lewinski
+contents: Xây dựng một hệ thống mà người dùng có thể bỏ phiếu cho bài viết.|Xếp hạng bài viết bằng việc bỏ phiếu bài viết "tốt nhất".|Học cách viết một Spacebar helper.|Học về bảo mật dữ liệu trong Meteor.|Tìm hiểu một số xem xét thú vị về hiệu năng của MongoDB.
+paragraphs: 49
 ---
 
-////
+Bây giờ trang của chúng ta đã trở nên ngày một nổi tiếng hơn, và việc tìm ra đường dẫn tốt nhất nhanh trong trở nên rắc rối.
 
-////
+Chúng ta có thể xây dựng một hệ thống xếp hạng phức tạp với karma, điểm phân dã dựa theo thời gian, và nhiều thứ khác nữa (phần lớn được cài đặt trong [Telescope](http://telesc.pe), người anh lớn của Microscope). Nhưng cho ứng dụng của chúng ta, chúng ta sẽ giữ cho mọi thứ thật đơn giản và chỉ đánh giá bài viết bởi số lượng phiếu bầu nó nhận được.
 
-////
+Hãy bắt đầu bằng việc cho người dùng một cách để bình chọn.
 
-### Data Model
+### Mô hình dữ liệu
 
-////
+Chúng ta sẽ lưu một danh sách upvoter cho mỗi bài viết để có thể biết có hiển thị button upvote tới người dùng, cũng như là để tránh người dùng bình chọn hai lần
 
 <% note do %>
 
-### Data Privacy & Publications
+### Sự riêng tư dữ liệu & Publications
 
-////
+Chúng ta sẽ publish những danh sách này tới tất cả người dùng, nó cũng sẽ tự động làm cho dữ liệu được truy cập từ console trình duyệt.
 
-////
+Đây là một vấn đề về sự riêng tư dữ liệu phát sinh từ cách mà collection hoạt động. Ví dụ, liệu chúng ta có muốn mọi người có thể tìm ra ai đã bình chọn cho bài viết của họ? Trong trường hợp của chúng ta, làm điều đó thực ra không mang lại hậu quả gì, nhưng việc nhận thức ra vấn đề đó cũng rất quan trọng.
 
 <% end %>
 
-////
+Chúng ta cũng sẽ dùng bất chuẩn hoá cho tổng số upvoter của mỗi bài viết để dễ dàng truy cập được con số đó. Vậy nên chúng ta sẽ thêm vào hai thuộc tính cho bài viết, `upvoters` và `votes`. Hãy bắt đầu bằng việc thêm vào dữ liệu tĩnh:
 
 ~~~js
 // Fixture data
@@ -110,7 +113,7 @@ if (Posts.find().count() === 0) {
 <%= caption "server/fixtures.js" %>
 <%= highlight "22,23,49,50,60,61,72,73" %>
 
-////
+Như thường lệ, dừng ứng dụng đang hoạt động, chạy lệnh `meteor reset`, khởi động lại ứng dụng và tạo một tài khoản mới. Hãy chắc chắn rằng hai thuộc tính này được khởi tạo khi bài viết đã được tạo:
 
 ~~~js
 //...
@@ -144,9 +147,9 @@ return {
 <%= caption "collections/posts.js" %>
 <%= highlight "17~18" %>
 
-### Voting Templates
+### Template bình chọn
 
-////
+Đầu tiên, chúng ta thêm vào một button upvote cho bộ phận bài viết và hiển thị biến đếm upvote trong metadata:
 
 ~~~html
 <template name="postItem">
@@ -170,7 +173,7 @@ return {
 
 <%= screenshot "13-1", "The upvote button" %>
 
-////
+Sau đó, chúng ta gọi đến server Method upvote khi người dùng bấm vào button:
 
 ~~~js
 //...
@@ -185,7 +188,7 @@ Template.postItem.events({
 <%= caption "client/templates/posts/post_item.js" %>
 <%= highlight "3~8" %>
 
-////
+Cuối cùng, chúng ta quay trở lại file `lib/collections/posts.js` và thêm vào Meteor Method phía server để upvote bài viết:
 
 ~~~js
 //...
@@ -220,13 +223,13 @@ Meteor.methods({
 
 <%= commit "13-1", "Added basic upvoting algorithm." %>
 
-////
+Method này khá là dễ hiểu. Chúng ta thực hiện một số đoạn kiểm tra có tính chất bảo vệ để chắc chắn rằng người dùng đã đăng nhập và bài viết thực sự tồn tại. Sau đó chúng ta kiểm tra thêm lần nữa là người đã bình chọn cho bài viết rồi hay chưa, nếu họ chưa thì tăng biến bình chọn thêm một và thêm người dùng đó vào danh sách upvoter.
 
-////
+Bước cuối cùng này khá là thú vị, như chúng ta đã vừa dùng một vài toán tử đặc biệt của Mongo. Còn nhiều thứ có thể học hỏi được, nhưng hai thứ sau khá là hữu ích: `$addToSet` thêm một mục dữ liệu vào một mảng thuộc tính miễn là nó chưa tồn tại, và `$inc` đơn giản tăng một trường số nguyên.
 
-### User Interface Tweaks
+### Tính điều chỉnh giao diện người dùng
 
-////
+Nếu như một người dùng chưa đăng nhập, hoặc đã từng upvote cho bài viết, họ sẽ không thể bình chọn thêm lần nữa. Để phản ánh điều này trong UI, chúng ta sẽ dùng một helper để thêm vào thuộc tính class CSS `disabled` với button upvote.
 
 ~~~html
 <template name="postItem">
@@ -268,13 +271,13 @@ Template.postItem.events({
 <%= caption "client/templates/posts/post_item.js" %>
 <%= highlight "8~15, 19" %>
 
-////
+Chúng ta đã thay đổi class từ `.upvote` sang `.upvotable`, vì vậy đừng quên thay đổi bộ điều khiển sự kiện bấm chuột.
 
 <%= screenshot "13-2", "Greying out upvote buttons." %>
 
 <%= commit "13-2", "Grey out upvote link when not logged in / already voted." %>
 
-////
+Tiếp theo, có thể bạn đã nhận ra là bài viết với một bình chọn được dán nhãn "1 vote**s**", vì vậy hãy dành thời gian để biến thành số nhiều nhãn này một cách thích hợp. Số nhiều có thể là một quá trình xử lý phức tạp, nhưng bây giờ chúng ta chỉ làm theo một cách đơn giản nhất. Chúng ta sẽ tạo một helper Spacebar chung mà có thể dùng ở nhiều nơi:
 
 ~~~js
 UI.registerHelper('pluralize', function(n, thing) {
@@ -288,7 +291,7 @@ UI.registerHelper('pluralize', function(n, thing) {
 ~~~
 <%= caption "client/helpers/spacebars.js" %>
 
-////
+Helper chúng ta đã tạo trước đó được gắn chặt với template nó áp dụng vào. Nhưng bằng việc sử dụng `UI.registerHelper`, chúng ta tạo một helper *toàn cục* mà có thể dùng trong bất kỳ template nào:
 
 ~~~html
 <template name="postItem">
@@ -313,19 +316,19 @@ UI.registerHelper('pluralize', function(n, thing) {
 
 <%= commit "13-3", "Added pluralize helper to format text better." %>
 
-////
+Bạn bây giờ sẽ thấy "1 vote".
 
-### Smarter Voting Algorithm
+### Thuật toán bình chọn thông minh hơn
 
-////
+Đoạn code upvote của chúng ta trông khá tốt, nhưng chúng ta cần phải làm tốt hơn nữa. Trong method upvote, chúng ta tạo ra hai lệnh gọi Mongo: một để gắn với bài viết và một để cập nhật nó.
 
-////
+Có hai vấn đề với việc này. Đầu tiên, nó không hiệu quả theo nghĩa chúng ta phải tới cơ sở dữ liệu hai lần. Nhưng quan trọng hơn, nó dẫn đến một cuộc đua điều kiện. Chúng ta đang đi theo thuật toán như sau:
 
-////
-////
-////
+1. Lấy bài viết từ cơ sở dữ liệu.
+2. Kiểm tra xem người dùng đã bỏ phiếu hay chưa.
+3. Nếu chưa, bỏ phiếu cho người dùng đó.
 
-////
+Điều gì sẽ xảy ra nếu người dùng bỏ phiếu cho bìa viết với bước 1 và 3? Đoạn code hiện tại của chúng ta mở cửa cho người dùng có thể bỏ phiếu hai lần cho cùng một bài viết. Rất biết ơn là Mongo cho phép chúng ta gộp bước 1-3 vào trong cùng một lệnh Mongo:
 
 ~~~js
 //...
@@ -359,42 +362,42 @@ Meteor.methods({
 
 <%= commit "13-4", "Better upvoting algorithm." %>
 
-////
+Điều đang được nói đến là "tìm tất cả bài viết với `id` này và người dùng này chưa bỏ phiếu, sau đó thay đổi chúng theo cách này". Nếu người dùng *chưa* bỏ phiếu, dĩ nhiên là nó sẽ tìm bài viết với `id` đó. Mặt khác, nếu như người dùng *đã* bỏ phiếu, câu truy vấn sẽ không khớp với bất kỳ tài liệu nào, và do đó không có gì diễn ra.
 
 <% note do %>
 
-### Latency Compensation
+### Đền bù độ trễ
 
-////
+Giả dụ bạn cố ăn gian và gửi một bài viết tới đầu danh sách bằng việc đổi số lượng bình chọn của bài viết:
 
 ~~~js
 > Posts.update(postId, {$set: {votes: 10000}});
 ~~~
 <%= caption "Browser console" %>
 
-////
+(`postId` là id của một bài viết)
 
-////
+Hàng rào chắn này có thể được xây dựng với callback `deny()` (trong `collections/posts.js`) và lập tức có tác dụng.
 
-////
+Nhưng nếu như bạn nhìn kỹ hơn, bạn có thể đã nhận ra sự đền bù độ trễ trong hành động. Nó có thể rất nhanh, nhưng bài viết sẽ nhảy lên vị trí đầu trong một khoảng thời gian trước khi trở lại đúng vị trí của nó.
 
-////
+Điều gì đã diễn ra? Trong collection cục bộ `Posts`, `update` được áp dụng mà không có trở ngại gì. Điều này xảy ra tức thì, nên bài viết sẽ lên đầu danh sách. Trong khi đó, trên server, `update` bị từ chối. Nên sau đó một chút (đo bằng mili giây nếu bạn chạy ứng dụng Meteor trên chính máy của mình), server sẽ trả về lỗi, bảo là collection cục bộ phải đổi lại giá trị.
 
-////
+Kết quả là: trong khi chờ đợi cho server trả lời, giao diện người dùng không thể tránh khỏi việc tin tưởng collection cục bộ. Ngay khi server trở lại và từ chối việc sửa đổi, giao diện người dùng phản ánh lại điều đó.
 
 <% end %>
 
-### Ranking the Front Page Posts
+### Xếp hạng bài viết trang ngoài
 
-////
+Bây giờ chúng ta đã có một điểm số cho mỗi bài viết dựa trên số lượng bình chọn, hãy cùng hiển thị danh sách bài viết tốt nhất. Để làm điều này, chúng ta sẽ thấy làm thế nào để quản lý hai subscription riêng biệt đối với collection bài viết, và tạo template `postList` tổng quát hơn một chút.
 
-////
+Để bắt đầu, chúng ta muốn có *hai subscription*, một cho thứ tự sắp xếp. Thủ thuật ở đây là cả hai subscription sẽ subscribe tới *cùng* publish `posts`, chỉ khác biệt về tham số.
 
-////
+Chúng ta cũng sẽ tạo hai route mới là `newPosts` và `bestPosts`, truy cập được từ URLs `/new` và `/best` (dĩ nhiên là cùng với `/new/5` và `/best/5`).
 
-////
+Để làm điều này, chúng ta sẽ *mở rộng* `PostsListController` thành hai controller là `NewPostsListController` và `BestPostsListController`. Điều này giúp chúng ta tạo ra cùng chọn lựa route cho cả `home` và `newPosts`, bằng việc đưa cho chúng ta `NewPostsListController` đơn lẻ để kế thừa. Thêm vào đó, nó cũng là minh hoạ tốt cho việc thể hiển Iron Router có thể mềm dẻo như thế nào.
 
-////
+Vì vậy hãy cùng thay đổi thuộc tính sắp xếp `{submitted: -1}` trong `PostsListController` bằng `this.sort`, là thứ sẽ được cung cấp bởi `NewPostsListController` và `BestPostsListController`:
 
 ~~~js
 //...
@@ -450,20 +453,20 @@ Router.route('/best/:postsLimit?', {name: 'bestPosts'});
 <%= caption "lib/router.js" %>
 <%= highlight "10,23,27~55" %>
 
-////
+Chú ý rằng hiện tại chúng ta có nhiều hơn là một route, chúng ta đang lấy đi logic `nextPath` ra khỏi `PostsListController` và cho vào `NewPostsController` cũng như `BestPostsController` vì đường dẫn sẽ trở nên khác biệt trong cả hai trường hợp.
 
-////
+Thêm vào đó, khi chúng ta sắp xếp bởi `votes`, chúng ta có một sự sắp xếp theo sau bằng việc submit tem thời gian và `_id` để chắc chắn rằng thứ tự sắp xếp được đặc tả.
 
-////
+Với controller mới tạo, chúng ta có thể an toàn thoát khỏi route `postsList` trước đó. Chỉ cần xoá đoạn code sau:
 
-////
-////
-////
-////
-////
+```
+ Router.route('/:postsLimit?', {
+  name: 'postsList'
+ })
+```
 <%= caption "lib/router.js" %>
 
-////
+Chúng ta cũng sẽ thêm đường dẫn vào header:
 
 ~~~html
 <template name="header">
@@ -506,7 +509,7 @@ Router.route('/best/:postsLimit?', {name: 'bestPosts'});
 <%= caption "client/templates/includes/header.html" %>
 <%= highlight "11, 15~20" %>
 
-////
+Và cuối cùng, chúng ta cũng cần phải cập nhật bộ điều khiển sự kiện xoá bài viết:
 
 ~~~html
   'click .delete': function(e) {
@@ -522,17 +525,17 @@ Router.route('/best/:postsLimit?', {name: 'bestPosts'});
 <%= caption "client/templates/posts_edit.js" %>
 <%= highlight "7" %>
 
-////
+Với tất cả mọi thứ đã xong xuôi, bây giờ chúng ta có thể đạt tới một danh sách bài viết tốt nhất:
 
 <%= screenshot "13-4", "Ranking by points" %>
 
 <%= commit "13-5", "Added routes for post lists, and pages to display them." %>
 
-### A Better Header
+### Header tốt hơn
 
-////
+Bây giờ khi mà chúng ta đã có hai danh sách bài viết, có thể sẽ khó để biết được danh sách nào đang được hiển thị. Bởi vậy hãy cùng nhìn lại header để làm cho điều này hiển nhiên hơn. Chúng ta sẽ tạo một file quản lý `header.js` và tạo helper mà sử dụng đường dẫn hiện tại trong các mục dữ liệu trên navigation:
 
-////
+Lý do chúng ta muốn phụ trợ route nhiều tên là vì cả route `home` và `newPosts` (đang trỏ đến `/` và `/new` lần lượt) mang đến cùng một template. Nghĩa là `activeRouteClass` của chúng ta nên đủ thông minh để tạo ra tag `<li>` hoạt động trên cả hai trường hợp.
 
 ~~~html
 <template name="header">
@@ -595,20 +598,20 @@ Template.header.helpers({
 
 <% note do %>
 
-### Helper Arguments
+### Tham số helper
 
-////
+Chúng ta vẫn chưa dùng mô hình đặc biệt đó cho tới bây giờ, nhưng cũng giống như bất kỳ tag Spacebar nào khác, tag của template helper có thể nhận tham số.
 
-////
+Và trong khi bạn dĩ nhiên có thể gửi tên đặc biệt cho hàm của bạn, bạn cũng có thể gửi số không được đặc tả và cả tham số không tên và lấy lại chúng bằng việc gọi object `arguments` bên trong hàm.
 
-////
+Trong trường hợp cuối cùng này, có thể bạn muốn chuyển object `arguments` tới một mảng JavaScript ổn định và sau đó gọi `pop()` để tránh hash bị thêm vào cuối Spacebar.
 
 <% end %>
 
-////
+Cho mỗi khoản mục của navigation, helper `activeRouteClass` lấy danh sách tên của route, và sau đó dùng helper `any()` của Underscore để xem nếu như có route nào vượt qua bài kiểm tra (ví dụ URl tương ứng của nó bằng với đường dẫn hiện tại).
 
-////
+Nếu như bất kỳ route nào khớp với đường dẫn hiện tại, `any()` sẽ trả về `true`. Cuối cùng, chúng ta sẽ lợi dụng mô hình `boolean && string` của JavaScript khi mà `false && myString` trả về `false` nhưng `true && myString` trả về `myString`.
 
 <%= commit "13-6", "Added active classes to the header." %>
 
-////
+Bây giờ người dùng đã có thể bình chọn thời gian thực, chúng ta sẽ thấy các khoản mục nhảy lên và nhảy xuống trang chủ khi thứ hạng thay đổi. Nhưng chẳng phải là sẽ tuyệt hơn nữa nếu như có một cách để làm mềm tất cả những hoạt hoạ đó hay sao?
