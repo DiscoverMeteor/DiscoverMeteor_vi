@@ -1,29 +1,32 @@
 ---
-title: Notifications
+title: Tính năng thông báo
 slug: notifications
 date: 0011/01/01
 number: 11
-contents: Add a notifications collection to notify users of other user's actions.|Learn how to only share the relevant notifications with a given user.|Learn more about Meteor publications and subscriptions.
-paragraphs: 30
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/8719868039/
+photoAuthor: Mike Lewinski
+contents: Thêm một collection thông báo để báo cho người dùng biết hoạt động của người dùng khác.|Học cách chỉ chia sẻ thông báo với một người dùng nhất định.|Học thêm về publish và subscribe của Meteor.
+paragraphs: 25
 ---
 
-////
+Bây giờ khi mà người dùng đã có thể viết bình luận trên các bài viết khác, sẽ tốt hơn nếu chúng ta để họ biết rằng một hội thoại đã được bắt đầu.
 
-////
+Để làm điều này, chúng ta sẽ báo cho chủ của bài viết rằng có một bình luận mới trên bài viết của họ, và cung cấp đường dẫn để hiển thị bình luận đó.
 
-////
+Đây là một trong những tính năng nơi mà Meteor có thể toả sáng: bởi vì Meteor mặc định xử lý thời gian thực, chúng ta sẽ có thể hiển thị những thông báo đó _tức thời_. Chúng ta không cần người dùng phải làm mới trang hoặc kiểm tra lại, chúng ta có thể đơn giản thêm thông báo mới vào mà không cần phải viết thêm đoạn code đặc biệt nào.
 
-### Creating Notifications
+### Tạo thông báo
 
-////
+Chúng ta sẽ tạo một thông báo mỗi khi ai đó viết bình luận vào bài viết của bạn. Trong tương lai, tính năng thông báo có thể mở rộng để đáp ứng nhiều tình huống, nhưng tạm thời nó sẽ chỉ đủ để giúp người dùng được cho biết điều gì đang diễn ra.
 
-////
+Hãy cùng tạo collection `Notifications`, và một hàm `createCommentNotification` mà nhiệm vụ của nó sẽ là chèn một thông báo khớp với mỗi bình luận trên một trong những bài viết của bạn.
 
-////
+Vì chúng ta sẽ cập nhật thông báo từ phía client, chúng ta cần phải chắc chắn rằng gọi `allow` có khả năng chống nhiễu bên ngoài. Do đó cần phải kiểm tra rằng:
 
-- ////
-- ////
-- ////
+- Người dùng gọi lệnh `update` sở hữu thông báo được sửa đổi.
+- Người dùng chỉ cập nhật một trường đơn lẻ.
+- Trường đơn lẻ đó là một thuộc tính `read` của thông báo.
 
 ~~~js
 Notifications = new Mongo.Collection('notifications');
@@ -50,11 +53,11 @@ createCommentNotification = function(comment) {
 ~~~
 <%= caption "lib/collections/notifications.js" %>
 
-////
+Cũng giống như bài viết hoặc bình luận, collection `Notifications` sẽ được chia sẻ giữa cả client và server. Vì chúng ta cần phải cập nhật thông báo mỗi khi người dùng đã nhìn thấy chúng, chúng ta cũng cần phải kích hoạt tính năng cập nhật, chắc chắn rằng chúng ta hạn chế quyền cập nhật chỉ cho phép đối với dữ liệu của người dùng đó.
 
-////
+Chúng ta cũng vừa tạo một hàm đơn giản theo dõi bài viết người dùng đang tạo bình luận, khám phá ra xem ai sẽ nhận được thông báo, và thêm bản ghi thông báo mới.
 
-////
+Chúng ta đã tạo bình luận với Method phía server, nên chúng ta chỉ cần bổ sung Method đó để gọi hàm cần thiết. Chúng ta sẽ thay đổi `return Comments.insert(comment);` bằng `comment._id = Comments.insert(comment)` để lưu `_id` của bình luận mới được tạo vào biến số , sau đó gọi hàm `createCommentNotification` của chúng ta:
 
 ~~~js
 Comments = new Mongo.Collection('comments');
@@ -86,7 +89,7 @@ Meteor.methods({
 <%= caption "lib/collections/comments.js" %>
 <%= highlight "17~123" %>
 
-////
+Hãy cùng publish thông báo:
 
 ~~~js
 Meteor.publish('posts', function() {
@@ -105,7 +108,7 @@ Meteor.publish('notifications', function() {
 <%= caption "server/publications.js" %>
 <%= highlight "10~12" %>
 
-////
+Và subscribe phía client:
 
 ~~~js
 Router.configure({
@@ -122,9 +125,9 @@ Router.configure({
 
 <%= commit "11-1", "Added basic notifications collection." %>
 
-### Displaying Notifications
+### Hiển thị thông báo
 
-////
+Bây giờ chúng ta có thể tiếp tục và thêm một danh sách thông báo vào phần header.
 
 ~~~html
 <template name="header">
@@ -161,7 +164,7 @@ Router.configure({
 <%= caption "client/templates/includes/header.html" %>
 <%= highlight "15~22" %>
 
-////
+Và tạo template `notifications` và `notificationItem` (chúng dùng chung cùng một file đơn lẻ là `notifications.html`)
 
 ~~~html
 <template name="notifications">
@@ -193,9 +196,9 @@ Router.configure({
 ~~~
 <%= caption "client/templates/notifications/notifications.html" %>
 
-////
+Kế hoạch là để cho mỗi thông báo chứa một đường dẫn tới bài viết được viết bình luận, và tên của người dùng đã viết bình luận.
 
-////
+Tiếp đó, chúng ta cần chắc chắn rằng đã chọn đúng danh sách thông báo trog helper, và cập nhật những thông báo đó thành "read" (đã đọc) khi mà người dùng bấm vào đường dẫn đó.
 
 ~~~js
 Template.notifications.helpers({
@@ -223,17 +226,17 @@ Template.notificationItem.events({
 
 <%= commit "11-2", "Display notifications in the header." %>
 
-////
+Bạn có thể nghĩ rằng hệ thống thông báo không khác nhiều so với hệ thống hiển thị lỗi, và thực tế là cấu trúc của chúng rất giống nhau. Chỉ có một điểm khác biệt: chúng ta đã vừa tạo một collection đồng bộ thích đáng client-server. Điều này có nghĩa là hệ thống thông báo của chúng ta *ổn định*, và miễn là chúng ta dùng cùng một tài khoản, nó sẽ tồn tài giữa các lần làm mới trình duyệt và giữa các thiết bị khác nhau.
 
-////
+Hãy thử điều đó: mở một trình duyệt thứ hai (ví dụ như là từ Firefox), tạo một tài khoản người dùng, và viết bình luận vào bài viết bạn đã tạo với tài khoản chính thứ nhất (cái mà bạn đang mở với Chrome). Bạn sẽ thấy thứ gì đó như sau:
 
 <%= screenshot "11-1", "Displaying notifications." %>
 
-### Controlling access to notifications
+### Quản lý truy cập tới thông báo
 
-////
+Chức năng thông báo đã hoạt động tốt. Tuy nhiên vẫn còn một vấn đề nhỏ: hệ thống thông báo của chúng ta đang ở chế độ công khai.
 
-////
+Nếu bạn vẫn đang để trình duyệt thứ hai ở trạng thái mở, cố chạy đoạn code sau ở phía console trình duyệt:
 
 ~~~js
 ❯ Notifications.find().count();
@@ -241,15 +244,15 @@ Template.notificationItem.events({
 ~~~
 <%= caption "Browser console" %>
 
-////
+Tài khoản mới này (là người đã viết bình luận) không nên thấy bất kỳ thông báo nào. Thông báo mà họ nhìn thấy trong collection `Notifications` thực tế thuộc về người dùng *đầu tiên* của chúng ta.
 
-////
+Ngoài vấn đề quyền riêng tư, chúng ta cũng không thể nào đủ sức để có dữ liệu thông báo nạp trên tất cả trình duyệt của người dùng. Trên một trang đủ lớn, điều này có thể dẫn đến vấn đề quá tải bộ nhớ và tạo ra những vấn đề nghiêm trọng về hiệu suất.
 
-////
+Chúng ta sẽ giải quyết bài toán này với **publish**. Chúng ta có thể dùng việc publish để đặc tả chính xác phần nào của collection sẽ được chia sẻ với các trình duyệt.
 
-////
+Để hoàn thành điều này, chúng ta cần phải trả về một con trỏ khác trong phần publish so với là `Notifications.find()` như hiện tại. Là, chúng ta muốn trả về một con trỏ tương ứng với thông báo hiện tại của người dùng.
 
-////
+Làm như vậy khá là hiển nhiên, vì hàm `publish` có được `_id` của người dùng hiện tại với `this.userId`:
 
 ~~~js
 Meteor.publish('notifications', function() {
@@ -260,7 +263,7 @@ Meteor.publish('notifications', function() {
 
 <%= commit "11-3", "Only sync notifications that are relevant to the user." %>
 
-////
+Bây giờ, nếu kiểm tra hai cửa sổ trình duyệt, bạn sẽ thấy hai collection thông báo khác nhau:
 
 ~~~js
 ❯ Notifications.find().count();
@@ -274,6 +277,6 @@ Meteor.publish('notifications', function() {
 ~~~
 <%= caption "Browser console (user 2)" %>
 
-////
+Thực tế, danh sách thông báo nên được thay đổi khi bạn đăng nhập vào ứng dụng và đăng xuất khỏi ứng dụng. Điều này là do publish tự động thay đổi và xuất bản lại mỗi khi tài khoản của người dùng thay đổi.
 
-////
+Ứng dụng của chúng ta ngày càng trở nên chức năng hơn, và do ngày càng nhiều người dùng tham gia và bắt đầu viết bài nên chúng ta sẽ có nguy cơ trang chủ quá dài. Chúng ta sẽ bàn về vấn đề này ở chương tiếp theo với việc thực hiện phân trang.
