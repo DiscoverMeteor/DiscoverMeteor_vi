@@ -1,27 +1,30 @@
 ---
-title: Advanced Publications
+title: Publish nâng cao
 slug: advanced-publications
 date: 0013/01/02
 number: 13.5
+points: 10
 sidebar: true
-contents: Learn more advanced patterns for manipulating publications.|See just how flexible publications and subscriptions can get. 
-paragraphs: 38
+photoUrl: http://www.flickr.com/photos/ikewinski/8390558986/
+photoAuthor: Mike Lewinski
+contents: Học thêm một số kiểu mẫu nâng cao cho việc điều khiển publish.|Thấy được publish và subscribe có thể mềm dẻo như thế nào. 
+paragraphs: 36
 ---
 
 
-////
+Cho đến bây giờ chắc hẳn bạn đã nắm vững được cách thức publish và subscribe tương tác với nhau. Vì vậy hãy cùng giải thoát khỏi bánh xe huấn luyện và bước vào một vài tình huống nâng cao hơn.
  
-### Publishing a Collection Multiple Times
+### Publish một collection nhiều lần
 
-////
+Trong [chương sidebar đầu tiên của chúng ta về publish](/chapter/publications-and-subscriptions/), chúng ta đã thấy một vài khuôn mẫu publish và subscribe cơ bản, và chúng ta đã học làm thế nào hàm `_publishCursor` có thể dễ dàng cài đặt cho ứng dụng của chúng ta.
 
-////
+Đầu tiên, hãy cùng gợi nhớ lại chính xác `_publishCursor` là cái gì: nó lấy tất cả tài liệu mà khớp với một con trỏ, và đẩy chúng tới collection *có cùng tên* ở phía client. Chú ý rằng tên của _publication_ không thể nào bao gồm.
 
-////
+Điều này có nghĩa là chúng ta có thể có _nhiều hơn một publication_ liên kết bản collection giữa client và server.
 
-////
+Chúng ta đã luôn gặp mô hình này trong [chương về phân trang](/chapter/pagination/), khi mà chúng ta đã publish một tập con phân trang của tất cả bài viết thêm vào bài viết đang được hiển thị.
 
-////
+Một trường hợp khác được dùng là để publish *miêu tả chung* của một lượng dữ liệu lớn, cũng như toàn bộ chi tiết của một mục dữ liệu đơn lẻ:
 
 <%= diagram "doublecollection", "Publishing a collection twice", "pull-center" %>
 
@@ -35,13 +38,13 @@ Meteor.publish('postDetail', function(postId) {
 });
 ~~~
 
-////
+Bây giờ khi mà client subscribe tới những publish này, collection `'posts'` của nó nhận dữ liệu sinh từ hai nguồn: danh sách tiêu đề và tên tác giả từ subscription thứ nhất, và toàn bộ chi tiết của bài viết từ cái thứ hai.
 
-////
+Bạn có thể nhận ra rằng bài viết được publish từ `postDetail` cũng được publish bởi `allPosts` (mặc dù với chỉ một tập con thuộc tính). Tuy  nhiên, Meteor đảm nhận việc phủ lên nhau này bằng cách hợp nhất các trường và chắc chắn rằng không có bài viết bị trùng lặp.
 
-////
+Điều này rất tuyệt, bởi vì bây giờ khi mà chúng ta dịch ra danh sách tóm tắt của bài viết, chúng ta đang dùng object mà chỉ có đủ dữ liệu để làm việc cần thiết. Tuy nhiên, khi chúng ta đưa ra trang bài viết đơn lẻ, chúng ta cần phải làm mọi thứ để hiển thị nó. Dĩ nhiên, chúng ta cần phải chú ý để client không kỳ vọng tất cả các trường hữu dụng đối với tất cả bài viết trong trường hợp này -- đây là một điều cơ bản!
 
-////
+Cần phải ghi chú rằng bạn không bị hạn chế việc thay đổi thuộc tính của tài liệu. Bạn có thể publish cùng thuộc tính ở cả hai publication, nhưng sắp xếp các mục một cách khác đi.
 
 ~~~js
 Meteor.publish('newPosts', function(limit) {
@@ -54,17 +57,17 @@ Meteor.publish('bestPosts', function(limit) {
 ~~~
 <%= caption "server/publications.js" %>
 
-### Subscribing to a Publication Multiple Times
+### Subscribe tới Publication nhiều lần
 
-////
+Chúng ta vừa thấy làm thế nào để publish một collection đơn lẻ nhiều hơn một lần. Điều đó dẫn đến bạn có thể hoàn thành một kết quả tương tự với một mô hình khác: tạo một publication đơn, nhưng *subscribe* tới nó nhiều lần.
 
-////
+Trong Microscope, chúng ta subscribe tới publication `posts` nhiều lần, nhưng Iron Router cài đặt và tháo dỡ mỗi subscription cho chúng ta. Do đó không có lý do gì chúng ta không thể subscribe nhiều lần *một cách đồng thời*.
 
-////
+Ví dụ, giả sử rằng chúng ta muốn nạp cả những bài viết mới nhất và tốt nhất vào bộ nhớ cùng một lúc:
 
 <%= diagram "subscribetwice", "Subscribing twice to one publication", "pull-center" %>
 
-////
+Chúng ta vừa thiết lập một publication đơn lẻ:
 
 ~~~js
 Meteor.publish('posts', function(options) {
@@ -72,34 +75,34 @@ Meteor.publish('posts', function(options) {
 });
 ~~~
 
-////
+Và sau đó chúng ta subscribe tới publication này nhiều lần. Thực tế là nó hơn hoặc kém những gì chúng ta đang làm với Microscope:
 
 ~~~js
 Meteor.subscribe('posts', {submitted: -1, limit: 10});
 Meteor.subscribe('posts', {baseScore: -1, submitted: -1, limit: 10});
 ~~~
 
-////
+Điều gì đang thực sự xảy ra ở đây? Mỗi trình duyệt mở ra *hai* subscription khác nhau, mỗi kết nối tới *cùng* publication ở phía server.
 
-////
+Mỗi subscription cung cấp tham số khác nhau cho publication, nhưng về cơ bản, mỗi lần một bộ tài liệu (khác nhau) được dùng kéo từ collection `posts` và gửi xuống cho collection phía client.
 
-////
+Bạn còn có thể subscribe tới cùng một publication hai lần với *cùng bộ tham số!* Nó khá khó để nghĩ về nhiều tình huống mà hữu ích, nhưng sự mềm dẻo có thể hữu ích một ngày nào đó!
 
-### Multiple Collections in a Single Subscription
+### Nhiều collection trong một subscription đơn
 
-////
+Không giống như hệ cơ sở dữ liệu quan hệ truyền thống như MySQL thứ dùng *joins*, cơ sở dữ liệu NoSQL như Mongo tất cả đều về *bất chuẩn hoá* và *kết cấu lồng*. Hãy cùng xem những từ ngữ này trong bối cảnh của Meteor.
 
-////
+Hãy cùng nhìn vào một ví dụ cụ thể. Chúng ta thêm bình luận đối với bài viết, và đến giờ, chúng ta hoàn toàn hạnh phúc với việc chỉ publish bình luận trên bài viết đơn mà người dùng đang nhìn vào.
 
-////
+Tuy nhiên, giả sử chúng ta muốn chỉ ra bình luận trên *tất cả* bài viết trên một trang đầu (chú ý rằng những bài viết này sẽ thay đổi khi chúng ta phân trang chúng). Trường hợp này đưa ra một ví dụ tốt về việc nhúng bình luận vào trong bài viết, và thực tế là chúng ta đã đẩy *counts* số lượng bình luận bất chuẩn hoá.
 
-////
+Dĩ nhiên chúng ta có thể luôn luôn nhúng bình luận vào trong bài viết, bỏ qua luôn collection `Comments`. Nhưng như chúng ta đã thấy trước đó trong chương *Bất chuẩn hoá*, bằng việc làm như vậy chúng ta sẽ mất một số lợi ích có được từ làm việc với collection riêng lẻ.
 
-////
+Nhưng nó chuyển sang rằng có một số thủ thuật tham gia vào việc subscription làm cho nó có thể nhúng bình luận trong khi vẫn giữ được collection riêng biệt.
 
-////
+Hãy cùng tưởng tượng rằng ở trang chủ danh sách bài viết, chúng ta muốn subscribe tới danh sách của 2 bình luận mới nhất cho mỗi bài viết.
 
-////
+Nó sẽ trở nên khó khăn để hoàn thành điều này mà không dùng publication độc lập cho bình luận, đặc biệt là nếu danh sách bài viết bị giới hạn theo một cách nào đó (ví dụ 10 bài gần nhất). Chúng ta sẽ phải viết publication trông như sau:
 
 <%= diagram "multiplecollections", "Two collections in one subscription", "pull-center" %>
 
@@ -109,9 +112,9 @@ Meteor.publish('topComments', function(topPostIds) {
 });
 ~~~
 
-////
+Đây sẽ là một vấn đề nếu xét về mặt hiệu năng. Vì publication cần phải chạy nhanh xuống và xuất bản lại mỗi lần danh sách `topPostIds` thay đổi.
 
-////
+Có một cách cho điều này. Chúng ta có thể dùng sự thật là chúng ta không chỉ có thể có nhiều hơn một *publication* cho mỗi *collection*, mà còn có thể có nhiều *collection* cho một *publication*:
 
 ~~~js
 Meteor.publish('topPosts', function(limit) {
@@ -148,25 +151,25 @@ Meteor.publish('topPosts', function(limit) {
 });
 ~~~
 
-////
+Chú ý rằng chúng ta không trả về bất kỳ thứ gì trong publication, vì chúng ta gửi thông tin bằng tay tới `sub` (thông qua `.added()` và những hàm tương tự). Bởi vậy chúng ta không cần phải hỏi `_publishCursor` để làm điều đó cho chúng ta bằng việc trả về con trỏ.
 
-////
+Bây giờ, mỗi khi publish một bài viết chúng ta cũng đồng thời publish hai bình luận mới nhất gắn với nó. Và tất cả ở trong cùng một lệnh gọi subscription!
 
-////
+Mặc dù Meteor không tạo ra điều này một cách trực tiếp, bạn có thể nhìn vào gói `publish-with-relations` trên Atmosphere, là thứ làm cho mô hình này dễ sử dụng.
 
-### Linking different collections
+### Liên kết collection khác nhau
 
-////
+Ngoài ra kiến thức mới mẻ về sự mềm dẻo của việc subscription còn giúp chúng ta làm được thêm gì nữa? Thực sự thì, nếu chúng ta không dùng `_publishCursor`, chúng ta không cần phải theo sự ràng buộc mà collection nguồn ở phía server cần có cùng tên như collection đích ở phía client.
 
 <%= diagram "linkedcollections", "One collection for two subscriptions", "pull-center" %>
 
-////
+Một trong những lý do chúng ta muốn làm điều này là do *Thừa kế Bảng Đơn*
 
-////
+Giả sử rằng chúng ta muốn tham khảo nhiều loại object từ bài viết của chúng ta, mỗi trong số chúng được lưu những trường chung nhưng có một chút khác biệt về nội dung. Ví dụ, chúng ta có thể xây dựng một blog engine như kiểu Tumblr mà mỗi bài viết xử lý ID bình thường, tem thời gian, và tựa đề; nhưng thêm vào đó còn có thể có cả ảnh, video, đường dẫn hoặc chỉ văn bản.
 
-////
+Chúng ta có thể lưu trữ tất cả object này trong một collection `'resources'`, sử dụng thuộc tính `type` để chỉ ra đó là kiểu object nào (`video`, `image`, `link`, vân vân).
 
-////
+Và mặc dù chúng ta có một collection `Resources` phía server, chúng ta còn có thể biến đổi collection đơn đó thành đa collection phía client `Videos`, `Images`, vân vân... với chỉ một chút thay đổi:
 
 ~~~js
   Meteor.publish('videos', function() {
@@ -180,8 +183,8 @@ Meteor.publish('topPosts', function(limit) {
   });
 ~~~
 
-////
+Chúng ta đang bảo `_publishCursor` publish (giống như là trả về) con trỏ video sẽ làm, nhưng thay vì publish tới collection `resources` phía client, chúng ta đang publish từ `'resources'` sang `'videos'`.
 
-////
+Một ý tưởng khác nữa là dùng publish tới collection phía client nơi mà không có *collection nào từ phía server!* Ví dụ, bạn có thể túm dữ liệu từ bên dịch vụ thứ 3, và publish chúng vào collection bên phía client.
 
-////
+Cảm ơn nhiều tới sự mềm dẻo của API publish, khả năng đã trở thành không có giới hạn.
