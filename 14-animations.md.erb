@@ -3,86 +3,77 @@ title: Animations
 slug: animations
 date: 0014/01/01
 number: 14
-contents: See what happens behind the scenes when Meteor swaps two DOM elements.|Learn how to animate the reordering of posts.|Learn how to animate the insertion of new posts.
-paragraphs: 85
+points: 10
+photoUrl: http://www.flickr.com/photos/ikewinski/8377615133/
+photoAuthor: Mike Lewinski
+contents: Tìm hiểu điều gì diễn ra phía sau phàn hình khi mà Meteor hoán đổi hai thành phần DOM.|Học cách tạo animation cho thành phần sắp xếp lại bài viết.|Học cách tạo animation cho thao tác chèn và xoá bài viết.|Học về animation khi di chuyển giữa hai trang.
+paragraphs: 58
 ---
 
-<% note do %>
+Bây giờ chúng ta đã có tính năng bỏ phiếu theo thời gian thực, ghi điểm, và xếp hạng. Tuy nhiên, điều này dẫn đến sự xung đột, không ổn định đối với trải nghiệm người dùng khi mà bài viết nhảy chỗ này qua chỗ khác trên trang chủ. Chúng ta sẽ dùng animation để làm mượt điều này.
 
-### Out of Date?
+### Giới thiệu  `_uihooks`
 
-////
+`_uihooks` là một tính năng còn mới và chưa được tạo tài liệu của Blaze. Như tên gọi của nó, nó cho chúng ta truy cập tới hook mà có thể kích hoạt mỗi khi có thành phần được chèn mới, xoá bỏ hoặc tạo animation.
 
-////
+Danh sách đầy đủ của hook như bên dưới:
 
-<% end %>
+- `insertElement`: được gọi mỗi khi có thành phần mới được chèn vào.
+- `moveElement`: được gọi mỗi khi một thành phần mới thay đổi vị trí.
+- `removeElement`: được gọi khi một thành phần bị xoá.
 
-////
+Một khi đã được định nghĩa, những thành phần hook này sẽ *thay thế* hành vi mặc định của Meteor. Hay nói theo cách khác, thay vì việc chèn mới, di chuyển hoặc xoá phần tử, Meteor sẽ làm bất kỳ thứ gì mà chúng ta mô tả - và chúng ta hoàn toàn có thể điều khiển những hoạt động này hoạt động như ý muốn!
 
-### Meteor & the DOM
+### Meteor & DOM
 
-////
+Trước khi bắt đầu vào phần thú vị (là làm cho mọi thứ di chuyển), chúng ta cần phải hiểu cách Meteor tương tác với DOM (Document Object Model -- tổ hợp những thành phần HTML làm nên nội dung của trang).
 
-////
+Điểm cốt yếu phải chú ý là thành phần DOM thực sự không có khả năng “di chuyển”; tuy nhiên, chúng có thể được xoá và tạo lại (chú ý rằng đây là hạn chế của chính bản thân DOM, không phải của Meteor). Vì vậy để tạo cảm giác phần tử A và B thay đổi vị trí, Meteor sẽ thực sự xoá thành phần B và chèn một thành phần sao chép mới (B') trước thành phần A.
 
-////
+Điều này làm cho animation cần một chút thủ thuật, do chúng ta không thể tạo animation cho B di chuyển tới vị trí mới, vì B sẽ biến mất ngay khi Meteor tạo lại trang (điều này xảy ra ngay lập tức vì khả năng phản ứng). Xin đừng lo lắng, chúng ta sẽ tìm ra cách.
 
-### The Soviet Runner
+### Vận động viên chạy Soviet
 
-////
+Nhưng trước hết, hãy bắt đầu với một câu chuyện.
 
-////
+Đó là vào năm 1980, trong giai đoạn của chiến tranh lạnh. Olympics được tổ chức tại Moscow, và người Soviet quyết định phải chiến thắng giải chạy 100 mét bằng mọi giá. Vì vậy một nhóm nhà khoa học thông minh Soviet trang bị cho vận động viên với thiết bị di chuyển tức thời, ngay khi nghe thấy tiếng súng bắt đầu, vận động viên biến mất chớp nhoáng, và ngay lập tức hiện ra lại trong không-thời gian liên tục tại điểm kết thúc. 
 
-////
+May mắn là giám khảo cuộc đua đã sớm nhận ra sự vi phạm, và vận động viên đó không còn cách nào khác là di chuyển tức thời về lại vạch xuất phát, trước khi được phép tham gia cuộc đua như mọi vận động viên khác.
 
-### Breaking It Down
+Nguồn gốc của câu chuyện lịch sử này có thể không thực sự đáng tin cậy, vì vậy bạn không nên tin nó hoàn toàn đúng. Nhưng hãy thử giữ lại "người vận động viên Soviet và thiết bị di chuyển tức thời" trong đầu khi đi tiếp nội dung chương này.
 
-////
+### Chia nhỏ
 
-////
+Khi Meteor nhận được cập nhật và phản ánh lại vào DOM, bài viết của chúng ta sẽ được dịch chuyển tức thời tới vị trí cuối cùng của chúng, và giống như là vận động viên soviet. Nhưng dù cho trong Olympics hay trong ứng dụng của chúng ta, chúng ta không có khả năng di chuyển tức thời xung quanh. Vì vậy, chúng ta di chuyển thành phần về “vị trí xuất phát” và làm cho nó “chạy” (hay nói cách khác, tạo animation cho nó) tới vị trí đích.
 
-////
-////
-////
-////
-////
-////
+Bởi vậy để thay đổi vị trí bài viết A và B (đang được đặt tại vị trí p1 và p2 theo thứ tự), chúng ta sẽ đi theo các bước sau:
 
-////
+1. Xoá B
+2. Tạo B' phía trước A trong DOM
+3. Di chuyển tức thời B' tới p2
+4. Di chuyển tức thời A tới p1
+5. Tạo animation A tới p2
+6. Tạo animation B' tới p1
+
+Biểu đồ sau giải thích những bước trên chi tiết hơn:
 
 <%= diagram "animation_diagram", "Switching two posts", "pull-center" %>
 
-////
+Một lần nữa, trong bước 3 và 4 chúng ta đã không *tạo animation* giữa A và B' tới vị trí của chúng mà “di chuyển tức thời” chúng. Vì điều này xảy ra ngay lập tức, chúng sẽ có hiệu ứng là B đã không bị xoá, và cả hai thành phần đều được chuyển tới vị trí mới.
 
-////
+Mặc định, Meteor có thể giải quyết được bước 1 & 2, và việc thực hiện lại chúng khá là dễ dàng. Và ở bước 5 và 6, tất cả việc chúng ta phải làm là di chuyển thành phần tới vị trí mới. Do vậy, phần mà chúng ta thực sự cần phải quan tâm là bước 3 và 4, gửi các thành phần tới điểm bắt đầu animation.
 
-////
+### Thay đổi vị trí với CSS
 
-### Proper Timing
+Để tạo animation cho bài viết cần sắp xếp, chúng ta sẽ phải dấn thân vào mảnh đất CSS. Một chút ôn lại về thay đổi vị trí với CSS có thể sẽ cần thiết.
 
-////
+Thành phần trên trang web dùng mặc định vị trí *tĩnh*. Thành phần được đặt vị trí tĩnh phù hợp với luồng của trang, và toạ độ của chúng trên màn hình không thể thay đổi hoặc tạo animation.
 
-////
+Vị trí **relative** (tương đối) thì khác, chúng là thành phần phù hợp với luồng của trang, nhưng đồng thời cũng có thể thay đổi vị trí *tương đối so với vị trí ban đầu*.
 
-////
+Vị trí **absolute** (tuyệt đối) đi một bước xa hơn và để cho bạn toạ độ x/y tương đối so với **tài liệu** hoặc **thành phần cha tuyệt đối hoặc tương đối đầu tiên**. 
 
-////
-
-////
-
-////
-
-### CSS Positioning
-
-////
-
-////
-
-////
-
-////
-
-////
+Chúng ta sẽ dùng vị trí tương đối để tạo animation cho bài viết. Chúng tôi đã tạo CSS cho bạn, nhưng nếu bạn muốn tự làm thì tất cả mọi việc cần thực hiện là thêm đoạn code sau vào stylesheet:
 
 ~~~css
 .post{
@@ -92,225 +83,275 @@ paragraphs: 85
 ~~~
 <%= caption "client/stylesheets/style.css" %>
 
-////
+Điều này làm cho bước 5 và 6 dễ dàng hơn: tất cả mọi việc chúng ta cần làm là thiết lập lại `top` thành `0px` (giá trị mặc định) và bài viết của chúng ta sẽ di chuyển trở lại vị trí "bình thường". 
 
-////
+Vì vậy về cơ bản, thử thách duy nhất của chúng ta là tìm ra nơi để *từ đó* tạo ra animation (bước 3 và 4) tương đối tới vị trí mới. Nói cách khác, phải bù trừ bao nhiêu. Nhưng điều đó cũng không thực sự khó: cách bù trừ đúng đơn giản là vị trí của một bài viết cũ trừ đi vị trí mới của nó. 
 
-<% note do %>
+### Cài đặt `_uihooks`
 
-### Position:absolute
+Bây giờ chúng ta đã hiều về những nhân tố khác nhau khi thử với việc tạo animation cho một danh sách hạng mục. Chúng ta thực sự đã sẵn sàng để cài đặt animation. Chúng ta sẽ bắt đằng việp bọc lại danh sách bài viết vào một thành phần chứa `.wrapper`:
 
-////
-
-////
-
-<% end %>
-
-### Total Recall
-
-////
-
-////
-
-### Ranking Posts
-
-////
-
-////
-
-////
-
-////
-
-~~~js
-Template.postsList.helpers({
-  postsWithRank: function() {
-    return this.posts.map(function(post, index, cursor) {
-      post._rank = index;
-      return post;
-    });
-  }
-});
-~~~
-<%= caption "/client/templates/posts/posts_list.js" %>
-<%= highlight "2~8" %>
-
-////
-
-////
-
-~~~html
+```html
 <template name="postsList">
-  <div class="posts">
-    {{#each postsWithRank}}
-      {{> postItem}}
-    {{/each}}
+  <div class="posts page">
+    <div class="wrapper">
+      {{#each posts}}
+        {{> postItem}}
+      {{/each}}
+    </div>
     
     {{#if nextPath}}
       <a class="load-more" href="{{nextPath}}">Load more</a>
+    {{else}}
+      {{#unless ready}}
+        {{> spinner}}
+      {{/unless}}
     {{/if}}
   </div>
 </template>
-~~~
-<%= caption "/client/templates/posts/posts_list.html" %>
+```
+<%= caption "/client/templates/posts/post_list.html" %>
+<%= highlight "3,7" %>
 
-<%= highlight "3" %>
+Trước khi chúng ta làm bất kỳ thứ gì khác, hãy cùng nhìn lại hoạt động của bài viết hiện tại, *mà không có* animation:
 
-### Putting It Together
+<%= gifscreenshot "14-1", "The non-animated post list." %>
 
-////
+Hãy cùng mang đến `_uihooks`. Chúng ta sẽ chọn div `.wrapper` đó bên trong template callback `rendered`, và định nghĩa một thành phần hook `moveElement`.
 
-////
-////
-////
-
-////
-
-////
-////
-<%= caption "/client/templates/posts/post_item.html" %>
-<%= highlight "2" %>
-
-////
-
-////
-
-~~~js
-var POST_HEIGHT = 80;
-var Positions = new Mongo.Collection(null);
-
-Template.postItem.helpers({
-
-  //..
-  
-  },
-  attributes: function() {
-    var post = _.extend({}, Positions.findOne({postId: this._id}), this);
-    var newPosition = post._rank * POST_HEIGHT;
-    var attributes = {};
-    
-    if (! _.isUndefined(post.position)) {
-      var offset = post.position - newPosition;      
-      attributes.style = "top: " + offset + "px";
-      if (offset === 0)
-        attributes.class = "post animate"
+```js
+Template.postsList.rendered = function () {
+  this.find('.wrapper')._uihooks = {
+    moveElement: function (node, next) {
+      // do nothing for now
     }
-    
-    Meteor.setTimeout(function() {
-      Positions.upsert({postId: post._id}, {$set: {position: newPosition}})
-    });
-    
-    return attributes;
   }
-});
+}
+```
+<%= caption "/client/templates/posts/post_list.js" %>
+<%= highlight "1~7" %>
 
-//..
-~~~
-<%= caption "/client/templates/posts/post_item.js" %>
-<%= highlight "1~2, 8~26" %>
+Hàm `moveElement`mà chúng ta vừa định nghĩa sẽ được gọi mỗi khi vị trí của một thành phần mới thay đổi *thay vì* hoạt động mặc định của Blaze. Và do hàm đó đang rỗng, điều đó nghĩa là *không có gì diễn ra*.
 
-////
+Hãy thử nó: mở phần hiển thị “Best“ và upvote một vài bài viết: thứ tự sẽ không bị thay đổi cho tới khi bạn bắt buộc nó dịch lại trang (bằng việc tải lại trang hoặc thay đổi route).
 
-////
+<%= gifscreenshot "14-2", "An empty moveElement callback: nothing happens" %>
 
-////
+Chúng ta vừa kiểm chứng rằng `_uihooks` hoạt động. Bây giờ hãy tạo animation cho nó!
+
+### Tạo animation cho việc sắp xếp lại bài viết
+
+Hàm hook `moveElement` nhận vào hai tham số: `node` và `next`.
+
+- `node` là thành phần đang được di chuyển tới vị trí mới trong DOM. 
+- `next` là thành phần ngay *sau* vị trí mới mà `node` đang được di chuyển tới. 
+
+Biết được điều này, chúng ta có thể tạo quá trình animation như sau (hãy tham chiếu lại phần ví dụ về “vận động viên Soviet” nếu cần). Khi mà một sự thay đổi được tìm ra, chúng ta sẽ:
+
+1. Chèn `node` vào trước `next` (nói cách khác, hoạt động mặc định sẽ diễn ra nếu chúng ta không đặc tả hàm hook `moveElement` nào).
+2. Di chuyển `node` quay trở lại vị trí ban đầu của nó.
+3. Nhích mọi thành phần giữa `node` và `next` để tạo không gian cho `node`.
+4. Tạo animation cho tất cả thành phần trở lại ví trí mặc định mới.
+
+Chúng ta sẽ làm tất cả điều này thông qua thư viện [jQuery](http://jquery.com), là thư viện xử lý DOM tốt nhất hiện nay. jQuery thực ra nằm ngoài phạm vi của cuốn sách, nhưng hãy cùng lướt qua một số method jQuery hữu ích mà chúng ta sẽ sử dụng:
+
+- [`$()`](http://api.jquery.com/jQuery/): bọc bất kỳ thành phần DOM nào thành một object jQuery.
+- [`offset()`](http://api.jquery.com/offset/): gọi ra vị trí hiện tại của một thành phần tương đối với *tài liệu*, và trả về một object chứa thuộc tính `top` và `left`.
+- [`outerHeight()`](http://api.jquery.com/outerHeight/): lấy ra độ dài “bên ngoài” (bao gồm padding và margin) của một thành phần.
+- [`nextUntil(selector)`](http://api.jquery.com/nextUntil/): lấy tất cả phần tử phía sau phần tử mục tiêu (nhưng không bao gồm) phần tử khớp với `selector`.
+- [`insertBefore(selector)`](http://api.jquery.com/insertBefore/): insert an element before the one matched by `selector`. 
+- [`removeClass(class)`](http://api.jquery.com/removeClass/): remove the `class` CSS class, if present on the element.
+- [`css(propertyName, propertyValue)`](http://api.jquery.com/css/): set the `propertyName` CSS property to `propertyValue`. 
+- [`height()`](http://api.jquery.com/height/): get an element's height. 
+- [`addClass(class)`](http://api.jquery.com/addClass/): add the `class` CSS class to an element.
+
+```js
+Template.postsList.rendered = function () {
+  this.find('.wrapper')._uihooks = {
+    moveElement: function (node, next) {
+      var $node = $(node), $next = $(next);
+      var oldTop = $node.offset().top;
+      var height = $node.outerHeight(true);
+      
+      // find all the elements between next and node
+      var $inBetween = $next.nextUntil(node);
+      if ($inBetween.length === 0)
+        $inBetween = $node.nextUntil(next);
+      
+      // now put node in place
+      $node.insertBefore(next);
+      
+      // measure new top
+      var newTop = $node.offset().top;
+      
+      // move node *back* to where it was before
+      $node
+        .removeClass('animate')
+        .css('top', oldTop - newTop);
+      
+      // push every other element down (or up) to put them back
+      $inBetween
+        .removeClass('animate')
+        .css('top', oldTop < newTop ? height : -1 * height)
+        
+      
+      // force a redraw
+      $node.offset();
+      
+      // reset everything to 0, animated
+      $node.addClass('animate').css('top', 0);
+      $inBetween.addClass('animate').css('top', 0);
+    }
+  }
+}
+```
+<%= caption "/client/templates/posts/post_list.js" %>
+
+Một vài ghi chú:
+
+- Chúng ta tính toán độ dài của `$node` để biết xem phải bù vào thành phần `$inBetween` bao nhiêu. Chúng ta dùng `outerHeight(true)` để margin và padding làm nhân tố trong việc tính toán.
+- Chúng ta không biết là `next` tới trước hay là sau `node` khi đi xuống thành phần DOM. Vì vậy chúng ta kiểm tra cả hai sự cài đặt khi định nghĩa `$inBetween`. 
+- Để chuyển giữa thành phần “di chuyển tức thời” and “animation”, chúng ta đơn giản dịch chuyển CSS class `animate` tắt và mở (animation thực sự được định nghĩa trong code CSS ứng dụng). 
+- Vì chúng ta đang sử dụng vị trí tương đối, chúng ta có thể luôn luôn điều chỉnh lại bất kỳ thành phần thuộc tính `top` nào trở về 0 để đưa lại vị trí nó nên thuộc về. 
 
 <% note do %>
 
-### Running Schedule
+### Bắt buộc vẽ lại
 
-////
+Bạn có thể đang thắc mắc về dòng `$node.offset()`. Tại sao chúng ta lại hỏi vị trí của `$node` nếu như chúng ta định làm gì với nó? 
 
-////
+Nghĩ về nó theo cách này: nếu như bạn bảo một thiết bị android thông minh chạy về hướng bắc 5 km, và sau khi đã hoàn thành thì chạy lại vị trí ban đầu, nó có thể sẽ suy ra rằng việc kết thúc tại cùng vị trí có thể giảm chi phí năng lượng và không chạy đi đâu cả.
 
-////
+Vì vậy để chắc chắn rằng thiết bị android của chúng ta chạy tổng cộng 10 km, chúng ta sẽ bảo nó đo lại toạ độ tại thời điểm 5km trước khi quay đầu về.
+
+Trình duyệt cũng hoạt động theo cách tương tự: nếu chúng ta đưa ra cả lệnh `css('top', oldTop - newTop)` và `css('top', 0)` một cách liên tục, toạ độ mới sẽ đơn giản thay thế toạ độ cũ và không có gì xảy ra. Nếu chúng ta thực sự muốn thấy animation, chúng ta cần phải bắt buộc trình duyệt vẽ lại thành phần sau khi vị trí đầu đã thay đổi.
+
+Một cách đơn giản để bắt buộc vẽ lại là bảo trình duyệt kiểm tra thành phần `offset` -- nó không thể biết đó là gì cho đến khi đã vẽ lại thành phần một lần nữa. 
 
 <% end %>
 
-### The Attributes Helper
+Hãy tạo một sự quay vòng. Quay trở lại phần hiển thị “Best” và bắt đầu upvoting: bạn sẽ thấy bài viết lướt lên và xuống với vẻ duyên dáng như múa ba lê!
 
-////
-
-////
-
-////
-
-////
-
-////
-
-////
-
-### Timing Out
-
-////
-
-////
-
-- ////
-- ////
-- ////
-- ////
-- ////
-
-////
-
-- ////
-- ////
-- ////
-- ////
-- ////
-- ////
-
-////
+<%= gifscreenshot "14-3", "Animated reordering" %>
 
 <%= commit "14-1", "Added post reordering animation." %>
 
-### Animating New Posts
+### Không thể làm mờ dần
 
-////
+Bây giờ khi chúng ta đã hoàn thành phần thủ thuật cho việc sắp xếp, bài viết với animation được chèn vào và xoá đi sẽ là phần tiếp theo!
 
-~~~js
-//..
+Đầu tiên, chúng ta sẽ fade in bài viết mới (chú ý rằng vì mục đích đơn giản, chúng ta sử dụng JavaScript animation trong lần này):
 
-attributes: function() {
-  var post = _.extend({}, Positions.findOne({postId: this._id}), this);
-  var newPosition = post._rank * POST_HEIGHT;
-  var attributes = {};
-  
-  if (_.isUndefined(post.position)) {
-    attributes.class = 'post invisible';
-  } else {
-    var delta = post.position - newPosition;      
-    attributes.style = "top: " + delta + "px";
-    if (delta === 0)
-      attributes.class = "post animate"
+```js
+Template.postsList.rendered = function () {
+  this.find('.wrapper')._uihooks = {
+    insertElement: function (node, next) {
+      $(node)
+        .hide()
+        .insertBefore(next)
+        .fadeIn();
+    },
+    moveElement: function (node, next) {
+      //...
+    }
   }
-  
-  Meteor.setTimeout(function() {
-    Positions.upsert({postId: post._id}, {$set: {position: newPosition}})
-  });
-  
-  return attributes;
 }
+```
+<%= caption "/client/templates/posts/post_list.js" %>
+<%= highlight "3~7" %>
 
-//..
-~~~
-<%= caption "/client/templates/posts/post_item.js" %>
-<%= highlight "8~10" %>
+Để có một bức tranh rõ ràng, chúng ta có thể kiểm tra animation mới bằng việc chèn bài viết thông qua dòng lệnh với:
 
-////
+```js
+Meteor.call('postInsert', {url: 'http://apple.com', title: 'Testing Animations'})
+```
+
+<%= gifscreenshot "14-4", "Fading in new posts" %>
+
+Và sau đó chúng ta sẽ fade out bài viết đã xoá:
+
+```js
+Template.postsList.rendered = function () {
+  this.find('.wrapper')._uihooks = {
+    insertElement: function (node, next) {
+      $(node)
+        .hide()
+        .insertBefore(next)
+        .fadeIn();
+    },
+    moveElement: function (node, next) {
+      //...
+    },
+    removeElement: function(node) {
+      $(node).fadeOut(function() {
+        $(this).remove();
+      });
+    }
+  }
+}
+```
+<%= caption "/client/templates/posts/post_list.js" %>
+<%= highlight "12~16" %>
+
+Một lần nữa, hãy đơn giản xoá bài viết thông qua dòng lệnh (dùng `Posts.remove('somePostId')`) để thấy hiện ứng diễn ra.
+
+<%= gifscreenshot "14-5", "Fading out deleted posts" %>
 
 <%= commit "14-2", "Fade items in when they are drawn." %>
 
-<% note do %>
+### Chuyển tiếp trang
 
-### CSS & JavaScript
+Cho đến giờ chúng ta đã tạo thành phần animation *bên trong* một trang. Nhưng điều gì nếu như chúng ta muốn thêm hiệu ứng chuyển tiếp *giữa các* trang?
 
-////
+Việc chuyển tiếp trang là công việc của Iron Router. Bạn bấm vào một đường dẫn, và nội dung của helper `{{> yield}}` trong `layout.html` được tự động thay đổi.
 
-////
+Nó giống như chúng ta đã thay đổi hoạt động mặc định của Blaze cho danh sách bài viết, chúng ta có thể làm điều tương tự cho `{{> yield}}` để thêm vào hiệu ứng fade giữa các route!
 
-<% end %>
+Nếu chúng ta muốn fade in và out trang web, chúng ta sẽ phải chắc chắn rằng trang này hiển thị trên chóp của trang khác. Chúng ta làm điều đó bằng việc dùng `position:absolute` trên div container`.page` mà bọc mọi template của trang.
 
-////
+Chúng ta không muốn trang hoàn toàn được đặt vị trí tương đối với cửa sổ window, vì nó sẽ che mất header của ứng dụng. Vì vậy chúng ta sẽ để `position:relative` cho div `#main` để `position:absolute` của div `.page` nhận nguồn từ `#main`.
+
+Để tiết kiệm thời gian, chúng tôi đã tạo sẵn code CSS cần thiết cho `style.css`:
+
+```css
+//...
+
+#main{
+  position: relative;
+}
+.page{
+  position: absolute;
+  top: 0px;
+  width: 100%;
+}
+
+//...
+```
+<%= caption "/client/stylesheets/style.css" %>
+
+Đã đến lúc để thêm vào code fade cho trang. Nó cũng khá quen thuộc, vì nó là đoạn code mà chúng ta đã dùng cho việc chèn và xoá bài viết:
+
+```js
+Template.layout.rendered = function() {
+  this.find('#main')._uihooks = {
+    insertElement: function(node, next) {
+      $(node)
+        .hide()
+        .insertBefore(next)
+        .fadeIn();
+    },
+    removeElement: function(node) {
+      $(node).fadeOut(function() {
+        $(this).remove();
+      });
+    }
+  }
+}
+```
+<%= caption "/client/templates/application/layout.js" %>
+
+<%= gifscreenshot "14-6", "Transitioning in-between pages with a fade" %>
+
+<%= commit "14-3", "Transition between pages by fading." %>
+
+Chúng ta vừa xem xét một vài mô hình cho việc tạo animation cho thành phần trong ứng dụng Meteor. Trong khi đây không phải là một danh sách xem xét hết mọi khía cạnh, hi vọng rằng nó cung cấp phần cơ bản để xây dựng sự chuyển tiếp chi tiết hơn.
