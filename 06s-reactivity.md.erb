@@ -1,14 +1,14 @@
 ---
-title: Tương Tác Ngược
+title: Tương tác lại
 slug: reactivity
 date: 0006/01/02
 number: 6.5
 sidebar: true
-contents: Học về hệ thống code phụ thuộc tương tác ngược.|Hiểu được động cơ và làm thế nào để khai báo code.|Học cách sử dụng code cấp cao để dùng dữ liệu tương tác ngược.
+contents: Học về hệ thống code phụ thuộc tương tác lại.|Hiểu được động cơ và làm thế nào để khai báo code.|Học cách sử dụng code cấp cao để dùng dữ liệu tương tác lại.
 paragraphs: 21
 ---
 
-Nếu như Collection là tính năng lõi của Meteor, thì **tương tác ngược** (reactivity) là lớp vỏ làm cho tính năng đó trở nên hữu ích.
+Nếu như Collection là tính năng lõi của Meteor, thì **tương tác lại** (reactivity) là lớp vỏ làm cho tính năng đó trở nên hữu ích.
 
 Collection biến đổi tận gốc cách ứng dụng giải quyết vấn đề dữ liệu thay đổi. Thay vì phải kiểm tra dữ liệu thay đổi bằng tay (ví dụ như là thông qua lệnh gọi AJAX) và sau đó ráp nối lại những thay đổi đó vào HTML, việc thay đổi của dữ liệu có thể diễn ra tại bất kỳ thời điểm nào và được ghép vào giao diện người dùng của bạn một cách liền mạch với Meteor.
 
@@ -49,7 +49,7 @@ Trong trường hợp đó, bạn sẽ cần dùng callback `observe()` để ch
 
 Meteor cung cấp cho chúng ta một cách tốt hơn: khả năng phản ứng, tức là cách tiếp cận **khai báo** trong phần lõi của nó. Khai báo để cho chúng ta khai báo mối quan hệ giữa các object, và biết được chúng sẽ được giữ đồng bộ, thay vì phải đặc tả cho từng trường hợp thay đổi.
 
-Đây là một khái niệm có sức mạnh, bởi vì một hệ thống thời gian thực có nhiều đầu vào có thể bị thay đổi ở những thời điểm không đoán trước được. Bằng việc khai báo trạng thái làm thế nào để ráp HTML dựa trên bất kỳ nguồn dữ liệu tương tác ngược nào chúng ta quan tâm đên, Meteor có thể đảm đương được công việc theo dõi những nguồn này và nhận trách nhiệm làm công việc hỗn độn là giữ cho giao diện người dùng được cập nhật.
+Đây là một khái niệm có sức mạnh, bởi vì một hệ thống thời gian thực có nhiều đầu vào có thể bị thay đổi ở những thời điểm không đoán trước được. Bằng việc khai báo trạng thái làm thế nào để ráp HTML dựa trên bất kỳ nguồn dữ liệu tương tác lại nào chúng ta quan tâm đên, Meteor có thể đảm đương được công việc theo dõi những nguồn này và nhận trách nhiệm làm công việc hỗn độn là giữ cho giao diện người dùng được cập nhật.
 
 Tất cả điều ở trên muốn nói rằng, thay vì việc nghĩ đến callback `observe`, Meteor để chúng ta viết:
 
@@ -73,23 +73,23 @@ Template.postsList.helpers({
 });
 ~~~
 
-Phía sau màn hình, Meteor bọc lại `observe()` callback cho chúng ta, và vẽ lại những phần HTML thích đáng khi dữ liệu tương tác ngược thay đổi.
+Phía sau màn hình, Meteor bọc lại `observe()` callback cho chúng ta, và vẽ lại những phần HTML thích đáng khi dữ liệu tương tác lại thay đổi.
 
 ### Theo dấu phụ thuộc trong Meteor: tính toán số (computation)
 
-Trong khi Meteor là một framework thời gian thực, tương tác ngược, không phải *tất cả* code bên trong Meteor đều có tính chất tương tác ngược. Nếu điều đó xảy ra, toàn bộ ứng dụng của bạn sẽ chạy lại mỗi khi có bất kỳ thay đổi nào. Thay vào đó, tương tác ngược hạn chế tới những vùng đặc biệt trong mã code của bạn, chúng ta có thể gọi chúng là những vùng **tính toán số**
+Trong khi Meteor là một framework thời gian thực, tương tác lại, không phải *tất cả* code bên trong Meteor đều có tính chất tương tác lại. Nếu điều đó xảy ra, toàn bộ ứng dụng của bạn sẽ chạy lại mỗi khi có bất kỳ thay đổi nào. Thay vào đó, tương tác lại hạn chế tới những vùng đặc biệt trong mã code của bạn, chúng ta có thể gọi chúng là những vùng **tính toán số**
 
-Nói cách khác, một tính toán số là một khối code mà được chạy mỗi khi mà có một nguồn dữ liệu tương tác ngược mà nó phụ thuộc vào thay đổi. Nếu bạn có một nguồn dữ liệu tương tác ngược (ví dụ, một biến Session) và muốn đáp lại một cách tương tác ngược với nó, bạn cần phải thiết lập tính toán số cho nó.
+Nói cách khác, một tính toán số là một khối code mà được chạy mỗi khi mà có một nguồn dữ liệu tương tác lại mà nó phụ thuộc vào thay đổi. Nếu bạn có một nguồn dữ liệu tương tác lại (ví dụ, một biến Session) và muốn đáp lại một cách tương tác lại với nó, bạn cần phải thiết lập tính toán số cho nó.
 
 Chú ý rằng thường thì bạn không cần phải làm việc này bởi vì Meteor đã cho mỗi template và helper tính toán số đặc biệt của nó (nghĩa là bạn có thể chắc rằng template sẽ phản xạ một cách tương tác tới nguồn dữ liệu của chúng)
 
-Mỗi nguồn dữ liệu tương tác ngược theo dõi tất cả tính toán số mà sử dụng nó để nó có thể biết được chúng mỗi khi giá trị mà nó sở hữu thay đổi. Để làm điều đó, nó gọi hàm `invalidate()` đối với tính toán số.
+Mỗi nguồn dữ liệu tương tác lại theo dõi tất cả tính toán số mà sử dụng nó để nó có thể biết được chúng mỗi khi giá trị mà nó sở hữu thay đổi. Để làm điều đó, nó gọi hàm `invalidate()` đối với tính toán số.
 
 Tính toán số thường được thiết lập để dễ dàng đánh giá lại nội dung của nó trong invalidation, và đây là thứ xảy ra với tính toán số của template (mặc dù tính toán số của template cũng làm một số xảo thuật để thử và vẽ lại trang một cách hiệu quả hơn). Mặc dù bạn cũng có thể có thêm quyền điều khiển đối với tính toán số trong invalidation nếu bạn muốn, trong thực hành điều này hầu như luôn là cách xử lý mà bạn sẽ sử dụng.
 
 ### Thiết lập một tính toán số (computation)
 
-Bây giờ bạn đã hiểu được học thuyết phía sau tính toán số, việc thiết lập sẽ làm cho nó dễ hiểu hơn. Chúng ta sẽ dùng hàm `Tracker.autorun` để bao bọc một khối code tính toán và làm cho nó tương tác ngược:
+Bây giờ bạn đã hiểu được học thuyết phía sau tính toán số, việc thiết lập sẽ làm cho nó dễ hiểu hơn. Chúng ta sẽ dùng hàm `Tracker.autorun` để bao bọc một khối code tính toán và làm cho nó tương tác lại:
 
 ~~~js
 Meteor.startup(function() {
@@ -101,11 +101,11 @@ Meteor.startup(function() {
 
 Chú ý rằng chúng ta phải cho khối `Tracker` bọc trong khối `Meteor.startup()` để chắc chắn rằng nó chỉ chạy duy nhất một lần khi Meteor đã kết thúc việc nạp collection `Posts`.
 
-Phía sau màn hình, `autorun` sẽ tạo ra một tính toán số, và làm cho nó được tính lại mỗi khi nguồn dữ liệu mà nó phụ thuộc vào thay đổi. Chúng ta vừa thiết lập một tính toán số rất đơn giản đó là logs lại số lượng post ra console. Vì `Posts.find()` là một nguồn dữ liệu tương tác ngược, nó sẽ đảm nhiệm vai trò báo cho tính toán số tính lại giá trị mỗi khi số lượng posts thay đổi.
+Phía sau màn hình, `autorun` sẽ tạo ra một tính toán số, và làm cho nó được tính lại mỗi khi nguồn dữ liệu mà nó phụ thuộc vào thay đổi. Chúng ta vừa thiết lập một tính toán số rất đơn giản đó là logs lại số lượng post ra console. Vì `Posts.find()` là một nguồn dữ liệu tương tác lại, nó sẽ đảm nhiệm vai trò báo cho tính toán số tính lại giá trị mỗi khi số lượng posts thay đổi.
 
 ~~~js
 > Posts.insert({title: 'New Post'});
 There are 4 posts.
 ~~~
 
-Kết quả của tất cả điều này là chúng ta có thể viết code mà dùng dữ liệu tương tác ngược một cách rất tự nhiên, biết rằng ở phía sau màn hình, hệ thống phụ thuộc sẽ đảm nhiệm vai trò chạy lại mỗi khi đến thời điểm phù hợp.
+Kết quả của tất cả điều này là chúng ta có thể viết code mà dùng dữ liệu tương tác lại một cách rất tự nhiên, biết rằng ở phía sau màn hình, hệ thống phụ thuộc sẽ đảm nhiệm vai trò chạy lại mỗi khi đến thời điểm phù hợp.

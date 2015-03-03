@@ -1,5 +1,5 @@
 ---
-title: Errors
+title: Thông báo 
 slug: errors
 date: 0009/01/01
 number: 9
@@ -37,7 +37,7 @@ throwError = function(message) {
 ~~~
 <%= caption "client/helpers/errors.js" %>
 
-Điểm thuận lợi để lưu thông báo lỗi với collection cục bộ là, cũng như mọi collection khác, nó tương tác ngược -- nghĩa là chúng ta có thể hiển thị lỗi một cách có tương tác giống như hiển thị bất kỳ dữ liệu collection nào khác.
+Điểm thuận lợi để lưu thông báo lỗi với collection cục bộ là, cũng như mọi collection khác, nó tương tác lại -- nghĩa là chúng ta có thể hiển thị lỗi một cách có tương tác giống như hiển thị bất kỳ dữ liệu collection nào khác.
 
 ### Hiển thị lỗi
 
@@ -229,7 +229,7 @@ Hiện tại mọi thứ đã hoạt động, nhưng nếu bạn kích hoạt nh
 
 Điều này là do trong khi thành phần `.alert` biến mất khi nhìn *bằng mắt* nhưng thực ra vẫn tồn tại trong DOM. Chúng ta cần sửa điều này.
 
-Đây chính là một trong những tình huống mà Meteor toả sáng. Vì collection `Errors` tương tác ngược, tất cả việc chúng ta cần làm là xoá thông báo lỗi cũ ra khỏi collection!
+Đây chính là một trong những tình huống mà Meteor toả sáng. Vì collection `Errors` tương tác lại, tất cả việc chúng ta cần làm là xoá thông báo lỗi cũ ra khỏi collection!
 
 Chúng ta sẽ dùng hàm `Meteor.setTimeout` để đặc tả một hàm callback sẽ được chạy sau mỗi khoảng thời gian tạm ngừng (trong trường hợp này là 3000 mili giây).
 
