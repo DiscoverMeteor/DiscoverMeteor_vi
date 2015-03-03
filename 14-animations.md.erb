@@ -6,31 +6,31 @@ number: 14
 points: 10
 photoUrl: http://www.flickr.com/photos/ikewinski/8377615133/
 photoAuthor: Mike Lewinski
-contents: Tìm hiểu điều gì diễn ra phía sau phàn hình khi mà Meteor hoán đổi hai thành phần DOM.|Học cách tạo animation cho thành phần sắp xếp lại bài viết.|Học cách tạo animation cho thao tác chèn và xoá bài viết.|Học về animation khi di chuyển giữa hai trang.
+contents: Tìm hiểu điều gì diễn ra phía sau màn hình khi mà Meteor hoán đổi hai thành phần DOM.|Học cách tạo animation cho thành phần sắp xếp lại bài viết.|Học cách tạo animation cho thao tác chèn và xoá bài viết.|Học về animation khi di chuyển giữa hai trang.
 paragraphs: 58
 ---
 
-Bây giờ chúng ta đã có tính năng bỏ phiếu theo thời gian thực, ghi điểm, và xếp hạng. Tuy nhiên, điều này dẫn đến sự xung đột, không ổn định đối với trải nghiệm người dùng khi mà bài viết nhảy chỗ này qua chỗ khác trên trang chủ. Chúng ta sẽ dùng animation để làm mượt điều này.
+Bây giờ chúng ta đã có tính năng bỏ phiếu theo thời gian thực, ghi điểm, và xếp hạng. Tuy nhiên, điều này dẫn đến sự xung đột, không ổn định đối với trải nghiệm người dùng khi mà bài viết nhảy chỗ này qua chỗ khác trên trang chủ. Chúng ta sẽ dùng animation để làm trơn vấn đề này.
 
 ### Giới thiệu  `_uihooks`
 
-`_uihooks` là một tính năng còn mới và chưa được tạo tài liệu của Blaze. Như tên gọi của nó, nó cho chúng ta truy cập tới hook mà có thể kích hoạt mỗi khi có thành phần được chèn mới, xoá bỏ hoặc tạo animation.
+`_uihooks` là một tính năng còn mới và chưa được tạo tài liệu của Blaze. Như tên gọi, nó cho phép chúng ta truy cập tới hàm hook mà có thể kích hoạt mỗi khi có thành phần mới được chèn vào, xoá bỏ hoặc khi tạo animation.
 
-Danh sách đầy đủ của hook như bên dưới:
+Danh sách đầy đủ hàm hook như bên dưới:
 
 - `insertElement`: được gọi mỗi khi có thành phần mới được chèn vào.
-- `moveElement`: được gọi mỗi khi một thành phần mới thay đổi vị trí.
+- `moveElement`: được gọi mỗi khi có thành phần thay đổi vị trí.
 - `removeElement`: được gọi khi một thành phần bị xoá.
 
-Một khi đã được định nghĩa, những thành phần hook này sẽ *thay thế* hành vi mặc định của Meteor. Hay nói theo cách khác, thay vì việc chèn mới, di chuyển hoặc xoá phần tử, Meteor sẽ làm bất kỳ thứ gì mà chúng ta mô tả - và chúng ta hoàn toàn có thể điều khiển những hoạt động này hoạt động như ý muốn!
+Một khi đã được định nghĩa, những hàm hook này sẽ *thay thế* hành vi mặc định của Meteor. Hay nói theo cách khác, thay vì việc chèn mới, di chuyển hoặc xoá phần tử, Meteor sẽ làm bất kỳ thứ gì mà chúng ta mô tả - và chúng ta hoàn toàn có thể điều khiển những hoạt động này như ý muốn!
 
 ### Meteor & DOM
 
 Trước khi bắt đầu vào phần thú vị (là làm cho mọi thứ di chuyển), chúng ta cần phải hiểu cách Meteor tương tác với DOM (Document Object Model -- tổ hợp những thành phần HTML làm nên nội dung của trang).
 
-Điểm cốt yếu phải chú ý là thành phần DOM thực sự không có khả năng “di chuyển”; tuy nhiên, chúng có thể được xoá và tạo lại (chú ý rằng đây là hạn chế của chính bản thân DOM, không phải của Meteor). Vì vậy để tạo cảm giác phần tử A và B thay đổi vị trí, Meteor sẽ thực sự xoá thành phần B và chèn một thành phần sao chép mới (B') trước thành phần A.
+Điểm cốt yếu phải chú ý là thành phần DOM thực sự không có khả năng “di chuyển”; tuy nhiên, chúng có thể được xoá  và tạo lại (chú ý rằng đây là hạn chế của chính bản thân DOM, không phải của Meteor). Vì vậy để tạo cảm giác phần tử A và B thay đổi vị trí, Meteor sẽ thực sự xoá thành phần B và chèn một thành phần sao chép mới (B') trước thành phần A.
 
-Điều này làm cho animation cần một chút thủ thuật, do chúng ta không thể tạo animation cho B di chuyển tới vị trí mới, vì B sẽ biến mất ngay khi Meteor tạo lại trang (điều này xảy ra ngay lập tức vì khả năng phản ứng). Xin đừng lo lắng, chúng ta sẽ tìm ra cách.
+Điều này làm cho animation cần một chút thủ thuật, do chúng ta không thể tạo animation cho B di chuyển tới vị trí mới, vì B sẽ biến mất ngay khi Meteor tạo lại trang (điều này xảy ra ngay lập tức vì khả năng phản ứngđi của ). Xin đừng lo lắng, chúng ta sẽ tìm ra cách.
 
 ### Vận động viên chạy Soviet
 
@@ -40,7 +40,7 @@ Nhưng trước hết, hãy bắt đầu với một câu chuyện.
 
 May mắn là giám khảo cuộc đua đã sớm nhận ra sự vi phạm, và vận động viên đó không còn cách nào khác là di chuyển tức thời về lại vạch xuất phát, trước khi được phép tham gia cuộc đua như mọi vận động viên khác.
 
-Nguồn gốc của câu chuyện lịch sử này có thể không thực sự đáng tin cậy, vì vậy bạn không nên tin nó hoàn toàn đúng. Nhưng hãy thử giữ lại "người vận động viên Soviet và thiết bị di chuyển tức thời" trong đầu khi đi tiếp nội dung chương này.
+Nguồn gốc của câu chuyện lịch sử này có thể không thực sự đáng tin cậy, vì vậy bạn không nên tin nó hoàn toàn đúng. Nhưng hãy giữ lại "người vận động viên Soviet và thiết bị di chuyển tức thời" trong đầu khi đi tiếp nội dung chương này.
 
 ### Chia nhỏ
 
@@ -67,11 +67,11 @@ Mặc định, Meteor có thể giải quyết được bước 1 & 2, và việ
 
 Để tạo animation cho bài viết cần sắp xếp, chúng ta sẽ phải dấn thân vào mảnh đất CSS. Một chút ôn lại về thay đổi vị trí với CSS có thể sẽ cần thiết.
 
-Thành phần trên trang web dùng mặc định vị trí *tĩnh*. Thành phần được đặt vị trí tĩnh phù hợp với luồng của trang, và toạ độ của chúng trên màn hình không thể thay đổi hoặc tạo animation.
+Thành phần trên trang web mặc định dùng vị trí *tĩnh*. Thành phần được đặt vị trí tĩnh phù hợp với luồng của trang, và toạ độ của chúng trên màn hình không thể thay đổi hoặc tạo animation.
 
 Vị trí **relative** (tương đối) thì khác, chúng là thành phần phù hợp với luồng của trang, nhưng đồng thời cũng có thể thay đổi vị trí *tương đối so với vị trí ban đầu*.
 
-Vị trí **absolute** (tuyệt đối) đi một bước xa hơn và để cho bạn toạ độ x/y tương đối so với **tài liệu** hoặc **thành phần cha tuyệt đối hoặc tương đối đầu tiên**. 
+Vị trí **absolute** (tuyệt đối) đi một bước xa hơn và để cho bạn thiết  toạ độ x/y tương đối so với **tài liệu** hoặc **thành phần cha tuyệt đối hoặc tương đối đầu tiên**. 
 
 Chúng ta sẽ dùng vị trí tương đối để tạo animation cho bài viết. Chúng tôi đã tạo CSS cho bạn, nhưng nếu bạn muốn tự làm thì tất cả mọi việc cần thực hiện là thêm đoạn code sau vào stylesheet:
 
@@ -85,11 +85,11 @@ Chúng ta sẽ dùng vị trí tương đối để tạo animation cho bài vi�
 
 Điều này làm cho bước 5 và 6 dễ dàng hơn: tất cả mọi việc chúng ta cần làm là thiết lập lại `top` thành `0px` (giá trị mặc định) và bài viết của chúng ta sẽ di chuyển trở lại vị trí "bình thường". 
 
-Vì vậy về cơ bản, thử thách duy nhất của chúng ta là tìm ra nơi để *từ đó* tạo ra animation (bước 3 và 4) tương đối tới vị trí mới. Nói cách khác, phải bù trừ bao nhiêu. Nhưng điều đó cũng không thực sự khó: cách bù trừ đúng đơn giản là vị trí của một bài viết cũ trừ đi vị trí mới của nó. 
+Vì vậy về cơ bản, thử thách duy nhất của chúng ta là tìm ra nơi để *từ đó* tạo ra animation (bước 3 và 4) tương đối tới vị trí mới. Nói cách khác, phải bù trừ bao nhiêu. Nhưng điều đó cũng không thực sự khó: cách đơn giản là lấy vị trí của một bài viết cũ trừ đi vị trí mới của nó. 
 
 ### Cài đặt `_uihooks`
 
-Bây giờ chúng ta đã hiều về những nhân tố khác nhau khi thử với việc tạo animation cho một danh sách hạng mục. Chúng ta thực sự đã sẵn sàng để cài đặt animation. Chúng ta sẽ bắt đằng việp bọc lại danh sách bài viết vào một thành phần chứa `.wrapper`:
+Bây giờ chúng ta đã hiều về những nhân tố khác nhau khi thử với việc tạo animation cho một danh sách hạng mục. Chúng ta thực sự đã sẵn sàng để cài đặt animation. Chúng ta sẽ bắt bằng việc bọc lại danh sách bài viết vào một thành phần chứa đựng `.wrapper`:
 
 ```html
 <template name="postsList">
@@ -146,7 +146,7 @@ Hàm hook `moveElement` nhận vào hai tham số: `node` và `next`.
 - `node` là thành phần đang được di chuyển tới vị trí mới trong DOM. 
 - `next` là thành phần ngay *sau* vị trí mới mà `node` đang được di chuyển tới. 
 
-Biết được điều này, chúng ta có thể tạo quá trình animation như sau (hãy tham chiếu lại phần ví dụ về “vận động viên Soviet” nếu cần). Khi mà một sự thay đổi được tìm ra, chúng ta sẽ:
+Biết được điều này, chúng ta có thể tạo ra quá trình animation như sau (hãy tham chiếu lại phần ví dụ về “vận động viên Soviet” nếu cần). Khi mà một sự thay đổi được tìm ra, chúng ta sẽ:
 
 1. Chèn `node` vào trước `next` (nói cách khác, hoạt động mặc định sẽ diễn ra nếu chúng ta không đặc tả hàm hook `moveElement` nào).
 2. Di chuyển `node` quay trở lại vị trí ban đầu của nó.
@@ -158,12 +158,12 @@ Chúng ta sẽ làm tất cả điều này thông qua thư viện [jQuery](http
 - [`$()`](http://api.jquery.com/jQuery/): bọc bất kỳ thành phần DOM nào thành một object jQuery.
 - [`offset()`](http://api.jquery.com/offset/): gọi ra vị trí hiện tại của một thành phần tương đối với *tài liệu*, và trả về một object chứa thuộc tính `top` và `left`.
 - [`outerHeight()`](http://api.jquery.com/outerHeight/): lấy ra độ dài “bên ngoài” (bao gồm padding và margin) của một thành phần.
-- [`nextUntil(selector)`](http://api.jquery.com/nextUntil/): lấy tất cả phần tử phía sau phần tử mục tiêu (nhưng không bao gồm) phần tử khớp với `selector`.
-- [`insertBefore(selector)`](http://api.jquery.com/insertBefore/): insert an element before the one matched by `selector`. 
-- [`removeClass(class)`](http://api.jquery.com/removeClass/): remove the `class` CSS class, if present on the element.
-- [`css(propertyName, propertyValue)`](http://api.jquery.com/css/): set the `propertyName` CSS property to `propertyValue`. 
-- [`height()`](http://api.jquery.com/height/): get an element's height. 
-- [`addClass(class)`](http://api.jquery.com/addClass/): add the `class` CSS class to an element.
+- [`nextUntil(selector)`](http://api.jquery.com/nextUntil/): lấy tất cả phần tử phía sau phần tử mục tiêu cho tới (nhưng không bao gồm) phần tử match với `selector`.
+- [`insertBefore(selector)`](http://api.jquery.com/insertBefore/): chèn một thành phần trước thành phần match với `selector`. 
+- [`removeClass(class)`](http://api.jquery.com/removeClass/): xoá bỏ class CSS `class` nếu xuất hiện trên thành phần.
+- [`css(propertyName, propertyValue)`](http://api.jquery.com/css/): thiết lập thuộc tính CSS `propertyName` thành `propertyValue`. 
+- [`height()`](http://api.jquery.com/height/): lấy độ cao của một thành phần. 
+- [`addClass(class)`](http://api.jquery.com/addClass/): thêm class CSS `class` CSS vào một thành phần.
 
 ```js
 Template.postsList.rendered = function () {
@@ -209,20 +209,20 @@ Template.postsList.rendered = function () {
 
 Một vài ghi chú:
 
-- Chúng ta tính toán độ dài của `$node` để biết xem phải bù vào thành phần `$inBetween` bao nhiêu. Chúng ta dùng `outerHeight(true)` để margin và padding làm nhân tố trong việc tính toán.
-- Chúng ta không biết là `next` tới trước hay là sau `node` khi đi xuống thành phần DOM. Vì vậy chúng ta kiểm tra cả hai sự cài đặt khi định nghĩa `$inBetween`. 
+- Chúng ta tính toán độ dài của `$node` để biết xem phải bù vào thành phần `$inBetween` bao nhiêu. Chúng ta dùng `outerHeight(true)` để có margin và padding làm nhân tố trong việc tính toán.
+- Chúng ta không biết là `next` tới trước hay là sau `node` khi đi dần xuống DOM. Vì vậy chúng ta kiểm tra cả hai cấu hình khi định nghĩa `$inBetween`. 
 - Để chuyển giữa thành phần “di chuyển tức thời” and “animation”, chúng ta đơn giản dịch chuyển CSS class `animate` tắt và mở (animation thực sự được định nghĩa trong code CSS ứng dụng). 
-- Vì chúng ta đang sử dụng vị trí tương đối, chúng ta có thể luôn luôn điều chỉnh lại bất kỳ thành phần thuộc tính `top` nào trở về 0 để đưa lại vị trí nó nên thuộc về. 
+- Vì chúng ta đang sử dụng vị trí tương đối, chúng ta có thể luôn luôn điều chỉnh lại bất kỳ thành phần thuộc tính `top` nào trở về 0 để đưa lại vị trí mà  thuộc về. 
 
 <% note do %>
 
 ### Bắt buộc vẽ lại
 
-Bạn có thể đang thắc mắc về dòng `$node.offset()`. Tại sao chúng ta lại hỏi vị trí của `$node` nếu như chúng ta định làm gì với nó? 
+Bạn có thể đang thắc mắc về dòng `$node.offset()`. Tại sao chúng ta lại hỏi vị trí của `$node` nếu như chúng ta không định làm gì đó với nó? 
 
-Nghĩ về nó theo cách này: nếu như bạn bảo một thiết bị android thông minh chạy về hướng bắc 5 km, và sau khi đã hoàn thành thì chạy lại vị trí ban đầu, nó có thể sẽ suy ra rằng việc kết thúc tại cùng vị trí có thể giảm chi phí năng lượng và không chạy đi đâu cả.
+Hãy  theo cách này: nếu như bạn bảo một thiết bị người máy thông minh chạy về hướng bắc 5 km, và sau khi đã hoàn thành thì chạy lại vị trí ban đầu, nó có thể sẽ suy ra rằng việc kết thúc tại cùng vị trí có thể giảm chi phí năng lượng và không chạy đi đâu cả.
 
-Vì vậy để chắc chắn rằng thiết bị android của chúng ta chạy tổng cộng 10 km, chúng ta sẽ bảo nó đo lại toạ độ tại thời điểm 5km trước khi quay đầu về.
+Vì vậy để chắc chắn rằng thiết bị người máy của chúng ta chạy tổng cộng 10km, chúng ta sẽ bảo nó đo lại toạ độ tại thời điểm 5km trước khi quay đầu về.
 
 Trình duyệt cũng hoạt động theo cách tương tự: nếu chúng ta đưa ra cả lệnh `css('top', oldTop - newTop)` và `css('top', 0)` một cách liên tục, toạ độ mới sẽ đơn giản thay thế toạ độ cũ và không có gì xảy ra. Nếu chúng ta thực sự muốn thấy animation, chúng ta cần phải bắt buộc trình duyệt vẽ lại thành phần sau khi vị trí đầu đã thay đổi.
 
@@ -230,7 +230,7 @@ Một cách đơn giản để bắt buộc vẽ lại là bảo trình duyệt 
 
 <% end %>
 
-Hãy tạo một sự quay vòng. Quay trở lại phần hiển thị “Best” và bắt đầu upvoting: bạn sẽ thấy bài viết lướt lên và xuống với vẻ duyên dáng như múa ba lê!
+Hãy tạo ra sự quay vòng. Hãy quay trở lại phần hiển thị “Best” và bắt đầu upvoting: bạn sẽ thấy bài viết lướt lên và xuống với vẻ duyên dáng như đang múa ba lê!
 
 <%= gifscreenshot "14-3", "Animated reordering" %>
 
@@ -238,7 +238,7 @@ Hãy tạo một sự quay vòng. Quay trở lại phần hiển thị “Best�
 
 ### Không thể làm mờ dần
 
-Bây giờ khi chúng ta đã hoàn thành phần thủ thuật cho việc sắp xếp, bài viết với animation được chèn vào và xoá đi sẽ là phần tiếp theo!
+Bây giờ khi chúng ta đã hoàn thành phần thủ thuật cho việc sắp xếp, phần tiếp theo sẽ về bài viết với animation được chèn vào và xoá đi!
 
 Đầu tiên, chúng ta sẽ fade in bài viết mới (chú ý rằng vì mục đích đơn giản, chúng ta sử dụng JavaScript animation trong lần này):
 
