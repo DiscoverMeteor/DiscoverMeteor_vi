@@ -1,3 +1,3 @@
-This is an outline of [Discover Meteor](http://discovermeteor.com).
+Đây là bản dịch tiếng Việt cho cuốn sách [Discover Meteor](http://discovermeteor.com).
 
-Online translated version: [http://vi.discovermeteor.com/](http://vi.discovermeteor.com/)
+Xem trực tuyến tại: [http://vi.discovermeteor.com/](http://vi.discovermeteor.com/)
