@@ -30,7 +30,7 @@ Trước khi bắt đầu vào phần thú vị (là làm cho mọi thứ di chu
 
 Điểm cốt yếu phải chú ý là thành phần DOM thực sự không có khả năng “di chuyển”; tuy nhiên, chúng có thể được xoá  và tạo lại (chú ý rằng đây là hạn chế của chính bản thân DOM, không phải của Meteor). Vì vậy để tạo cảm giác phần tử A và B thay đổi vị trí, Meteor sẽ thực sự xoá thành phần B và chèn một thành phần sao chép mới (B') trước thành phần A.
 
-Điều này làm cho animation cần một chút thủ thuật, do chúng ta không thể tạo animation cho B di chuyển tới vị trí mới, vì B sẽ biến mất ngay khi Meteor tạo lại trang (điều này xảy ra ngay lập tức vì khả năng phản ứngđi của ). Xin đừng lo lắng, chúng ta sẽ tìm ra cách.
+Điều này làm cho animation cần một chút thủ thuật, do chúng ta không thể tạo animation cho B di chuyển tới vị trí mới, vì B sẽ biến mất ngay khi Meteor tạo lại trang (điều này xảy ra ngay lập tức vì khả năng phản ứng lại của Meteor). Xin đừng lo lắng, chúng ta sẽ tìm ra cách.
 
 ### Vận động viên chạy Soviet
 
@@ -44,7 +44,7 @@ Nguồn gốc của câu chuyện lịch sử này có thể không thực sự 
 
 ### Chia nhỏ
 
-Khi Meteor nhận được cập nhật và phản ánh lại vào DOM, bài viết của chúng ta sẽ được dịch chuyển tức thời tới vị trí cuối cùng của chúng, và giống như là vận động viên soviet. Nhưng dù cho trong Olympics hay trong ứng dụng của chúng ta, chúng ta không có khả năng di chuyển tức thời xung quanh. Vì vậy, chúng ta di chuyển thành phần về “vị trí xuất phát” và làm cho nó “chạy” (hay nói cách khác, tạo animation cho nó) tới vị trí đích.
+Khi Meteor nhận được cập nhật và phản ánh lại vào DOM, bài viết của chúng ta sẽ được dịch chuyển tức thời tới vị trí cuối cùng của chúng, và giống như là vận động viên soviet. Nhưng dù cho trong trường hợp Olympics hay trong ứng dụng của chúng ta, việc di chuyển tức thời là không thể. Vì vậy, chúng ta di chuyển thành phần về “vị trí xuất phát” và làm cho nó “chạy” (hay nói cách khác, tạo animation cho nó) tới vị trí đích.
 
 Bởi vậy để thay đổi vị trí bài viết A và B (đang được đặt tại vị trí p1 và p2 theo thứ tự), chúng ta sẽ đi theo các bước sau:
 
