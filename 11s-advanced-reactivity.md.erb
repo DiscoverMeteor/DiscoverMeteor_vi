@@ -3,18 +3,21 @@ title: Tương tác lại nâng cao
 slug: advanced-reactivity
 date: 0011/01/02
 number: 11.5
+points: 10
 sidebar: true
-contents: Learn about how to create reactive data sources in Meteor.|Create a simple example of a reactive data source.|See how Tracker compares to AngularJS.
-paragraphs: 26
+photoUrl: http://www.flickr.com/photos/ikewinski/8676146109/
+photoAuthor: Mike Lewinski
+contents: Học cách làm thế nào tạo ra nguồn dữ liệu tương tác lại trong Meteor.|Tạo một ví dụ đơn giản về nguồn dữ liệu tương tác lại.|So sánh giữa Tracker và AngularJS.
+paragraphs: 29
 ---
 
-////
+Hiếm khi bạn phải tự viết phụ thuộc để theo dấu code của mình, nhưng sẽ rất hữu ích nếu chúng ta hiểu được để điều tra được cách thức hoạt động của luồng xử lý phụ thuộc.
 
-////
+Tưởng tượng rằng chúng ta muốn theo dõi xem có bao nhiêu bạn Facebook của người dùng hiện tại đã "thích" mỗi bài viết trên Microscope. Hãy giả sử rằng chúng ta đã làm việc cụ thể về cách thức xác thực tài khoản người dùng với Facebook, tạo lệnh gọi API tương thích, và đã phân tách được dữ liệu tương ứng. Bây giờ chúng ta có một hàm bất đồng bộ bên phía client trả về số lượng thích là `getFacebookLikeCount(user, url, callback)`.
 
-////
+Điều cần phải lưu ý về hàm này là nó rất *không tương tác lại* và cũng không theo thời gian thực. Nó gọi một yêu cầu HTTP tới Facebook, nhưng hàm này sẽ không chạy lại bởi chính nó mỗi khi biến đếm thay đổi ở phía Facebook, và UI của chúng ta sẽ không thay đổi trong khi dữ liệu bên dưới thì có.
 
-////
+Để điều chỉnh điều này, chúng ta có thể bắt đầu dùng `setInterval` để gọi tới hàm của chúng ta với mỗi vài giây:
 
 ~~~js
 currentLikeCount = 0;
@@ -30,7 +33,7 @@ Meteor.setInterval(function() {
 }, 5 * 1000);
 ~~~
 
-////
+Mỗi lần kiểm tra biến `currentLikeCount`, chúng ta có thể kỳ vọng sẽ nhận được con số đúng với sai sót độ biên năm giây. Chúng ta có thể dùng biến này trong helper như sau:
 
 ~~~js
 Template.postItem.likeCount = function() {
@@ -38,19 +41,19 @@ Template.postItem.likeCount = function() {
 }
 ~~~
 
-////
+Tuy nhiên, vẫn chưa có gì bảo cho template của chúng ta vẽ lại mỗi khi `currentLikeCount` thay đổi. Mặc dù hiện tại biến số được giả lập thời gian thực và sẽ thay đổi bởi chính bản thân nó, nó vẫn không *tương tác ngược* nên không thể giao tiếp một cách chính xác với hệ thống Meteor.
 
-### Tracking Reactivity: Computations
+### Theo dấu tương tác lại: Sự tính toán
 
-////
+Tương tác ngược của Meteor được thực hiện trung gian thông qua *phụ thuộc*, là cấu trúc dữ liệu theo dấu một bộ tính toán.
 
-////
+Như chúng ta đã thấy trong chương sidebar trước đó về tương tác lại, một sự tính toán là một bộ phận code mà dùng dữ liệu tương tác ngược. Trong trường hợp này, có một sự tính toán được tạo ngầm cho template `postItem`, và mỗi helper trên trình quản lý của template cũng có sự tính toán của riêng nó.
 
-////
+Bạn có thể suy nghĩ một tính toán là một phần code "đảm nhiệm" về dữ liệu tương tác lại. Khi dữ liệu thay đổi, chính là thao tác tính toán này được thông báo (qua `invalidate()`), và cũng chính là sự tính toán quyết định xem cái gì cần phải được hoàn thành.
 
-### Turning a Variable Into a Reactive Function
+### Chuyển một biến số sang một hàm tương tác lại
 
-////
+Để chuyển biến số `currentLikeCount` sang một nguồn dữ liệu tương tác lại, chúng ta cần phải theo dấu tất cả sự tính toán đã sử dụng nó trong một phụ thuộc. Điều này cần thay đổi nó từ một biến số sang một hàm số (là thứ sẽ trả về giá trị):
 
 ~~~js
 var _currentLikeCount = 0;
@@ -76,17 +79,17 @@ Meteor.setInterval(function() {
 ~~~
 <%= highlight "1~7,14~17" %>
 
-////
+Chúng ta vừa thực hiện thiết lập một phụ thuộc là `_currentLikeCountListeners`, nó sẽ theo dõi tất cả sự tính toán mà `currentLikeCount()` đã sử dụng. Mỗi khi giá trị của `currentLikeCount` thay đổi, chúng ta gọi tới hàm `changed()` trên phụ thuộc đó, thứ sẽ làm mất hiệu lực tất cả tính toán đã được theo dõi.
 
-////
+Những tính toàn này sau đó có thể di chuyển tiếp và xử lý thay đổi cho từng nền tảng trường hợp.
 
-////
+Nếu như bạn thấy rằng đoạn code ở trên quá nhiều bản mẫu cho một nguồn dữ liệu tương tác lại đơn giản, bạn đã đúng, và Meteor có cung cấp một vài công cụ làm sẵn để cho việc này trở nên đơn giản hơn (giống như là bạn không cần phải dùng đến tính toán trực tiếp, mà bạn sẽ thường dùng autoruns). Có một gói nền tảng là `reactive-var` làm chính xác những gì mà hàm `currentLikeCount()` của chúng ta đã làm. Nếu chúng ta thêm nó vào:
 
 ~~~bash
 meteor add reactive-var
 ~~~
 
-////
+Thì chúng ta có thể đơn giản hoá code như sau:
 
 ~~~js
 var currentLikeCount = new ReactiveVar();
@@ -105,22 +108,22 @@ Meteor.setInterval(function() {
 ~~~
 <%= highlight "1,9" %>
 
-////
+Bây giờ để dùng nó, chúng ta sẽ gọi `currentLikeCount.get()` trong helper và mọi thứ sẽ hoạt động như trước. Chúng ta cũng có thể sử dụng một gói hệ thống nữa tên là `reactive-dict`, cung cấp lưu trữ tương tác ngược dạng khoá-giá trị (hầu như tác dụng giống với `Session`).
 
 
-### Comparing Tracker to Angular
+### So sánh Tracker với Angular
 
-////
+[Angular](http://angularjs.org/) là một thư viện được phát triển bởi đội ngũ Google, tương tác lại chỉ ở phía client. Việc so sánh giữa cách tiếp cận của Meteor tới việc theo dõi phụ thuộc với cách của Angular chỉ mang tính minh hoạ, vì phương pháp của hai thứ khá là khác nhau.
 
-////
+Như chúng ta đã thấy thì mô hình Meteor dùng khối code gọi là khối tính toán. Những tính toán này được theo dõi bởi (hàm) nguồn dữ liệu tác lại đặc biệt mà có nhiệm vụ làm mất hiệu lực chúng khi cần thiết. Vì vậy nguồn dữ liệu thông báo _một cách rõ ràng_ cho tất cả phụ thuộc của nó mỗi khi chúng gọi tới `invalidate()`. Chú ý rằng mặc dù điều này thường là khi dữ liệu đã thay đổi, nguồn dữ liệu cũng có thể tạm thời quyết định kích hoạt việc làm mất hiệu lực này cho những lý do khác.
 
-////
+Thêm vào đó, mặc dù tính toán thường được chạy lại mỗi khi việc làm mất hiệu lực đã diễn ra, bạn cũng có thể thiết lập chúng để hoạt động theo ý muốn. Tất cả điều này giúp chúng ta có sự quản lý cấp cao đối với việc tương tác lại.
 
-////
+Về phía Angular, việc tương tác lại được làm trung gian thông qua `phạm vi` (scope) của object. Một phạm vi có thể được nghĩ như là một object JavaScript với một vài hàm đặc biệt.
 
-////
+Khi bạn muốn tương tác lại phụ thuộc vào giá trị của một phạm vi, bạn gọi tới `scope.$watch`, nói lên rằng bạn quan tâm đến (ví dụ phần nào của phạm vi mà bạn cần dùng tới) và một hàm listener sẽ chạy mỗi khi biểu diễn đó thay đổi. Vì vậy bạn nói rõ ràng và chính xác điều gì bạn muốn làm mỗi khi biểu diễn đó thay đổi.
 
-////
+Quay trở lại ví dụ về Facebook của chúng ta, chúng ta sẽ viết:
 
 ~~~js
 $rootScope.$watch('currentLikeCount', function(likeCount) {
@@ -128,13 +131,14 @@ $rootScope.$watch('currentLikeCount', function(likeCount) {
 });
 ~~~
 
-////
+Dĩ nhiên, cũng như bạn hiếm khi thực hiện tính toán trong Meteor, bạn cũng sẽ không thường gọi `$watch` trực tiếp trong Angular vì `ng-model` và `{{expressions}}` tự động thiết lập theo dõi và đảm nhiệm việc tạo lại khi dữ liệu thay đổi.
 
-////
+Mỗi khi giá trị tương tác lại đó thay đổi, `scope.$apply()` sẽ phải được gọi. Điều này ước lượng lại mỗi watcher của phạm vi, nhưng chỉ gọi hàm listener của watcher mà giá trị của biển thức đó đã *thay đổi*.
 
-////
 
-////
+Vì vậy `scope.$apply()` cũng tương tự như `dependency.changed()`, ngoại trừ việc nó thực hiện tại cấp bậc phạm vi, thay vì cho bạn quyền điều khiển chính xác listener nào nên được ước tính giá trị lại. Điều này có nghĩa là, việc thiếu một chút quyền điều khiển này giúp Angular có khả năng thông minh và hiệu quả trong việc quyết định chính xác listener nào cần phải được ước tính lại.
+
+Nếu dùng Angular, code cho hàm `getFacebookLikeCount()` sẽ tương tự như sau:
 
 ~~~js
 Meteor.setInterval(function() {
@@ -149,4 +153,4 @@ Meteor.setInterval(function() {
 ~~~
 <%= highlight "5~6" %>
 
-////
+Phải thừa nhận rằng, Meteor đảm nhiệm hầu hết những phần nặng nề cho chúng ta và để chúng ta có được lợi ích từ tương tác lại mà không cần quá nhiều công việc phải làm. Nhưng cũng hi vọng, việc học sâu về những khuôn mẫu này sẽ giúp ích cho bạn trong việc đưa dự án tiến xa hơn.
