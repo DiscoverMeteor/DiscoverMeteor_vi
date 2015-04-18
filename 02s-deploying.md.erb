@@ -44,9 +44,9 @@ Bạn có thể tham khảo [tài liệu chính thức] (http://docs.meteor.com/
 
 [Modulus] (https://modulus.io/) là một lựa chọn tuyệt vời cho việc triển khai các ứng dụng Node.js. Đó là một trong số ít PaaS (nền tảng như một dịch vụ) mà cung cấp hỗ trợ Meteor chính thức, và đã có khá một số lượng người chạy sản phẩm ứng dụng Meteor trên đó.
 
-Bnaj có thể học thêm về Modulus bằng việc đọc [hướng dẫn triển khai cho ứng dụng Meteor](http://help.modulus.io/customer/portal/articles/1647770-using-meteor-with-modulus) của họ.
+Bạn có thể học thêm về Modulus bằng việc đọc [hướng dẫn triển khai cho ứng dụng Meteor](http://help.modulus.io/customer/portal/articles/1647770-using-meteor-with-modulus).
 
-Bắt đầu bởi [tạo một tài khoản] (https://modulus.io/register). Để triển khai các ứng dụng của chúng tôi trên Modulus, sau đó chúng tôi sẽ cần phải cài đặt các công cụ dòng lệnh Modulus:
+Hãy bắt đầu bằng việc [tạo một tài khoản] (https://modulus.io/register). Để triển khai ứng dụng trên Modulus, chúng ta cần phải cài đặt công cụ dòng lệnh Modulus
 
 ~~~bash
 npm install -g modulus
@@ -64,9 +64,9 @@ Bây giờ chúng ta sẽ tạo ra một dự án Modulus (lưu ý rằng bạn 
 modulus project create
 ~~~
 
-Bước tiếp theo sẽ được tạo ra một cơ sở dữ liệu MongoDB cho ứng dụng của chúng tôi. Chúng ta có thể tạo ra một cơ sở dữ liệu MongoDB với [Modulus chính nó] (http://help.modulus.io/customer/portal/articles/1647770-using-meteor-with-modulus), [Soạn] (https: //www.compose.io /) hoặc với bất kỳ nhà cung cấp đám mây MongoDB khác.
+Bước tiếp theo sẽ được tạo ra một cơ sở dữ liệu MongoDB cho ứng dụng của chúng ta. Chúng ta có thể tạo ra một cơ sở dữ liệu MongoDB với [chính Modulus] (http://help.modulus.io/customer/portal/articles/1647770-using-meteor-with-modulus), [Compose] (https: //www.compose.io /) hoặc với bất kỳ nhà cung cấp dịch vụ cloud MongoDB nào khác.
 
-Một khi chúng ta đã tạo ra cơ sở dữ liệu MongoDB của chúng tôi, chúng tôi có thể nhận được các `MONGO_URL` cho cơ sở dữ liệu của chúng tôi từ giao diện người dùng web Modulus '(đi vào Bảng điều khiển> Cơ sở dữ liệu> Chọn cơ sở dữ liệu của bạn> Quản trị), sau đó sử dụng nó để cấu hình ứng dụng của chúng tôi như vậy:
+Một khi đã tạo ra cơ sở dữ liệu MongoDB, chúng ta có thể nhận được `MONGO_URL` cho cơ sở dữ liệu từ giao diện người dùng web Modulus '(đi vào Bảng điều khiển> Cơ sở dữ liệu> Chọn cơ sở dữ liệu của bạn> Quản trị), sau đó sử dụng nó để cấu hình ứng dụng như vậy:
 
 ~~~bash
 modulus env set MONGO_URL "mongodb://<user>:<pass>@mongo.onmodulus.net:27017/<database_name>"
@@ -86,11 +86,11 @@ Mặc dù giải pháp cloud xuất hiện hàng ngày, chúng thường xuất 
 
 [Meteor Up](https://github.com/arunoda/meteor-up) (hoặc nói ngắn gọn `mup`) là một giải pháp khác, được đi kèm với tiện ích dòng lệnh giúp cho việc thiết lập và triển khai dễ dàng hơn. Vì vậy hãy cùng xem làm thế nào để triển khai Microscope với Meteor Up.
 
-Trước hết, chúng ta cần một server để push dữ liệu lên. Chúng tôi khuyến khích dùng [Digital Ocean](http://digitalocean.com) mà có thể bắt đầu với chỉ $5 một tháng, hoặc [AWS](http://aws.amazon.com/), thứ có thể bắt đầu hoàn toàn miễn phí (bạn sẽ sớm gặp phải những vấn đề về việc mở rộng, nhưng đủ để bạn tìm hiểu sơ qua với Meteor Up).
+Trước hết, chúng ta cần một server để push dữ liệu lên. Chúng tôi khuyến khích dùng [Digital Ocean](http://digitalocean.com) là dịch vụ có thể bắt đầu với chỉ $5 một tháng, hoặc [AWS](http://aws.amazon.com/), dịch vụ có thể bắt đầu hoàn toàn miễn phí (bạn sẽ sớm gặp phải những vấn đề về việc mở rộng, nhưng đủ để bạn tìm hiểu sơ qua với Meteor Up).
 
 Dù cho bạn chọn server nào, bạn sẽ đi đến ba thứ: địa chỉ IP cho server, tài khoản đăng nhập (thường là `root` hoặc `ubuntu`), và mật khẩu. Hãy giữ cho chúng được bảo mật, vì bạn sẽ cần dùng đến sớm thôi!
 
-### khởi tạo Meteor Up
+### Khởi tạo Meteor Up
 
 Để bắt đầu, chúng ta cần phải cài đặt Meteor Up qua `npm` như sau:
 
@@ -112,7 +112,7 @@ mup init
 
 <% note do %>
 
-### Chia sẻ với Dropbox
+### Chia sẻ qua Dropbox
 
 Cách tốt nhất để chắc chắn rằng bạn và nhóm của bạn cùng dùng chung thiết lập cho việc triển khai là tạo thư mục thiết lập Meteor Up bên trong Dropbox hoặc một dịch vụ tương tự.
 
@@ -151,15 +151,15 @@ Bước tiếp theo là thiết lập file `mup.json`. Sau đây là file `mup.j
 ~~~
 <%= caption "mup.json" %>
 
-Hãy xem xét từng bước của thiết lập ở trên.
+Hãy xem xét từng bước thiết lập ở trên.
 
-** Authentication Server **
+**Authentication Server**
 
 Bạn sẽ nhận thấy rằng Meteor Up hỗ trợ xác thực dựa trên mật khẩu và xác thực dựa trên khoá mật (PEM), vì vậy nó có thể được sử dụng với hầu hết các nhà cung cấp điện toán đám mây.
 
 **Lưu ý quan trọng**: nếu bạn chọn để sử dụng xác thực dựa trên mật khẩu, trước hết hãy chắc chắn rằng bạn đã cài đặt `sshpass` ([tham khảo hướng dẫn này] (https://gist.github.com/arunoda/7790979)).
 
-** Cấu hình MongoDB **
+**Cấu hình MongoDB**
 
 Bước tiếp theo là cấu hình cơ sở dữ liệu MongoDB cho ứng dụng của bạn. Chúng tôi khuyên bạn nên sử dụng [Compose] (https://www.compose.io) hoặc bất kỳ nhà cung cấp dịch vụ đám mây MongoDB nào khác, vì họ cung cấp hỗ trợ chuyên nghiệp và các công cụ quản lý tốt hơn.
 
@@ -167,7 +167,7 @@ Nếu bạn đã quyết định sử dụng Compose, thiết lập `setupMongo`
 
 **Đường dẫn ứng dụng Meteor**
 
-Vì cuấ hình Meteor Up của chúng ta nằm trong một thư mục khác, chúng ta sẽ cần phải trỏ Meteor Up trở lại ứng dụng của chúng ta bằng việc sử dụng thuộc tính `app`. Chỉ cần nhập vào đường dẫn local đầy đủ , mà bạn có thể nhận được bằng cách sử dụng lệnh `pwd` từ terminal khi đã nằm bên trong thư mục của ứng dụng.
+Vì cấu hình Meteor Up của chúng ta nằm trong một thư mục khác, chúng ta sẽ cần phải trỏ Meteor Up trở lại ứng dụng của chúng ta bằng việc sử dụng thuộc tính `app`. Chỉ cần nhập vào đường dẫn local đầy đủ, mà bạn có thể nhận được bằng cách sử dụng lệnh `pwd` từ terminal khi đã nằm bên trong thư mục của ứng dụng.
 
 **Biến môi trường**
 
