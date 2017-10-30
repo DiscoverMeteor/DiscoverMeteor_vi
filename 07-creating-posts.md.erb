@@ -94,7 +94,7 @@ Thiết lập route nghĩa là nếu người dùng truy cập vào URL `/submit
 
 Chú ý: có rất nhiều markup ở đây, tuy nhiên nó đơn giản tới từ Twitter Bootstrap. Trong khi chỉ có thành phần form là cần thiết, tất cả markup khác giúp ứng dụng của chúng ta trông đẹp mắt hơn. Hiển thị trông sẽ giống như sau:
 
-<%= screenshot "7-1", "The post submit form" %>
+<%= screenshot "7-1", "Form đăng bài viết" %>
 
 ////
 
@@ -119,7 +119,7 @@ Template.postSubmit.events({
 ~~~
 <%= caption "client/templates/posts/post_submit.js" %>
 
-<%= commit "7-1", "Added a submit post page and linked to it in the header." %>
+<%= commit "7-1", "Tạo trang submit bài viết và link nó vào header." %>
 
 Hàm này sử dụng [jQuery](http://jquery.com) để phân tách giá trị (value) của nhiều trường trong form của chúng ta, và tạo ra một object post mới từ kết quả phân tách. Chúng ta cần chắc chắn là chúng ta `preventDefault` trên tham số `event` của handler để chắc chắn là trình duyệt không tự ý submit form.
 
@@ -161,7 +161,7 @@ Posts.allow({
 <%= caption "lib/collections/posts.js" %>
 <%= highlight "3~8" %>
 
-<%= commit "7-2", "Removed insecure, and allowed certain writes to posts." %>
+<%= commit "7-2", "Xoá phần không bảo mật, và thêm vào bài viết." %>
 
 Chúng ta gọi `Posts.allow`, báo cho Meteor biết là "đây là một hoàn cảnh mà client được phép thực hiện thao tác tới collection `Posts`". Trong trường hợp này, chúng ta bảo rằng "client được phép chèn bài viết miễn là nó có `userId`".
 
@@ -169,7 +169,7 @@ Chúng ta gọi `Posts.allow`, báo cho Meteor biết là "đây là một hoàn
 
 Chúng ta vừa thành công trong việc chắc chắn rằng bạn cần phải log in để tạo bài viết. Thử log out và tạo một bài viết; bạn sẽ thấy như sau trên console:
 
-<%= screenshot "7-2", "Insert failed: Access denied " %>
+<%= screenshot "7-2", "Insert thất bại: không có quyền truy cập" %>
 
 Tuy nhiên, chúng ta vẫn phải đổi mặt với một vài vấn đề:
 
@@ -285,7 +285,7 @@ Cách dễ dàng nhất để tránh người dùng do nhầm lẫn mà cố g�
 <%= caption "client/templates/includes/header.html" %>
 <%= highlight "3~5" %>
 
-<%= commit "7-5", "Only show submit post link if logged in." %>
+<%= commit "7-5", "Chỉ hiển thị link submit bài viết nếu đang đăng nhập." %>
 
 helper `currentUser` được cung cấp cho chúng ta bằng gói `accounts` và là Spacebars tương ứng với `Meteor.user()`. Vì nó tương tác ngược, đường dẫn sẽ xuất hiện hoặc biến mất khi bạn log in và log out.
 
@@ -377,7 +377,7 @@ Meteor.methods({
 
 ////
 
-<%= commit "7-6", "Use a method to submit the post." %>
+<%= commit "7-6", "Dùng method để submit bài viết." %>
 
 <% note do %>
 
@@ -477,7 +477,7 @@ Template.postsList.helpers({
 <%= caption "client/templates/posts/posts_list.js" %>
 <%= highlight "3" %>
 
-<%= commit "7-8", "Sort posts by submitted timestamp." %>
+<%= commit "7-8", "Sắp xếp bài viết theo thời gian submit." %>
 
 Chúng ta đã làm việc nhiều một chút, nhưng cuối cùng có được một giao diện để người dùng nhập nội  vào ứng dụng một cách an toàn!
 
