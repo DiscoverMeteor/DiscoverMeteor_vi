@@ -13,7 +13,7 @@ Chúng tôi muốn các trang này có thể được truy cập thông qua mộ
  
 Điều này có nghĩa chúng tôi sẽ cần một loại định tuyến *routing* để nhìn vào những gì bên trong thanh URL của trình duyệt và hiển thị đúng nội dung phù hợp.
 
-### Thêm Iron Router Package
+### Thêm gói Iron Router
 
 [Iron Router](https://github.com/EventedMind/iron-router) là một gói phần mềm routing được hình thành cụ thể cho các ứng dụng Meteor.
  
@@ -148,7 +148,7 @@ Chúng ta muốn liên kết tại trang chủ trỏ về danh sách các bài v
 
 <%= commit "5-1", "Very basic routing." %>
 
-### Waiting On Data
+### Chờ dữ liệu
 
 Nếu bạn triển khai các phiên bản hiện tại của ứng dụng (hoặc khởi động các ví dụ web bằng cách sử dụng liên kết ở trên), bạn sẽ nhận thấy danh sách xuất hiện trống trong một vài phút trước khi bài viết xuất hiện. Nguyên nhân là bởi vì khi tải trang đầu tiên, không có bài viết để hiển thị cho tới khi các thuê bao 'posts` hoàn thành việc lấy dữ liệu từ máy chủ.
  
@@ -173,7 +173,7 @@ Những gì chúng ta đang nói đến ở đây là đối với *mỗi* route
  
 Sự khác biệt chính giữa điều này và những gì chúng ta đã có trước đó (khi các thuê bao nằm trong `main.js`, mà bây giờ đã trống rỗng và có thể được gỡ bỏ), là bây giờ Iron Router biết khi nào route sẵn sàng - đó là khi các route có dữ liệu nó cần xử lý.
 
-### Get A Load Of This
+### Lưu ý
 
 Biết khi nào `postsList` route sẵn sàng không giúp được gì nếu chúng ta chỉ cần hiển thị một mẫu trống. Rất may, Iron Router có một giải pháp đi kèm giúp trì hoãn việc hiển thị một mẫu cho đến khi các route gọi nó đã sẵn sàng, và hiển thị một mẫu `loading` thay vì:
 
@@ -361,7 +361,7 @@ Nếu tất cả mọi thứ hoạt động đúng, thay đổi trong trang sẽ
 
 <% end %>
 
-### Post Not Found
+### Không tìm thấy bài viết
 
 Chúng ta đừng quên rằng routing hoạt động cả hai cách: nó có thể thay đổi URL khi chúng ta ghé thăm một trang, nhưng nó cũng có thể hiển thị một trang mới khi chúng ta thay đổi URL. Vì vậy, chúng ta cần phải tìm ra những gì sẽ xảy ra nếu ai đó nhập *sai* URL.
  
@@ -410,11 +410,11 @@ Router.onBeforeAction('dataNotFound', {only: 'postPage'});
 
 Như vậy Iron Router sẽ biết hiển thị các trang "không tìm thấy" không chỉ cho các route không hợp lệ mà còn cho các route `postPage`, bất cứ khi nào các hàm `data` trả về một đối tượng "falsy" (ví dụ ` null`, `false`,` undefined` , hoặc rỗng).
 
-<%= commit "5-4", "Added not found template." %>
+<%= commit "5-4", "Thêm template không tìm thấy." %>
 
 <% note do %>
 
-### Tại sao lại gọi là "Iron Router" (sắt)?
+### Tại sao lại gọi là "Iron Router"?
  
 Bạn có thể đang thắc mắc về câu chuyện đằng sau cái tên "Iron Router". Theo tác giả Chris Mather, nó xuất phát từ thực tế rằng thiên thạch(meteor) được cấu tạo chủ yếu từ sắt.
 
